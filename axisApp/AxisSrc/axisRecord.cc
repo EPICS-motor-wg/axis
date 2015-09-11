@@ -837,15 +837,12 @@ static long postProcess(axisRecord * pmr)
     {
         if (fabs(pmr->bdst) >=  fabs(pmr->mres))
         {
-            msta_field msta;
-
             /* First part of jog done. Do backlash correction. */
             double vbase = pmr->vbas / fabs(pmr->mres);
             double vel = pmr->velo / fabs(pmr->mres);
             double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
 
             /* Use if encoder or ReadbackLink is in use. */
-            msta.All = pmr->msta;
             bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
             double relpos = pmr->diff / pmr->mres;
             double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
@@ -906,8 +903,6 @@ static long postProcess(axisRecord * pmr)
     }
     else if (pmr->mip & MIP_JOG_BL1)
     {
-        msta_field msta;
-        
         /* First part of jog done. Do backlash correction. */
         double bvel = pmr->bvel / fabs(pmr->mres);
         double vbase = pmr->vbas / fabs(pmr->mres);
@@ -915,7 +910,6 @@ static long postProcess(axisRecord * pmr)
         double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
 
         /* Use if encoder or ReadbackLink is in use. */
-        msta.All = pmr->msta;
         bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
         double relpos = pmr->diff / pmr->mres;
         double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
@@ -2161,8 +2155,6 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
             double rbdst1 = 1.0 + (fabs(pmr->bdst) / fabs(pmr->mres));
             long rdbdpos = NINT(pmr->rdbd / fabs(pmr->mres)); /* retry deadband steps */
             long rpos, npos;
-            msta_field msta;
-            msta.All = pmr->msta;
 
             /*** Use if encoder or ReadbackLink is in use. ***/
             if (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip))
@@ -3267,22 +3259,21 @@ static long get_alarm_double(const DBADDR  *paddr, struct dbr_alDouble * pad)
 static void alarm_sub(axisRecord * pmr)
 {
     msta_field msta;
-    int status;
 
     if (pmr->udf == TRUE)
     {
-        status = recGblSetSevr((dbCommon *) pmr, UDF_ALARM, INVALID_ALARM);
+        recGblSetSevr((dbCommon *) pmr, UDF_ALARM, INVALID_ALARM);
         return;
     }
     /* limit-switch and soft-limit violations */
     if (pmr->hlsv && (pmr->hls || (pmr->dval > pmr->dhlm)))
     {
-        status = recGblSetSevr((dbCommon *) pmr, HIGH_ALARM, pmr->hlsv);
+        recGblSetSevr((dbCommon *) pmr, HIGH_ALARM, pmr->hlsv);
         return;
     }
     if (pmr->hlsv && (pmr->lls || (pmr->dval < pmr->dllm)))
     {
-        status = recGblSetSevr((dbCommon *) pmr, LOW_ALARM, pmr->hlsv);
+        recGblSetSevr((dbCommon *) pmr, LOW_ALARM, pmr->hlsv);
         return;
     }
     
@@ -3293,12 +3284,12 @@ static void alarm_sub(axisRecord * pmr)
         msta.Bits.CNTRL_COMM_ERR =  0;
         pmr->msta = msta.All;
         MARK(M_MSTA);
-        status = recGblSetSevr((dbCommon *) pmr, COMM_ALARM, INVALID_ALARM);
+        recGblSetSevr((dbCommon *) pmr, COMM_ALARM, INVALID_ALARM);
     }
 
     if ((msta.Bits.EA_SLIP_STALL != 0) || (msta.Bits.RA_PROBLEM != 0))
     {
-      status = recGblSetSevr((dbCommon *) pmr, STATE_ALARM, MAJOR_ALARM);
+      recGblSetSevr((dbCommon *) pmr, STATE_ALARM, MAJOR_ALARM);
     }
 
     return;
@@ -4052,11 +4043,9 @@ USAGE... Synchronize target positions with readbacks.
 static void syncTargetPosition(axisRecord *pmr)
 {
     int dir = (pmr->dir == motorDIR_Pos) ? 1 : -1;
-    msta_field msta;
     double rdblvalue;
     long rtnstat;
 
-    msta.All = pmr->msta;
 
     if (pmr->ueip)
     {
