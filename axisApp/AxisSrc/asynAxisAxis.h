@@ -84,5 +84,8 @@ class epicsShareClass asynAxisAxis {
   friend class asynAxisController;
 };
 
+#define asynMotorController asynAxisController 
+#define asynMotorAxis asynAxis
+
 #endif /* _cplusplus */
 #endif /* asynAxisAxis_H */
