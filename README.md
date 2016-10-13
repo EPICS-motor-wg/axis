@@ -1,9 +1,10 @@
-# motor
-APS BCDA synApps module: motor
+# axis
 
-For more information, see:
-*  [main page](http://htmlpreview.github.io/?https://github.com/epics-modules/motor/blob/master/documentation/motor.html)
-*  [motor wiki](https://github.com/epics-modules/motor/wiki)
-*  http://www.aps.anl.gov/bcda/synApps
+EPICS module: axis
 
-converted from APS SVN repository: Fri Oct 16 12:31:41 CDT 2015
+Currently this is a fork of the motorRecord, with the goal to do
+further development, cleanup and API extensions.
+The baseline is after R6-9 and after the conversion from svn to Git.
+
+
+https://github.com/epics-modules/motor/commit/60a2298b225583f5fa6a6576f7088bb9db661e16
