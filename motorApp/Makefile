@@ -24,9 +24,6 @@ NewportSrc_DEPEND_DIRS = AxisSrc
 DIRS += PIGCS2Src
 PIGCS2Src_DEPEND_DIRS = AxisSrc
 
-#DIRS += AcsTech80Src
-#AcsTech80Src_DEPEND_DIRS = AxisSrc
-
 #DIRS += OrielSrc
 #OrielSrc_DEPEND_DIRS = AxisSrc
 
