@@ -24,9 +24,6 @@ NewportSrc_DEPEND_DIRS = AxisSrc
 DIRS += PIGCS2Src
 PIGCS2Src_DEPEND_DIRS = AxisSrc
 
-#DIRS += PiJenaSrc
-#PiJenaSrc_DEPEND_DIRS = AxisSrc
-
 #DIRS += KohzuSrc
 #KohzuSrc_DEPEND_DIRS = AxisSrc
 
