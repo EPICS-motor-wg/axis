@@ -9,9 +9,6 @@ DIRS += AxisSrc
 # Select/deselect individual device driver modules by removing/adding a
 # "#" comment.
 
-#DIRS += SoftAxisSrc
-#SoftAxisSrc_DEPEND_DIRS = AxisSrc
-
 # All the following modules require ASYN.
 ifdef ASYN
 
