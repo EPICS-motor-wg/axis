@@ -27,9 +27,6 @@ PIGCS2Src_DEPEND_DIRS = AxisSrc
 DIRS += AttocubeSrc
 AttocubeSrc_DEPEND_DIRS = AxisSrc
 
-#DIRS += AerotechSrc
-#AerotechSrc_DEPEND_DIRS = AxisSrc
-
 # The Hytec support requires ipac
 ifdef IPAC
 DIRS += HytecSrc
