@@ -24,9 +24,6 @@ NewportSrc_DEPEND_DIRS = AxisSrc
 DIRS += PIGCS2Src
 PIGCS2Src_DEPEND_DIRS = AxisSrc
 
-#DIRS += PC6KSrc
-#PC6KSrc_DEPEND_DIRS = AxisSrc
-
 #DIRS += NewFocusSrc
 #NewFocusSrc_DEPEND_DIRS = AxisSrc
 
