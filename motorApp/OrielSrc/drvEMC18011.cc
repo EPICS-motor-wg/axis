@@ -43,7 +43,7 @@ USAGE...	Motor record driver level support for Spectra-Physics
 #include <stdio.h>
 #include <epicsThread.h>
 #include <drvSup.h>
-#include "motor.h"
+#include "axis.h"
 #include "OrielRegister.h"
 #include "drvEMC18011.h"
 #include "asynOctetSyncIO.h"

@@ -45,8 +45,8 @@ USAGE...        Motor record driver level support for Kohzu SC800
 #include <epicsThread.h>
 #include <drvSup.h>
 #include <iocsh.h>
-#include "motor.h"
-#include "motorRecord.h"
+#include "axis.h"
+#include "axisRecord.h"
 #include "drvSC800.h"
 #include "asynOctetSyncIO.h"
 #include "epicsExport.h"

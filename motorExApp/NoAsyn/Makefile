@@ -15,7 +15,7 @@ PROD_IOC_DEFAULT = NoAsyn
 PROD_IOC_vxWorks = NoAsynVx
 
 COMMONDBDS  = base.dbd
-COMMONDBDS += motorRecord.dbd
+COMMONDBDS += axisRecord.dbd
 COMMONDBDS += devSoftMotor.dbd
 #!COMMONDBDS += devMXmotor.dbd
 

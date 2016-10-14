@@ -1,4 +1,4 @@
-# FILENAME...   motorRecord.dbd
+# FILENAME...   axisRecord.dbd
 
 
 # Experimental Physics and Industrial Control System (EPICS)
@@ -71,7 +71,7 @@ menu(motorRMOD) {
 
 include "menuOmsl.dbd"
 
-recordtype(motor) {
+recordtype(axis) {
         include "dbCommon.dbd" 
         field(VERS,DBF_FLOAT) {
                 prompt("Code Version")

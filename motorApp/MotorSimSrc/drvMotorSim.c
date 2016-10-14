@@ -42,7 +42,7 @@ USAGE...	Simulated Motor Support.
 #include "drvSup.h"
 #include "epicsExport.h"
 #define DEFINE_MOTOR_PROTOTYPES 1
-#include "motor_interface.h"
+#include "axis_interface.h"
 
 #include "route.h"
 
@@ -78,7 +78,7 @@ typedef struct drvSim * DRVSIM_ID;
 typedef struct drvSim
 {
   AXIS_HDL pFirst;
-  epicsThreadId motorThread;
+  epicsThreadId axisThread;
   motorAxisLogFunc print;
   void * logParam;
   epicsTimeStamp now;
@@ -785,14 +785,14 @@ void motorSimCreate( int card, int axis, int lowLimit, int hiLimit, int home, in
 	 "Creating motor simulator: card: %d, axis: %d, hi: %d, low %d, home: %d, ncards: %d, naxis: %d",
 	 card, axis, hiLimit, lowLimit, home, nCards, nAxes );
 
-  if (drv.motorThread==NULL)
+  if (drv.axisThread==NULL)
     {
-      drv.motorThread = epicsThreadCreate( "motorSimThread", 
+      drv.axisThread = epicsThreadCreate( "motorSimThread", 
 					   epicsThreadPriorityLow,
 					   epicsThreadGetStackSize(epicsThreadStackMedium),
 					   (EPICSTHREADFUNC) motorSimTask, (void *) &drv );
 
-      if (drv.motorThread == NULL)
+      if (drv.axisThread == NULL)
 	{
 	  drv.print( drv.logParam, TRACE_ERROR, "Cannot start motor simulation thread" );
 	  return;

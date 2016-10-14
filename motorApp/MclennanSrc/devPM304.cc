@@ -25,8 +25,8 @@
 
 
 #include 	<string.h>
-#include        "motorRecord.h"
-#include        "motor.h"
+#include        "axisRecord.h"
+#include        "axis.h"
 #include        "motordevCom.h"
 #include        "drvPM304.h"
 #include 	"epicsExport.h"

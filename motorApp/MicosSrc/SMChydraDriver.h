@@ -4,15 +4,15 @@ USAGE...      Motor driver support for the Micos SMC hydra controller.
 
 */
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 #define MAX_SMCHYDRA_AXES 2
 
 // No controller-specific parameters yet
 #define NUM_SMCHYDRA_PARAMS 0  
 
-class epicsShareClass SMChydraAxis : public asynMotorAxis
+class epicsShareClass SMChydraAxis : public asynAxisAxis
 {
 public:
   /* These are the methods we override from the base class */
@@ -27,7 +27,7 @@ public:
   asynStatus setClosedLoop(bool closedLoop);
 
 private:
-  SMChydraController *pC_;          /* Pointer to the asynMotorController to which this axis belongs.
+  SMChydraController *pC_;          /* Pointer to the asynAxisController to which this axis belongs.
                                       Abbreviated because it is used very frequently */
   asynStatus sendAccelAndVelocity(double accel, double velocity);
   int motorForm_;
@@ -44,7 +44,7 @@ private:
 friend class SMChydraController;
 };
 
-class epicsShareClass SMChydraController : public asynMotorController {
+class epicsShareClass SMChydraController : public asynAxisController {
 public:
   SMChydraController(const char *portName, const char *SMChydraPortName, int numAxes, double movingPollPeriod, double idlePollPeriod);
 

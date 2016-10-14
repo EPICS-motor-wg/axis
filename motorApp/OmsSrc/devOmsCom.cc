@@ -79,8 +79,8 @@ USAGE...        Data and functions common to all OMS device level support.
 #include <epicsString.h>
 #include <dbAccess.h>
 
-#include "motorRecord.h"
-#include "motor.h"
+#include "axisRecord.h"
+#include "axis.h"
 #include "motordevCom.h"
 #include "devOmsCom.h"
 #include "drvMAXv.h"
@@ -88,14 +88,14 @@ USAGE...        Data and functions common to all OMS device level support.
 
 /* WARNING... The following is a COPY of a motorRecord.cc definition.
    If device support uses MIP definitions, then they should be moved
-   from motorRecord.cc to motor.h. In addition, for device support to
+   from motorRecord.cc to axis.h. In addition, for device support to
    fully use MIP (e.g. correct accleration on STOP command), device
    support needs record support to implement previous MIP (PMIP). */
 #define MIP_JOG_STOP    0x2000  /* Stop jogging. */
 
 /*
 Command set used by record support.  WARNING! this must match "motor_cmnd" in
-motor.h
+axis.h
 */
 
 struct motor_table

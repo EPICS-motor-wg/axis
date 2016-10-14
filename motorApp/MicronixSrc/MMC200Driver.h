@@ -7,15 +7,15 @@ July 10, 2013
 
 */
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 #define MAX_MMC200_AXES 99
 
 // No controller-specific parameters yet
 #define NUM_MMC200_PARAMS 0  
 
-class MMC200Axis : public asynMotorAxis
+class MMC200Axis : public asynAxisAxis
 {
 public:
   /* These are the methods we override from the base class */
@@ -30,7 +30,7 @@ public:
   asynStatus setClosedLoop(bool closedLoop);
 
 private:
-  MMC200Controller *pC_;          /**< Pointer to the asynMotorController to which this axis belongs.
+  MMC200Controller *pC_;          /**< Pointer to the asynAxisController to which this axis belongs.
                                    *   Abbreviated because it is used very frequently */
   int axisIndex_;    /* Numbered from 1 */
   char versionStr_[256];  /* Version string */
@@ -44,7 +44,7 @@ private:
 friend class MMC200Controller;
 };
 
-class MMC200Controller : public asynMotorController {
+class MMC200Controller : public asynAxisController {
 public:
   MMC200Controller(const char *portName, const char *MMC200PortName, int numAxes, double movingPollPeriod, double idlePollPeriod, int ignoreLimits);
 

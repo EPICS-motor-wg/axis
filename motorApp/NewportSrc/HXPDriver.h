@@ -4,8 +4,8 @@ USAGE...      Motor driver support for the Newport Hexapod controller.
 
 */
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 #define MAX_HXP_AXES 6
 #define HXP_POLL_TIMEOUT 2.0
@@ -52,7 +52,7 @@ USAGE...      Motor driver support for the Newport Hexapod controller.
 #define HXPCoordSysSetWString		    "HXP_COORD_SYS_SET_W"
 
 
-class epicsShareClass HXPAxis : public asynMotorAxis
+class epicsShareClass HXPAxis : public asynAxisAxis
 {
 public:
   /* These are the methods we override from the base class */
@@ -65,7 +65,7 @@ public:
   asynStatus setClosedLoop(bool closedLoop);
 
 private:
-  HXPController *pC_;          /* Pointer to the asynMotorController to which this axis belongs.
+  HXPController *pC_;          /* Pointer to the asynAxisController to which this axis belongs.
                                       Abbreviated because it is used very frequently */
   int moveSocket_;
   int pollSocket_;
@@ -82,11 +82,11 @@ private:
 friend class HXPController;
 };
 
-class epicsShareClass HXPController : public asynMotorController {
+class epicsShareClass HXPController : public asynAxisController {
 public:
   HXPController(const char *portName, const char *HXPPortName, int numAxes, double movingPollPeriod, double idlePollPeriod);
 
-  /* These are the methods that we override from asynMotorDriver */
+  /* These are the methods that we override from asynAxisAxisDriver */
   asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value); /* needed for implementation of moveAll */
   void report(FILE *fp, int level);
   HXPAxis* getAxis(asynUser *pasynUser);

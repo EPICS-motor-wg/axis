@@ -89,7 +89,7 @@ USAGE...    Motor record asyn driver level support for Newport MM4000.
 #include "drvSup.h"
 #include "epicsExport.h"
 #define DEFINE_MOTOR_PROTOTYPES 1
-#include "motor_interface.h"
+#include "axis_interface.h"
 
 motorAxisDrvSET_t motorMM4000 =
 {
@@ -154,7 +154,7 @@ typedef struct motorAxisHandle
 typedef struct
 {
     AXIS_HDL pFirst;
-    epicsThreadId motorThread;
+    epicsThreadId axisThread;
     motorAxisLogFunc print;
     void *logParam;
     epicsTimeStamp now;

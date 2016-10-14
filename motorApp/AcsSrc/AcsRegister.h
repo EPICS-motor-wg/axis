@@ -33,7 +33,7 @@ USAGE... This file contains function prototypes for ACS IOC shell commands.
  * -----------------
  */
 
-#include "motor.h"
+#include "axis.h"
 #include "motordrvCom.h"
 
 /* Function prototypes. */

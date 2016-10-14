@@ -7,8 +7,8 @@ Cosylab d.d. 2014
 
 */
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 
 //Number of controller specific parameters
@@ -81,7 +81,7 @@ enum homingType{
 };
 
 
-class phytronAxis : public asynMotorAxis
+class phytronAxis : public asynAxisAxis
 {
 public:
   /* These are the methods we override from the base class */
@@ -100,7 +100,7 @@ public:
   float axisModuleNo_; //Used by sprintf to form commands
 
 private:
-  phytronController *pC_;          /**< Pointer to the asynMotorController to which this axis belongs.
+  phytronController *pC_;          /**< Pointer to the asynAxisController to which this axis belongs.
                                    *   Abbreviated because it is used very frequently */
 
   phytronStatus setVelocity(double minVelocity, double maxVelocity, int moveType);
@@ -111,7 +111,7 @@ private:
 friend class phytronController;
 };
 
-class phytronController : public asynMotorController {
+class phytronController : public asynAxisController {
 public:
   phytronController(const char *portName, const char *phytronPortName, double movingPollPeriod, double idlePollPeriod, double timeout);
   asynStatus readInt32(asynUser *pasynUser, epicsInt32 *value);

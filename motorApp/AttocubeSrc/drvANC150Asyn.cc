@@ -71,7 +71,7 @@ USAGE...        asyn motor driver support for attocube systems AG ANC150
 #include "drvSup.h"
 #include "asynOctetSyncIO.h"
 #define DEFINE_MOTOR_PROTOTYPES 1
-#include "motor_interface.h"
+#include "axis_interface.h"
 #include "paramLib.h"
 #include "epicsExport.h"
 
@@ -139,7 +139,7 @@ typedef struct motorAxisHandle
 typedef struct
 {
     AXIS_HDL pFirst;
-    epicsThreadId motorThread;
+    epicsThreadId axisThread;
     motorAxisLogFunc print;
     void *logParam;
     epicsTimeStamp now;

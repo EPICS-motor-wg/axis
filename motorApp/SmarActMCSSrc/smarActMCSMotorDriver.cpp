@@ -8,8 +8,8 @@
 #include <iocsh.h>
 
 #include <asynOctetSyncIO.h>
-#include <asynMotorController.h>
-#include <asynMotorAxis.h>
+#include <asynAxisController.h>
+#include <asynAxisAxis.h>
 #include <smarActMCSMotorDriver.h>
 #include <errlog.h>
 
@@ -154,7 +154,7 @@ char cmd[10];
 }
 
 SmarActMCSController::SmarActMCSController(const char *portName, const char *IOPortName, int numAxes, double movingPollPeriod, double idlePollPeriod)
-	: asynMotorController(portName, numAxes,
+	: asynAxisController(portName, numAxes,
 	                      0, // parameters
 	                      0, // interface mask
 	                      0, // interrupt mask
@@ -167,7 +167,7 @@ asynStatus       status;
 char             junk[100];
 size_t           got_junk;
 int              eomReason;
-pAxes_ = (SmarActMCSAxis **)(asynMotorController::pAxes_);
+pAxes_ = (SmarActMCSAxis **)(asynAxisController::pAxes_);
 
 	status = pasynOctetSyncIO->connect(IOPortName, 0, &asynUserMot_p_, NULL);
 	if ( status ) {
@@ -263,7 +263,7 @@ int val;
 }
 
 SmarActMCSAxis::SmarActMCSAxis(class SmarActMCSController *cnt_p, int axis, int channel)
-	: asynMotorAxis(cnt_p, axis), c_p_(cnt_p)
+	: asynAxisAxis(cnt_p, axis), c_p_(cnt_p)
 {
 	int val;
 	int angle;
@@ -727,7 +727,7 @@ void *rval = 0;
 
 SmarActMCSController *pC;
 SmarActMCSAxis *pAxis;
-asynMotorAxis *pAsynAxis;
+asynAxisAxis *pAsynAxis;
 
 	// the asyn stuff doesn't seem to be prepared for exceptions. I get segfaults
 	// if constructing a controller (or axis) incurs an exception even if its

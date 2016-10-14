@@ -31,7 +31,7 @@ Based on drvMotorSim.c, Mark Rivers, December 13, 2009
 #include <iocsh.h>
 #include <asynOctetSyncIO.h>
 //#include <motorVersion.h>
-#include <motor_interface.h>
+#include <axis_interface.h>
 #include <ctype.h>
 
 #include "PIasynController.h"
@@ -52,7 +52,7 @@ static ELLLIST PIasynControllerList;
 static int PIasynControllerListInitialized = 0;
 
 PIasynController::PIasynController(const char *portName, const char* asynPort, int numAxes, int priority, int stackSize, int movingPollPeriod, int idlePollPeriod)
-    : asynMotorController(portName, numAxes, 10,
+    : asynAxisController(portName, numAxes, 10,
             asynInt32Mask | asynFloat64Mask,
             asynInt32Mask | asynFloat64Mask,
             ASYN_CANBLOCK | ASYN_MULTIDEVICE,
@@ -186,7 +186,7 @@ void PIasynController::report(FILE *fp, int level)
     }
 
     // Call the base class method
-    asynMotorController::report(fp, level);
+    asynAxisController::report(fp, level);
 }
 
 //PIasynAxis * PIasynController::getPIAxis(asynUser *pasynUser)
@@ -282,7 +282,7 @@ asynStatus PIasynController::writeInt32(asynUser *pasynUser, epicsInt32 value)
         this->movesDeferred = value;
     } else {
         /* Call base class call its method (if we have our parameters check this here) */
-        status = asynMotorController::writeInt32(pasynUser, value);
+        status = asynAxisController::writeInt32(pasynUser, value);
     }
     unlock();
     /* Do callbacks so higher layers see any changes */
@@ -343,17 +343,17 @@ asynStatus PIasynController::writeFloat64(asynUser *pasynUser, epicsFloat64 valu
     else if (function == motorResolution_ )
     {
         /* Call base class call its method (if we have our parameters check this here) */
-        status = asynMotorController::writeFloat64(pasynUser, value);
+        status = asynAxisController::writeFloat64(pasynUser, value);
     }
     else if (function == motorEncoderRatio_)
     {
         /* Call base class call its method (if we have our parameters check this here) */
-        status = asynMotorController::writeFloat64(pasynUser, value);
+        status = asynAxisController::writeFloat64(pasynUser, value);
     }
     else
     {
         /* Call base class call its method (if we have our parameters check this here) */
-        status = asynMotorController::writeFloat64(pasynUser, value);
+        status = asynAxisController::writeFloat64(pasynUser, value);
     }
     /* Do callbacks so higher layers see any changes */
     pAxis->callParamCallbacks();

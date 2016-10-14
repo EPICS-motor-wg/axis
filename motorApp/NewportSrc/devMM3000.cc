@@ -40,8 +40,8 @@ USAGE...	Motor record device level support for Newport MM3000.
 
 
 #include <string.h>
-#include "motorRecord.h"
-#include "motor.h"
+#include "axisRecord.h"
+#include "axis.h"
 #include "motordevCom.h"
 #include "drvMMCom.h"
 #include "epicsExport.h"
@@ -73,7 +73,7 @@ extern "C" {epicsExportAddress(dset,devMM3000);}
 /* --------------------------- program data --------------------- */
 
 /* This table is used to define the command types */
-/* WARNING! this must match "motor_cmnd" in motor.h */
+/* WARNING! this must match "motor_cmnd" in axis.h */
 
 static msg_types MM3000_table[] = {
     MOTION, 	/* MOVE_ABS */

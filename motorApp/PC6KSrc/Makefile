@@ -15,7 +15,7 @@ LIBRARY_IOC = Parker
 SRCS += ParkerRegister.cc
 SRCS += devPC6K.cc drvPC6K.cc
 
-Parker_LIBS += motor asyn
+Parker_LIBS += axis asyn
 Parker_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 include $(TOP)/configure/RULES

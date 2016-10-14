@@ -37,8 +37,8 @@ USAGE...	Motor record device level support for Physik Instrumente (PI)
 
 
 #include <string.h>
-#include "motorRecord.h"
-#include "motor.h"
+#include "axisRecord.h"
+#include "axis.h"
 #include "motordevCom.h"
 #include "drvPIJEDS.h"
 #include "epicsExport.h"
@@ -67,7 +67,7 @@ extern "C" {epicsExportAddress(dset,devPIJEDS);}
 /* --------------------------- program data --------------------- */
 
 /* This table is used to define the command types */
-/* WARNING! this must match "motor_cmnd" in motor.h */
+/* WARNING! this must match "motor_cmnd" in axis.h */
 
 static msg_types PIJEDS_table[] = {
     MOTION, 	/* MOVE_ABS */

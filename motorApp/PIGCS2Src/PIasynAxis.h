@@ -17,12 +17,12 @@ Based on drvMotorSim.c, Mark Rivers, December 13, 2009
 
 
 #include <asynDriver.h> // for asynStatus
-#include <asynMotorAxis.h>
+#include <asynAxisAxis.h>
 
 class PIasynController;
 class PIGCSController;
 
-class PIasynAxis : public asynMotorAxis
+class PIasynAxis : public asynAxisAxis
 {
 public:
     PIasynAxis(class PIasynController *pController, PIGCSController* pGCSController, int axis, const char* szName);

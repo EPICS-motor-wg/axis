@@ -1,4 +1,4 @@
-# Database for profile moves with asynMotor
+# Database for profile  moves with asynAxis
 # This is the database for the each axis, profileMoveController is the file
 # for the controller.
 #

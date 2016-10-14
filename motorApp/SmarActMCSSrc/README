@@ -7,8 +7,8 @@ Introduction
 ------------
 
 This driver supports the smarAct MCS Positioner
-by implementing subclasses of the 'asynMotorController'
-and 'asynMotorAxis' objects.
+by implementing subclasses of the 'asynAxisController'
+and 'asynAxisAxis' objects.
 
 Communication with the hardware is established via
 a 'asyn port' driver layer and it is thus possible
@@ -213,7 +213,7 @@ while moving and 1s while idle. The driver
 instance is named 'myMotor1' and can be
 addressed from a motorRecord's OUT field:
 
-  field(DTYP, "asynMotor")
+  field(DTYP, "asynAxis")
   field(OUT,  "asyn(myMotor1,0)")
 
 After creating a controller, one or more MCS axes 

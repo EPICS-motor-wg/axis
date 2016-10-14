@@ -1,6 +1,6 @@
 /*
 FILENAME...     motor.h
-USAGE...        Definitions and structures common to all levels of motorRecord
+USAGE...        Definitions and structures common to all levels of axisRecord
                 support (i.e., record, device and driver).
 
 */
@@ -208,10 +208,10 @@ typedef union
 struct motor_dset
 {
     struct dset base;
-    CALLBACK_VALUE (*update_values) (struct motorRecord *);
-    long (*start_trans) (struct motorRecord *);
-    RTN_STATUS (*build_trans) (motor_cmnd, double *, struct motorRecord *);
-    RTN_STATUS (*end_trans) (struct motorRecord *);
+    CALLBACK_VALUE (*update_values) (struct axisRecord *);
+    long (*start_trans) (struct axisRecord *);
+    RTN_STATUS (*build_trans) (motor_cmnd, double *, struct axisRecord *);
+    RTN_STATUS (*end_trans) (struct axisRecord *);
 };
 
 

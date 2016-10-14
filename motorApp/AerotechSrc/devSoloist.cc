@@ -40,8 +40,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "motorRecord.h"
-#include "motor.h"
+#include "axisRecord.h"
+#include "axis.h"
 #include "motordevCom.h"
 #include "drvSoloist.h"
 #include "epicsExport.h"
@@ -71,7 +71,7 @@ extern "C" {epicsExportAddress (dset, devSoloist);}
 
 /*
 * This table is used to define the command types
-* WARNING! this must match "motor_cmnd" in motor.h
+* WARNING! this must match "motor_cmnd" in axis.h
 */
 
 static msg_types Soloist_table[] = {

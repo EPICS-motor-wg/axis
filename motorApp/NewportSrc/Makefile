@@ -20,23 +20,23 @@ endif
 
 LIBRARY_IOC = Newport
 
-Newport_SRCS += NewportRegister.cc
+#Newport_SRCS += NewportRegister.cc
 
 # MM3000 (i.e., MM3000) device driver.
-Newport_SRCS += devMM3000.cc drvMM3000.cc
+#Newport_SRCS += devMM3000.cc drvMM3000.cc
 
 # MM4000/5 (i.e., MM4000) device driver.
-Newport_SRCS += devMM4000.cc drvMM4000.cc
-Newport_SRCS += drvMM4000Asyn.c
+#Newport_SRCS += devMM4000.cc drvMM4000.cc
+#Newport_SRCS += drvMM4000Asyn.c
 ifdef SNCSEQ
 Newport_SRCS += MM4005_trajectoryScan.st
 endif
 
 # PM500 device driver.
-Newport_SRCS += devPM500.cc  drvPM500.cc
+#Newport_SRCS += devPM500.cc  drvPM500.cc
 
 # ESP300 device driver.
-Newport_SRCS += devESP300.cc drvESP300.cc
+#Newport_SRCS += devESP300.cc drvESP300.cc
 
 # SMC100 device driver
 Newport_SRCS += SMC100Driver.cpp
@@ -73,7 +73,7 @@ Newport_SRCS += XPSGatheringRegister.c
 # Function which will run a tcl script on an XPS
 Newport_SRCS += tclCall.cc
 
-Newport_LIBS += motor asyn
+Newport_LIBS += axis asyn
 ifdef SNCSEQ
 Newport_LIBS += seq pv
 endif
@@ -82,7 +82,7 @@ Newport_SYS_LIBS_WIN32 += ws2_32
 
 PROD_IOC += XPSGatheringMain
 XPSGatheringMain_SRCS += XPSGatheringMain.c
-XPSGatheringMain_LIBS += Newport motor asyn
+XPSGatheringMain_LIBS += Newport axis asyn
 ifdef SNCSEQ
 XPSGatheringMain_LIBS += seq pv
 endif
@@ -91,7 +91,7 @@ XPSGatheringMain_SYS_LIBS_solaris += socket nsl
 
 PROD_IOC += XPSGathering2
 XPSGathering2_SRCS += XPSGathering2.c
-XPSGathering2_LIBS += Newport motor asyn
+XPSGathering2_LIBS += Newport axis asyn
 XPSGathering2_LIBS += $(EPICS_BASE_IOC_LIBS)
 XPSGathering2_SYS_LIBS_solaris += socket nsl
 

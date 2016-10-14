@@ -39,7 +39,7 @@ public:
 	virtual asynStatus setAccelerationCts( PIasynAxis* pAxis, double acceleration)	{ return asynSuccess; }
 	virtual asynStatus setAcceleration( PIasynAxis* pAxis, double acceleration)	{ return asynSuccess; }
     virtual asynStatus getStatus(PIasynAxis* pAxis, int& homing, int& moving, int& negLimit, int& posLimit, int& servoControl);
-    virtual asynStatus getGlobalState(asynMotorAxis** Axes, int numAxes);
+    virtual asynStatus getGlobalState(asynAxisAxis** Axes, int numAxes);
     virtual asynStatus getTravelLimits(PIasynAxis* pAxis, double& negLimit, double& posLimit)
     {
     	negLimit = -100;

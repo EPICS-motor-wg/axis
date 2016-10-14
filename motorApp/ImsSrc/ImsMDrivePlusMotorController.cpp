@@ -1,7 +1,7 @@
 //! @File : ImsMDrivePlusController.cpp
 //!         Motor record driver level support for Intelligent Motion Systems, Inc.
 //!         MDrivePlus series; M17, M23, M34.
-//!	      Simple implementation using "model 3" asynMotorController and asynMotorAxis base classes (derived from asynPortDriver)
+//!	      Simple implementation using "model 3" asynAxisController and asynAxisAxis base classes (derived from asynPortDriver)
 //!
 //!  Original Author : Nia Fong
 //!  Date : 11-21-2011
@@ -28,8 +28,8 @@
 #include <iocsh.h>
 #include <asynOctetSyncIO.h>
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 #include "ImsMDrivePlusMotorAxis.h"
 
 #include <epicsExport.h>
@@ -48,7 +48,7 @@
 //! @param[in] idlePollPeriod    Idle polling period in milliseconds
 ////////////////////////////////////////////////////////
 ImsMDrivePlusMotorController::ImsMDrivePlusMotorController(const char *motorPortName, const char *IOPortName, const char *devName, double movingPollPeriod, double idlePollPeriod)
-    : asynMotorController(motorPortName, NUM_AXES, NUM_IMS_PARAMS,
+    : asynAxisController(motorPortName, NUM_AXES, NUM_IMS_PARAMS,
 						  asynInt32Mask | asynFloat64Mask | asynUInt32DigitalMask,
 						  asynInt32Mask | asynFloat64Mask | asynUInt32DigitalMask,
 						  ASYN_CANBLOCK | ASYN_MULTIDEVICE,
@@ -59,8 +59,8 @@ ImsMDrivePlusMotorController::ImsMDrivePlusMotorController(const char *motorPort
 	static const char *functionName = "ImsMDrivePlusMotorController()";
 	asynStatus status;
 	ImsMDrivePlusMotorAxis *pAxis;
-	// asynMotorController constructor calloc's memory for array of axis pointers
-	pAxes_ = (ImsMDrivePlusMotorAxis **)(asynMotorController::pAxes_);
+	// asynAxisController constructor calloc's memory for array of axis pointers
+	pAxes_ = (ImsMDrivePlusMotorAxis **)(asynAxisController::pAxes_);
 
 	// copy names
 	strcpy(motorName, motorPortName);
@@ -92,7 +92,7 @@ ImsMDrivePlusMotorController::ImsMDrivePlusMotorController(const char *motorPort
 	// Create axis
 	// Assuming single axis per controller the way drvAsynIPPortConfigure( "M06", "ts-b34-nw08:2101", 0, 0 0 ) is called in st.cmd script
 	pAxis = new ImsMDrivePlusMotorAxis(this, 0);
-	pAxis = NULL;  // asynMotorController constructor tracking array of axis pointers
+	pAxis = NULL;  // asynAxisController constructor tracking array of axis pointers
 
 	// read home and limit config from S1-S4
 	readHomeAndLimitConfig();
@@ -113,7 +113,7 @@ void ImsMDrivePlusMotorController::initController(const char *devName, double mo
 {
 	strcpy(this->deviceName, devName);
 
-	// initialize asynMotorController variables
+	// initialize asynAxisController variables
 	this->numAxes_ = NUM_AXES;  // only support single axis
 	this->movingPollPeriod_ = movingPollPeriod;
 	this->idlePollPeriod_ = idlePollPeriod;
@@ -171,7 +171,7 @@ int ImsMDrivePlusMotorController::readHomeAndLimitConfig()
 
 ////////////////////////////////////////
 //! getAxis()
-//! Override asynMotorController function to return pointer to IMS axis object
+//! Override asynAxisController function to return pointer to IMS axis object
 //
 //! Returns a pointer to an ImsMDrivePlusAxis object.
 //! Returns NULL if the axis number encoded in pasynUser is invalid
@@ -188,7 +188,7 @@ ImsMDrivePlusMotorAxis* ImsMDrivePlusMotorController::getAxis(asynUser *pasynUse
 
 ////////////////////////////////////////
 //! getAxis()
-//! Override asynMotorController function to return pointer to IMS axis object
+//! Override asynAxisController function to return pointer to IMS axis object
 //
 //! Returns a pointer to an ImsMDrivePlusAxis object.
 //! Returns NULL if the axis number is invalid.
@@ -203,7 +203,7 @@ ImsMDrivePlusMotorAxis* ImsMDrivePlusMotorController::getAxis(int axisNo)
 
 ////////////////////////////////////////
 //! writeInt32()
-//! Override asynMotorController function to add hooks to IMS records
+//! Override asynAxisController function to add hooks to IMS records
 // Based on XPSController.cpp
 //
 //! param[in] pointer to asynUser object
@@ -234,7 +234,7 @@ asynStatus ImsMDrivePlusMotorController::writeInt32(asynUser *pasynUser, epicsIn
 			asynPrint(pasynUserSelf, ASYN_TRACE_ERROR, "%s:%s: ERROR, value of 1 to save to NVM\n", DRIVER_NAME, functionName);
 		}
 	} else { // call base class method to continue handling
-			status = asynMotorController::writeInt32(pasynUser, value);
+			status = asynAxisController::writeInt32(pasynUser, value);
 	}
 
 	callParamCallbacks(pAxis->axisNo_);

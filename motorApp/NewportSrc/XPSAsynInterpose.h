@@ -1,4 +1,4 @@
-#include "motor_interface.h"
+#include "axis_interface.h"
 
 typedef enum {
     minJerkTime = MOTOR_AXIS_NUM_PARAMS,

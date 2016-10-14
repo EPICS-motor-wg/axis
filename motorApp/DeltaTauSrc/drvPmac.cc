@@ -57,7 +57,7 @@ USAGE...	Driver level support for Delta Tau PMAC model.
 #include	<epicsThread.h>
 #include	<epicsInterrupt.h>
 
-#include	"motor.h"
+#include	"axis.h"
 #include	"drvPmac.h"
 #include	"epicsExport.h"
 

@@ -10,7 +10,7 @@ include $(TOP)/configure/CONFIG
 
 LIBRARY_IOC += PI_GCS2Support
 
-# motorRecord.h will be created from motorRecord.dbd
+# axisRecord.h will be created from axisRecord.dbd
 # install devMotorSoft.dbd into <top>/dbd
 DBD += PI_GCS2Support.dbd
 
@@ -28,7 +28,7 @@ PI_GCS2Support_SRCS += PIC702Controller.cpp
 PI_GCS2Support_SRCS += translateerror.c
 PI_GCS2Support_SRCS += PIInterface.cpp
 
-PI_GCS2Support_LIBS += motor
+PI_GCS2Support_LIBS += axis
 PI_GCS2Support_LIBS += asyn
 PI_GCS2Support_LIBS += $(EPICS_BASE_IOC_LIBS)
 

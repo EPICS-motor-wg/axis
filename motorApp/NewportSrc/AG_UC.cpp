@@ -18,8 +18,8 @@ April 11, 2013
 
 #include <asynOctetSyncIO.h>
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 #include <epicsExport.h>
 #include "AG_UC.h"
@@ -38,7 +38,7 @@ April 11, 2013
   */
 AG_UCController::AG_UCController(const char *portName, const char *serialPortName, int numAxes, 
                                  double movingPollPeriod, double idlePollPeriod)
-  :  asynMotorController(portName, numAxes, NUM_AG_UC_PARAMS, 
+  :  asynAxisController(portName, numAxes, NUM_AG_UC_PARAMS, 
                          0, // No additional interfaces beyond those in base class
                          0, // No additional callback interfaces beyond those in base class
                          ASYN_CANBLOCK | ASYN_MULTIDEVICE, 
@@ -187,7 +187,7 @@ asynStatus AG_UCController::setChannel(int channelID)
   * \param[in] level The level of report detail desired
   *
   * If details > 0 then information is printed about each axis.
-  * After printing controller-specific information it calls asynMotorController::report()
+  * After printing controller-specific information it calls asynAxisController::report()
   */
 void AG_UCController::report(FILE *fp, int level)
 {
@@ -197,7 +197,7 @@ void AG_UCController::report(FILE *fp, int level)
     controllerVersion_);
 
   // Call the base class method
-  asynMotorController::report(fp, level);
+  asynAxisController::report(fp, level);
 }
 
 /** Returns a pointer to an AG_UCAxis object.
@@ -205,7 +205,7 @@ void AG_UCController::report(FILE *fp, int level)
   * \param[in] pasynUser asynUser structure that encodes the axis index number. */
 AG_UCAxis* AG_UCController::getAxis(asynUser *pasynUser)
 {
-  return static_cast<AG_UCAxis*>(asynMotorController::getAxis(pasynUser));
+  return static_cast<AG_UCAxis*>(asynAxisController::getAxis(pasynUser));
 }
 
 /** Returns a pointer to an AG_UCAxis object.
@@ -213,7 +213,7 @@ AG_UCAxis* AG_UCController::getAxis(asynUser *pasynUser)
   * \param[in] axisNo Axis index number. */
 AG_UCAxis* AG_UCController::getAxis(int axisNo)
 {
-  return static_cast<AG_UCAxis*>(asynMotorController::getAxis(axisNo));
+  return static_cast<AG_UCAxis*>(asynAxisController::getAxis(axisNo));
 }
 
 
@@ -227,7 +227,7 @@ AG_UCAxis* AG_UCController::getAxis(int axisNo)
   */
 AG_UCAxis::AG_UCAxis(AG_UCController *pC, int axisNo, bool hasLimits, 
                        int forwardAmplitude, int reverseAmplitude)
-  : asynMotorAxis(pC, axisNo),
+  : asynAxisAxis(pC, axisNo),
     pC_(pC), hasLimits_(hasLimits), 
     forwardAmplitude_(forwardAmplitude), reverseAmplitude_(reverseAmplitude),
     currentPosition_(0), positionOffset_(0)
@@ -250,7 +250,7 @@ AG_UCAxis::AG_UCAxis(AG_UCController *pC, int axisNo, bool hasLimits,
   * \param[in] fp The file pointer on which report information will be written
   * \param[in] level The level of report detail desired
   *
-  * After printing device-specific information calls asynMotorAxis::report()
+  * After printing device-specific information calls asynAxisAxis::report()
   */
 void AG_UCAxis::report(FILE *fp, int level)
 {
@@ -264,7 +264,7 @@ void AG_UCAxis::report(FILE *fp, int level)
   }
 
   // Call the base class method
-  asynMotorAxis::report(fp, level);
+  asynAxisAxis::report(fp, level);
 }
 
 asynStatus AG_UCAxis::move(double position, int relative, double minVelocity, double maxVelocity, double acceleration)

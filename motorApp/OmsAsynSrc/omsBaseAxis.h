@@ -12,12 +12,12 @@ USAGE...        Pro-Dex OMS asyn motor base axes support
 #ifndef OMSBASEAXIS_H_
 #define OMSBASEAXIS_H_
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 class omsBaseController;
 
-class omsBaseAxis : public asynMotorAxis
+class omsBaseAxis : public asynAxisAxis
 {
 public:
     omsBaseAxis(class omsBaseController *, int, char );

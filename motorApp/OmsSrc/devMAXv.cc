@@ -35,7 +35,7 @@ USAGE... Device level support for OMS MAXv model.
  * .01  04-05-05 rls Copied from devOms58.cc
  */
 
-#include "motorRecord.h"
+#include "axisRecord.h"
 #include "devOmsCom.h"
 #include "epicsExport.h"
 

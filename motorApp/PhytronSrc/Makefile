@@ -13,7 +13,7 @@ phytronAxisMotor_SRCS += phytronAxisMotor.cpp
 
 INC += phytronAxisMotor.h
 
-phytronAxisMotor_LIBS += motor
+phytronAxisMotor_LIBS += axis
 phytronAxisMotor_LIBS += asyn
 phytronAxisMotor_LIBS += $(EPICS_BASE_IOC_LIBS)
 

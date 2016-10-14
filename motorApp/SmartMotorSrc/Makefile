@@ -12,7 +12,7 @@ LIBRARY_IOC = SmartMotor
 # Intelligent Motion Systems driver support.
 SRCS += devSmartMotor.cc drvSmartMotor.cc
 
-SmartMotor_LIBS += motor asyn
+SmartMotor_LIBS += axis asyn
 SmartMotor_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 include $(TOP)/configure/RULES

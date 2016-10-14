@@ -13,7 +13,7 @@ LIBRARY_IOC = Attocube
 # ANC 150 asyn motor driver.
 Attocube_SRCS += drvANC150Asyn.cc
 
-Attocube_LIBS += motor asyn
+Attocube_LIBS += axis asyn
 Attocube_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 include $(TOP)/configure/RULES

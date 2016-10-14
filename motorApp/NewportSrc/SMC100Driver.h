@@ -10,15 +10,15 @@ K. Goetze 2012-03-23
 
 */
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 #define MAX_SMC100_AXES 1
 
 // No controller-specific parameters yet
 #define NUM_SMC100_PARAMS 0  
 
-class epicsShareClass SMC100Axis : public asynMotorAxis
+class epicsShareClass SMC100Axis : public asynAxisAxis
 {
 public:
   /* These are the methods we override from the base class */
@@ -33,7 +33,7 @@ public:
   asynStatus setClosedLoop(bool closedLoop);
 
 private:
-  SMC100Controller *pC_;          /**< Pointer to the asynMotorController to which this axis belongs.
+  SMC100Controller *pC_;          /**< Pointer to the asynAxisController to which this axis belongs.
                                    *   Abbreviated because it is used very frequently */
   asynStatus sendAccelAndVelocity(double accel, double velocity);
   double stepSize_;      /**< Encoder increment value obtained with SU? command _or_ resolution, set at boot time */
@@ -42,7 +42,7 @@ private:
 friend class SMC100Controller;
 };
 
-class SMC100Controller : public asynMotorController {
+class SMC100Controller : public asynAxisController {
 public:
   SMC100Controller(const char *portName, const char *SMC100PortName, int numAxes, double movingPollPeriod, double idlePollPeriod, double stepSize);
 

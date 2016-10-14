@@ -7,15 +7,15 @@ March 1, 2012
 
 */
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 #define MAX_MCB4B_AXES 4
 
 // No controller-specific parameters yet
 #define NUM_MCB4B_PARAMS 0  
 
-class epicsShareClass MCB4BAxis : public asynMotorAxis
+class epicsShareClass MCB4BAxis : public asynAxisAxis
 {
 public:
   /* These are the methods we override from the base class */
@@ -30,14 +30,14 @@ public:
   asynStatus setClosedLoop(bool closedLoop);
 
 private:
-  MCB4BController *pC_;          /**< Pointer to the asynMotorController to which this axis belongs.
+  MCB4BController *pC_;          /**< Pointer to the asynAxisController to which this axis belongs.
                                    *   Abbreviated because it is used very frequently */
   asynStatus sendAccelAndVelocity(double accel, double velocity);
   
 friend class MCB4BController;
 };
 
-class epicsShareClass MCB4BController : public asynMotorController {
+class epicsShareClass MCB4BController : public asynAxisController {
 public:
   MCB4BController(const char *portName, const char *MCB4BPortName, int numAxes, double movingPollPeriod, double idlePollPeriod);
 

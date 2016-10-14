@@ -52,7 +52,7 @@ static vector<phytronController*> controllers;
   */
 phytronController::phytronController(const char *phytronPortName, const char *asynPortName,
                                  double movingPollPeriod, double idlePollPeriod, double timeout)
-  :  asynMotorController(phytronPortName,
+  :  asynAxisController(phytronPortName,
                          0xFF,
                          NUM_PHYTRON_PARAMS,
                          0, //No additional interfaces beyond those in base class
@@ -269,7 +269,7 @@ asynStatus phytronController::writeInt32(asynUser *pasynUser, epicsInt32 value)
   phytronStatus phyStatus;
 
   //Call base implementation first
-  asynMotorController::writeInt32(pasynUser, value);
+  asynAxisController::writeInt32(pasynUser, value);
 
   /*
    * Check if this is a call to reset the controller, else it is an axis request
@@ -425,7 +425,7 @@ void phytronController::resetAxisEncoderRatio(){
   * \param[in] level The level of report detail desired
   *
   * If details > 0 then information is printed about each axis.
-  * After printing controller-specific information it calls asynMotorController::report()
+  * After printing controller-specific information it calls asynAxisController::report()
   */
 void phytronController::report(FILE *fp, int level)
 {
@@ -433,7 +433,7 @@ void phytronController::report(FILE *fp, int level)
     this->portName, numAxes_, movingPollPeriod_, idlePollPeriod_);
 
   // Call the base class method
-  asynMotorController::report(fp, level);
+  asynAxisController::report(fp, level);
 }
 
 /** Returns a pointer to an phytronAxis object.
@@ -442,7 +442,7 @@ void phytronController::report(FILE *fp, int level)
   */
 phytronAxis* phytronController::getAxis(asynUser *pasynUser)
 {
-  return static_cast<phytronAxis*>(asynMotorController::getAxis(pasynUser));
+  return static_cast<phytronAxis*>(asynAxisController::getAxis(pasynUser));
 }
 
 /** Returns a pointer to an phytronAxis object.
@@ -451,7 +451,7 @@ phytronAxis* phytronController::getAxis(asynUser *pasynUser)
   */
 phytronAxis* phytronController::getAxis(int axisNo)
 {
-  return static_cast<phytronAxis*>(asynMotorController::getAxis(axisNo));
+  return static_cast<phytronAxis*>(asynAxisController::getAxis(axisNo));
 }
 
 /**
@@ -568,7 +568,7 @@ extern "C" int phytronCreateAxis(const char* controllerName, int module, int axi
   * Initializes register numbers, etc.
   */
 phytronAxis::phytronAxis(phytronController *pC, int axisNo)
-  : asynMotorAxis(pC, axisNo),
+  : asynAxisAxis(pC, axisNo),
     axisModuleNo_((float)axisNo/10),
     pC_(pC),
     response_len(0)
@@ -586,7 +586,7 @@ phytronAxis::phytronAxis(phytronController *pC, int axisNo)
   * \param[in] fp The file pointer on which report information will be written
   * \param[in] level The level of report detail desired
   *
-  * After printing device-specific information calls asynMotorAxis::report()
+  * After printing device-specific information calls asynAxisAxis::report()
   */
 void phytronAxis::report(FILE *fp, int level)
 {
@@ -596,7 +596,7 @@ void phytronAxis::report(FILE *fp, int level)
   }
 
   // Call the base class method
-  asynMotorAxis::report(fp, level);
+  asynAxisAxis::report(fp, level);
 }
 
 /** Sets velocity parameters before the move is executed. Controller produces a

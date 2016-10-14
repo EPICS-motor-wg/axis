@@ -37,7 +37,7 @@ USAGE... This file contains Aerotech A3200 Asyn driver "include" information.
 #ifndef DRV_MOTOR_A3200_ASYN_H
 #define DRV_MOTOR_A3200_ASYN_H
 
-#include "motor.h"
+#include "axis.h"
 
 #ifdef __cplusplus
 extern "C" {

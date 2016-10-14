@@ -15,7 +15,7 @@ LIBRARY_IOC = ThorLabs
 SRCS += ThorLabsRegister.cc
 SRCS += devMDT695.cc drvMDT695.cc
 
-ThorLabs_LIBS += motor asyn
+ThorLabs_LIBS += axis asyn
 ThorLabs_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 include $(TOP)/configure/RULES

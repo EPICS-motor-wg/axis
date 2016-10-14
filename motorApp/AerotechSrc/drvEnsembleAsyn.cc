@@ -89,7 +89,7 @@ in file LICENSE that is included with this distribution.
 
 #include "drvSup.h"
 #define DEFINE_MOTOR_PROTOTYPES 1
-#include "motor_interface.h"
+#include "axis_interface.h"
 
 #include "paramLib.h"
 #include "drvEnsembleAsyn.h"
@@ -158,7 +158,7 @@ typedef struct motorAxisHandle
 typedef struct
 {
     AXIS_HDL pFirst;
-    epicsThreadId motorThread;
+    epicsThreadId axisThread;
     motorAxisLogFunc print;
     void *logParam;
     epicsTimeStamp now;

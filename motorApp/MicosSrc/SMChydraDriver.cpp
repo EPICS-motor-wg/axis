@@ -18,8 +18,8 @@ Note: This driver was tested with the Micos SMC hydra CM and
 
 #include <asynOctetSyncIO.h>
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 #include <epicsExport.h>
 #include "SMChydraDriver.h"
@@ -35,7 +35,7 @@ Note: This driver was tested with the Micos SMC hydra CM and
   */
 SMChydraController::SMChydraController(const char *portName, const char *SMChydraPortName, int numAxes, 
                                  double movingPollPeriod, double idlePollPeriod)
-  :  asynMotorController(portName, numAxes, NUM_SMCHYDRA_PARAMS, 
+  :  asynAxisController(portName, numAxes, NUM_SMCHYDRA_PARAMS, 
                          0, // No additional interfaces beyond those in base class
                          0, // No additional callback interfaces beyond those in base class
                          ASYN_CANBLOCK | ASYN_MULTIDEVICE, 
@@ -84,7 +84,7 @@ extern "C" int SMChydraCreateController(const char *portName, const char *SMChyd
   * \param[in] level The level of report detail desired
   *
   * If details > 0 then information is printed about each axis.
-  * After printing controller-specific information it calls asynMotorController::report()
+  * After printing controller-specific information it calls asynAxisController::report()
   */
 void SMChydraController::report(FILE *fp, int level)
 {
@@ -92,7 +92,7 @@ void SMChydraController::report(FILE *fp, int level)
     this->portName, numAxes_, movingPollPeriod_, idlePollPeriod_);
 
   // Call the base class method
-  asynMotorController::report(fp, level);
+  asynAxisController::report(fp, level);
 }
 
 /** Returns a pointer to an SMChydraAxis object.
@@ -100,7 +100,7 @@ void SMChydraController::report(FILE *fp, int level)
   * \param[in] pasynUser asynUser structure that encodes the axis index number. */
 SMChydraAxis* SMChydraController::getAxis(asynUser *pasynUser)
 {
-  return static_cast<SMChydraAxis*>(asynMotorController::getAxis(pasynUser));
+  return static_cast<SMChydraAxis*>(asynAxisController::getAxis(pasynUser));
 }
 
 /** Returns a pointer to an SMChydraAxis object.
@@ -108,7 +108,7 @@ SMChydraAxis* SMChydraController::getAxis(asynUser *pasynUser)
   * \param[in] axisNo Axis index number. */
 SMChydraAxis* SMChydraController::getAxis(int axisNo)
 {
-  return static_cast<SMChydraAxis*>(asynMotorController::getAxis(axisNo));
+  return static_cast<SMChydraAxis*>(asynAxisController::getAxis(axisNo));
 }
 
 
@@ -121,7 +121,7 @@ SMChydraAxis* SMChydraController::getAxis(int axisNo)
   * Initializes register numbers, etc.
   */
 SMChydraAxis::SMChydraAxis(SMChydraController *pC, int axisNo)
-  : asynMotorAxis(pC, axisNo),
+  : asynAxisAxis(pC, axisNo),
     pC_(pC)
 {  
   sprintf(pC_->outString_, "%i getmotor", (axisNo + 1));
@@ -174,7 +174,7 @@ SMChydraAxis::SMChydraAxis(SMChydraController *pC, int axisNo)
   * \param[in] fp The file pointer on which report information will be written
   * \param[in] level The level of report detail desired
   *
-  * After printing device-specific information calls asynMotorAxis::report()
+  * After printing device-specific information calls asynAxisAxis::report()
   */
 void SMChydraAxis::report(FILE *fp, int level)
 {
@@ -192,7 +192,7 @@ void SMChydraAxis::report(FILE *fp, int level)
   }
 
   // Call the base class method
-  asynMotorAxis::report(fp, level);
+  asynAxisAxis::report(fp, level);
 }
 
 asynStatus SMChydraAxis::sendAccelAndVelocity(double acceleration, double velocity) 

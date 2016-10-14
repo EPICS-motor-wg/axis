@@ -32,7 +32,7 @@ March 1, 2012
   */
 MCB4BController::MCB4BController(const char *portName, const char *MCB4BPortName, int numAxes, 
                                  double movingPollPeriod, double idlePollPeriod)
-  :  asynMotorController(portName, numAxes, NUM_MCB4B_PARAMS, 
+  :  asynAxisController(portName, numAxes, NUM_MCB4B_PARAMS, 
                          0, // No additional interfaces beyond those in base class
                          0, // No additional callback interfaces beyond those in base class
                          ASYN_CANBLOCK | ASYN_MULTIDEVICE, 
@@ -81,7 +81,7 @@ extern "C" int MCB4BCreateController(const char *portName, const char *MCB4BPort
   * \param[in] level The level of report detail desired
   *
   * If details > 0 then information is printed about each axis.
-  * After printing controller-specific information it calls asynMotorController::report()
+  * After printing controller-specific information it calls asynAxisController::report()
   */
 void MCB4BController::report(FILE *fp, int level)
 {
@@ -89,7 +89,7 @@ void MCB4BController::report(FILE *fp, int level)
     this->portName, numAxes_, movingPollPeriod_, idlePollPeriod_);
 
   // Call the base class method
-  asynMotorController::report(fp, level);
+  asynAxisController::report(fp, level);
 }
 
 /** Returns a pointer to an MCB4BAxis object.
@@ -97,7 +97,7 @@ void MCB4BController::report(FILE *fp, int level)
   * \param[in] pasynUser asynUser structure that encodes the axis index number. */
 MCB4BAxis* MCB4BController::getAxis(asynUser *pasynUser)
 {
-  return static_cast<MCB4BAxis*>(asynMotorController::getAxis(pasynUser));
+  return static_cast<MCB4BAxis*>(asynAxisController::getAxis(pasynUser));
 }
 
 /** Returns a pointer to an MCB4BAxis object.
@@ -105,7 +105,7 @@ MCB4BAxis* MCB4BController::getAxis(asynUser *pasynUser)
   * \param[in] axisNo Axis index number. */
 MCB4BAxis* MCB4BController::getAxis(int axisNo)
 {
-  return static_cast<MCB4BAxis*>(asynMotorController::getAxis(axisNo));
+  return static_cast<MCB4BAxis*>(asynAxisController::getAxis(axisNo));
 }
 
 
@@ -118,7 +118,7 @@ MCB4BAxis* MCB4BController::getAxis(int axisNo)
   * Initializes register numbers, etc.
   */
 MCB4BAxis::MCB4BAxis(MCB4BController *pC, int axisNo)
-  : asynMotorAxis(pC, axisNo),
+  : asynAxisAxis(pC, axisNo),
     pC_(pC)
 {  
 }
@@ -127,7 +127,7 @@ MCB4BAxis::MCB4BAxis(MCB4BController *pC, int axisNo)
   * \param[in] fp The file pointer on which report information will be written
   * \param[in] level The level of report detail desired
   *
-  * After printing device-specific information calls asynMotorAxis::report()
+  * After printing device-specific information calls asynAxisAxis::report()
   */
 void MCB4BAxis::report(FILE *fp, int level)
 {
@@ -137,7 +137,7 @@ void MCB4BAxis::report(FILE *fp, int level)
   }
 
   // Call the base class method
-  asynMotorAxis::report(fp, level);
+  asynAxisAxis::report(fp, level);
 }
 
 asynStatus MCB4BAxis::sendAccelAndVelocity(double acceleration, double velocity) 

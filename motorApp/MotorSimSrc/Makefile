@@ -10,7 +10,7 @@ include $(TOP)/configure/CONFIG
 
 LIBRARY_IOC += motorSimSupport
 
-# motorRecord.h will be created from motorRecord.dbd
+# axisRecord.h will be created from axisRecord.dbd
 # install devMotorSoft.dbd into <top>/dbd
 DBD += motorSimSupport.dbd
 

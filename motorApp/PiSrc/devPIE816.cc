@@ -41,8 +41,8 @@ Last Modified:	2007/03/30 20:01:05
 
 
 #include <string.h>
-#include "motorRecord.h"
-#include "motor.h"
+#include "axisRecord.h"
+#include "axis.h"
 #include "motordevCom.h"
 #include "drvPIE816.h"
 #include "epicsExport.h"
@@ -71,7 +71,7 @@ extern "C" {epicsExportAddress(dset,devPIE816);}
 /* --------------------------- program data --------------------- */
 
 /* This table is used to define the command types */
-/* WARNING! this must match "motor_cmnd" in motor.h */
+/* WARNING! this must match "motor_cmnd" in axis.h */
 
 static msg_types PIE816_table[] = {
     MOTION, 	/* MOVE_ABS */

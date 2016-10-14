@@ -71,7 +71,7 @@ USAGE... This file contains driver "include" information that is specific to
 #ifndef	INCdrvMVP2001h
 #define	INCdrvMVP2001h 1
 
-#include "motor.h"
+#include "axis.h"
 #include "motordrvCom.h"
 #include "asynDriver.h"
 #include "asynOctetSyncIO.h"

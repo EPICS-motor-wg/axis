@@ -2,14 +2,14 @@ file "$(TOP)/db/basic_asyn_motor.db"
 {
 pattern
 {P,    N,   M,         DTYP,     PORT, ADDR, DESC,      EGU,     DIR,   VELO,  VBAS, ACCL, BDST, BVEL, BACC,    MRES, PREC,   DHLM,   DLLM, INIT}
-{IOC:, 1, "m$(N)", "asynMotor",  XPS1,  0, "Phi",      degrees,  Neg,    4.0,   0.1,  .25,    0,    1,   .2,    .001,     3,    180,   -180, ""}
-{IOC:, 2, "m$(N)", "asynMotor",  XPS1,  1, "Kappa",    degrees,  Neg,    6.0,   0.1,  .88,    0,    1,   .2,    .0001,    4,    180,   -180, ""}
-{IOC:, 3, "m$(N)", "asynMotor",  XPS1,  2, "Omega",    degrees,  Neg,    7.0,   0.1,  1.5,    0,    1,   .2,    .0001,    4,    360,   -180, ""}
-{IOC:, 4, "m$(N)", "asynMotor",  XPS1,  3, "Psi",      degrees,  Neg,    4.0,   0.1,   .5,    0,    1,   .2,    .00025,   4,    190,   -190, ""}
-{IOC:, 5, "m$(N)", "asynMotor",  XPS1,  4, "2theta",   degrees,  Neg,    4.0,   0.1,  1.0,    0,    1,   .2,    .0001,    4,    196,    -17, ""}
-{IOC:, 6, "m$(N)", "asynMotor",  XPS1,  5, "Nu",       degrees,  Neg,    4.0,   0.1,   .5,    0,    1,   .2,    .00025,   4,    190,   -190, ""}
-{IOC:, 7, "m$(N)", "asynMotor",  XPS1,  6, "Dummy1",   degrees,  Neg,    4.0,   0.1,   .5,    0,    1,   .2,    .00025,   4,    190,   -190, ""}
-{IOC:, 8, "m$(N)", "asynMotor",  XPS1,  7, "Dummy2",   degrees,  Neg,    4.0,   0.1,   .5,    0,    1,   .2,    .00025,   4,    190,   -190, ""}
+{IOC:, 1, "m$(N)", "asynAxis",  XPS1,  0, "Phi",      degrees,  Neg,    4.0,   0.1,  .25,    0,    1,   .2,    .001,     3,    180,   -180, ""}
+{IOC:, 2, "m$(N)", "asynAxis",  XPS1,  1, "Kappa",    degrees,  Neg,    6.0,   0.1,  .88,    0,    1,   .2,    .0001,    4,    180,   -180, ""}
+{IOC:, 3, "m$(N)", "asynAxis",  XPS1,  2, "Omega",    degrees,  Neg,    7.0,   0.1,  1.5,    0,    1,   .2,    .0001,    4,    360,   -180, ""}
+{IOC:, 4, "m$(N)", "asynAxis",  XPS1,  3, "Psi",      degrees,  Neg,    4.0,   0.1,   .5,    0,    1,   .2,    .00025,   4,    190,   -190, ""}
+{IOC:, 5, "m$(N)", "asynAxis",  XPS1,  4, "2theta",   degrees,  Neg,    4.0,   0.1,  1.0,    0,    1,   .2,    .0001,    4,    196,    -17, ""}
+{IOC:, 6, "m$(N)", "asynAxis",  XPS1,  5, "Nu",       degrees,  Neg,    4.0,   0.1,   .5,    0,    1,   .2,    .00025,   4,    190,   -190, ""}
+{IOC:, 7, "m$(N)", "asynAxis",  XPS1,  6, "Dummy1",   degrees,  Neg,    4.0,   0.1,   .5,    0,    1,   .2,    .00025,   4,    190,   -190, ""}
+{IOC:, 8, "m$(N)", "asynAxis",  XPS1,  7, "Dummy2",   degrees,  Neg,    4.0,   0.1,   .5,    0,    1,   .2,    .00025,   4,    190,   -190, ""}
 }
 
 

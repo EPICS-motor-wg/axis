@@ -12,7 +12,7 @@ LIBRARY_IOC = KohzuMotor
 # Khozu SC-800 motor controller.
 SRCS += devSC800.cc drvSC800.cc
 
-KohzuMotor_LIBS += motor asyn
+KohzuMotor_LIBS += axis asyn
 KohzuMotor_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 include $(TOP)/configure/RULES

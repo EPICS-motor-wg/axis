@@ -126,8 +126,8 @@ USAGE...	Motor record driver level support for OMS model VME58.
 #include	<epicsExit.h>
 #include	<epicsInterrupt.h>
 
-#include	"motorRecord.h"	/* For Driver Power Monitor feature only. */
-#include	"motor.h"
+#include	"axisRecord.h"	/* For Driver Power Monitor feature only. */
+#include	"axis.h"
 #include	"motordevCom.h"	/* For Driver Power Monitor feature only. */
 #include	"drvOms58.h"
 
@@ -1198,7 +1198,7 @@ static int motor_init()
             omsReg = pmotor->control.doneReg;
             for (total_encoders = total_pidcnt = 0, motor_index = 0; motor_index < total_axis; motor_index++)
             {
-                /* Test if motor has an encoder. */
+                /* Test if axis.has an encoder. */
                 send_mess(card_index, ENCODER_QUERY, oms58_axis[motor_index]);
                 while (!pmotor->control.doneReg)    /* Wait for command to complete. */
                     epicsThreadSleep(quantum * 2.0);
@@ -1217,7 +1217,7 @@ static int motor_init()
                     recv_mess(card_index, encoder_pos, 1);
                 }
 
-                /* Test if motor has PID parameters. */
+                /* Test if axis.has PID parameters. */
                 send_mess(card_index, PID_QUERY, oms58_axis[motor_index]);
                 do  /* Wait for command to complete. */
                 {

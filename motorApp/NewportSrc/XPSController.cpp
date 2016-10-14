@@ -87,8 +87,8 @@ Versions: Release 4-5 and higher.
 #include <iocsh.h>
 #include <asynDriver.h>
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 #include <epicsExport.h>
 #include "XPSController.h"
@@ -137,7 +137,7 @@ const static CorrectorTypes_t CorrectorTypes = {
 XPSController::XPSController(const char *portName, const char *IPAddress, int IPPort, 
                              int numAxes, double movingPollPeriod, double idlePollPeriod,
                              int enableSetPosition, double setPositionSettlingTime)
-  :  asynMotorController(portName, numAxes, NUM_XPS_PARAMS, 
+  :  asynAxisController(portName, numAxes, NUM_XPS_PARAMS, 
                          0, // No additional interfaces
                          0, // No addition interrupt interfaces
                          ASYN_CANBLOCK | ASYN_MULTIDEVICE, 
@@ -151,7 +151,7 @@ XPSController::XPSController(const char *portName, const char *IPAddress, int IP
   
   IPAddress_ = epicsStrDup(IPAddress);
   IPPort_ = IPPort;
-  pAxes_ = (XPSAxis **)(asynMotorController::pAxes_);
+  pAxes_ = (XPSAxis **)(asynAxisController::pAxes_);
   movesDeferred_ = false;
 
   // Create controller-specific parameters
@@ -240,7 +240,7 @@ void XPSController::report(FILE *fp, int level)
   }
 
   // Call the base class method
-  asynMotorController::report(fp, level);
+  asynAxisController::report(fp, level);
 }
 
 asynStatus XPSController::writeInt32(asynUser *pasynUser, epicsInt32 value)
@@ -288,7 +288,7 @@ asynStatus XPSController::writeInt32(asynUser *pasynUser, epicsInt32 value)
 
   } else {
     /* Call base class method */
-    status = asynMotorController::writeInt32(pasynUser, value);
+    status = asynAxisController::writeInt32(pasynUser, value);
   }
 
   /* Do callbacks so higher layers see any changes */
@@ -322,7 +322,7 @@ asynStatus XPSController::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
 
   } else {
     /* Call base class method */
-    status = asynMotorController::writeFloat64(pasynUser, value);
+    status = asynAxisController::writeFloat64(pasynUser, value);
 
   }
   /* Do callbacks so higher layers see any changes */
@@ -520,7 +520,7 @@ asynStatus XPSController::initializeProfile(size_t maxPoints, const char* ftpUse
 {
   ftpUsername_ = epicsStrDup(ftpUsername);
   ftpPassword_ = epicsStrDup(ftpPassword);
-  asynMotorController::initializeProfile(maxPoints);
+  asynAxisController::initializeProfile(maxPoints);
   return asynSuccess;
 }
 
@@ -564,7 +564,7 @@ asynStatus XPSController::buildProfile()
             driverName, functionName);
             
   // Call the base class method which will build the time array if needed
-  asynMotorController::buildProfile();
+  asynAxisController::buildProfile();
 
   strcpy(message, "");
   setStringParam(profileBuildMessage_, message);

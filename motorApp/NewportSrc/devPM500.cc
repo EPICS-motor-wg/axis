@@ -42,8 +42,8 @@ USAGE...	Motor record device level support for the Newport PM500 motor
 
 #include <string.h>
 #include <math.h>
-#include "motorRecord.h"
-#include "motor.h"
+#include "axisRecord.h"
+#include "axis.h"
 #include "motordevCom.h"
 #include "drvMMCom.h"
 #include "epicsExport.h"

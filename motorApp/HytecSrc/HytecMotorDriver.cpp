@@ -39,10 +39,10 @@
 /*  2.1         New interfaces 			Jim Chen       	 04/04/2011             */
 /*  	        This version follows the asyn motor model 3 latest interface	*/
 /*				changes that include:											*/
-/*				a).New asynMotorAxis base class									*/
+/*				a).New asynAxisAxis base class									*/
 /*				b).Moves the axis specific functions from the motor controller 	*/
 /*				   class to individual axis class								*/
-/*				c).Changes asynMotorDriver.cpp name to asynMotorController.cpp.	*/
+/*				c).Changes asynAxisAxisDriver.cpp name to asynAxisController.cpp.	*/
 /*  2.2         Bugs fix 				Jim Chen       	 14/04/2011             */
 /*  	        Fixed setPosition bug											*/
 /*				Added firmware version parameter								*/
@@ -93,7 +93,7 @@ HytecMotorController::HytecMotorController(const char *portName, int numAxes,
 			int ip_carrier, int ipslot, int vector, int useencoder,
 	        double encoderRatio0, double encoderRatio1, double encoderRatio2,
 	        double encoderRatio3)
-    :   asynMotorController(portName, numAxes, NUM_HYTEC_PARAMS, 
+    :   asynAxisController(portName, numAxes, NUM_HYTEC_PARAMS, 
             asynInt32Mask | asynFloat64Mask | asynUInt32DigitalMask, 
             asynInt32Mask | asynFloat64Mask | asynUInt32DigitalMask,
             ASYN_CANBLOCK | ASYN_MULTIDEVICE, 
@@ -393,18 +393,18 @@ void HytecMotorController::report(FILE *fp, int level)
     }
 
     // Call the base class method
-    asynMotorController::report(fp, level);
+    asynAxisController::report(fp, level);
 }
 
 // get axis
 HytecMotorAxis * HytecMotorController::getAxis(asynUser *pasynUser)
 {
-  	return dynamic_cast<HytecMotorAxis*>(asynMotorController::getAxis(pasynUser));
+  	return dynamic_cast<HytecMotorAxis*>(asynAxisController::getAxis(pasynUser));
 }
     
 HytecMotorAxis * HytecMotorController::getAxis(int axisNo)
 {
-  	return dynamic_cast<HytecMotorAxis*>(asynMotorController::getAxis(axisNo));
+  	return dynamic_cast<HytecMotorAxis*>(asynAxisController::getAxis(axisNo));
 }
     
 // Int32 read interface
@@ -462,7 +462,7 @@ asynStatus HytecMotorController::writeInt32(asynUser *pasynUser, epicsInt32 valu
 		
 	} else
         /* Call base class call its method (if we have our parameters check this here) */
-        status = asynMotorController::writeInt32(pasynUser, value);
+        status = asynAxisController::writeInt32(pasynUser, value);
     
     /* Do callbacks so higher layers see any changes */
     callParamCallbacks(pAxis->axisNo_);
@@ -512,7 +512,7 @@ asynStatus HytecMotorController::writeFloat64(asynUser *pasynUser, epicsFloat64 
 //	}
 //	else
 	    /* Call base class call its method (if we have our parameters check this here) */
-    	status = asynMotorController::writeFloat64(pasynUser, value);
+    	status = asynAxisController::writeFloat64(pasynUser, value);
     
     /* Do callbacks so higher layers see any changes */
     pAxis->callParamCallbacks();
@@ -634,7 +634,7 @@ void HytecMotorController::increaseMsgFail()
  *************************************************************************************/
 // Motor Axis methods
 HytecMotorAxis::HytecMotorAxis(HytecMotorController *pC, int axisNo, double ratio, int vector)
-  : asynMotorAxis(pC, axisNo),
+  : asynAxisAxis(pC, axisNo),
     pC_(pC), vector(vector), encoderRatio(ratio)
 {
 	InitialiseAxis();

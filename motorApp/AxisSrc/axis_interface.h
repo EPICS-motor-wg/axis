@@ -131,23 +131,23 @@ implement the PREM and the POST fields of the motor record.
 These return an error if there is a problem with the demand value. On return, I think the demand value should be
 replaced by the permitted value (but I don't see this being used).
 
-\li \b SET_DGAIN Called line 341 motordevCom.cc. Called line 2571 motorRecord.cc
-\li \b SET_HIGH_LIMIT Not called in motordevCom.cc. Called line 2346, 2387, 3466 motorRecord.cc
-\li \b SET_IGAIN Called line 334 motordevCom.cc. Called line 2571 motorRecord.cc
-\li \b SET_LOW_LIMIT Not called in motordevCom.cc. Called line 2346, 2387, 3501 motorRecord.cc
-\li \b SET_PGAIN Called line 326 motordevCom.cc. Called line 2571 motorRecord.cc
+\li \b SET_DGAIN Called line 341 motordevCom.cc. Called line 2571 axisRecord.cc
+\li \b SET_HIGH_LIMIT Not called in motordevCom.cc. Called line 2346, 2387, 3466 axisRecord.cc
+\li \b SET_IGAIN Called line 334 motordevCom.cc. Called line 2571 axisRecord.cc
+\li \b SET_LOW_LIMIT Not called in motordevCom.cc. Called line 2346, 2387, 3501 axisRecord.cc
+\li \b SET_PGAIN Called line 326 motordevCom.cc. Called line 2571 axisRecord.cc
 
 \subsubsection ss3 Other build_trans commands called singly
 
 The return status is never checked when these transactions are built.
 
-\li \b DISABL_TORQUE Not called in motordevCom.cc. Called line 2593 motorRecord.cc
-\li \b ENABLE_TORQUE Not called in motordevCom.cc. Called line 2591 motorRecord.cc. These two \b _TORQUE commands are crying out to be implemented as a single command because the parameter is currently ignored. Note that they don't really enable or disable torque, they actually open or close the PID loop.
+\li \b DISABL_TORQUE Not called in motordevCom.cc. Called line 2593 axisRecord.cc
+\li \b ENABLE_TORQUE Not called in motordevCom.cc. Called line 2591 axisRecord.cc. These two \b _TORQUE commands are crying out to be implemented as a single command because the parameter is currently ignored. Note that they don't really enable or disable torque, they actually open or close the PID loop.
 
-\li \b GET_INFO Called line 348 motordevCom.cc. Called line 1117, 1149, 1645, 1908, 2111, 3270 motorRecord.cc. Note that this ultimately leads to the motor status information being updated, and then this is accessed by a call to motor_update_values in motordevCom.
-\li \b LOAD_POS Called line 309 motordevCom.cc. Called line 3267 motorRecord.cc. Note that the position loaded is not a demand position - this is just a command to set the current position to a given absolute value.
-\li \b SET_ENC_RATIO Called line 300 motordevCom.cc. Called line 1638 motorRecord.cc.
-\li \b STOP_AXIS Not called in motordevCom.cc. Called line 1094, 1533, 1566, 1701, 1760, 1798 motorRecord.cc. It is not clear exactly what acceleration should be used in stopping - but I assume that the one that initiated the last move is probably OK.
+\li \b GET_INFO Called line 348 motordevCom.cc. Called line 1117, 1149, 1645, 1908, 2111, 3270 axisRecord.cc. Note that this ultimately leads to the motor status information being updated, and then this is accessed by a call to motor_update_values in motordevCom.
+\li \b LOAD_POS Called line 309 motordevCom.cc. Called line 3267 axisRecord.cc. Note that the position loaded is not a demand position - this is just a command to set the current position to a given absolute value.
+\li \b SET_ENC_RATIO Called line 300 motordevCom.cc. Called line 1638 axisRecord.cc.
+\li \b STOP_AXIS Not called in motordevCom.cc. Called line 1094, 1533, 1566, 1701, 1760, 1798 axisRecord.cc. It is not clear exactly what acceleration should be used in stopping - but I assume that the one that initiated the last move is probably OK.
 
 \subsection sec2 build_trans commands that are executed in groups
 
@@ -175,7 +175,7 @@ axis before starting.
 \li \b GO.
 
 These five transactions are called as a set in lines 659-662 and also
-in lines 1719-1726 in motorRecord.cc. Only one of HOME_FOR or HOME_REV
+in lines 1719-1726 in axisRecord.cc. Only one of HOME_FOR or HOME_REV
 is called, dependent on the setting of the record homf or homr
 fields. (What happens if you don't find the home switch - can't the
 controller work out which way to attempt to home?). Note that no 
@@ -189,7 +189,7 @@ acceleration is specified.
 \li \b GO
 
 These six transactions are called as a set three times in
-motorRecord.cc (between lines 704-746, lines 778-798 and lines
+axisRecord.cc (between lines 704-746, lines 778-798 and lines
 2042-2102). Only one of MOVE_REL and MOVE_ABS is called depending on
 whether it is a relative move or an absolute move, and the parameter
 passed in this transaction is the actual move distance. SET_VEL_BASE
@@ -204,8 +204,8 @@ for this is pretty unclear to me (I suspect it could be).
 
 There are two jog sequences:
 
-\li \b SET_ACCEL followed by \b JOG. Called between lines 1782-1785 motorRecord.cc.
-\li \b SET_ACCEL followed by \b JOG_VELOCITY. Called between lines 2622-2625 motorRecord.cc.
+\li \b SET_ACCEL followed by \b JOG. Called between lines 1782-1785 axisRecord.cc.
+\li \b SET_ACCEL followed by \b JOG_VELOCITY. Called between lines 2622-2625 axisRecord.cc.
 
 I don't really understand the real difference between these two set -
 as far as I can see the only difference in the OMS driver is that the

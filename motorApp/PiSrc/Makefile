@@ -22,7 +22,7 @@ SRCS += devPIE516.cc drvPIE516.cc PIE516Register.cc
 SRCS += devPIE816.cc drvPIE816.cc PIE816Register.cc
 
 
-PI_LIBS += motor asyn
+PI_LIBS += axis asyn
 PI_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 include $(TOP)/configure/RULES

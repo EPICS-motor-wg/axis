@@ -21,7 +21,7 @@ Created: 15.12.2010
 
 
 class PIasynAxis;
-class asynMotorAxis;
+class asynAxisAxis;
 class PIInterface;
 
 /**
@@ -64,7 +64,7 @@ public:
     virtual asynStatus setServo(PIasynAxis* pAxis, int servoState);
     virtual asynStatus getResolution(PIasynAxis* pAxis, double& resolution );
     virtual asynStatus getStatus(PIasynAxis* pAxis, int& homing, int& moving, int& negLimit, int& posLimit, int& servoControl) = 0;
-    virtual asynStatus getGlobalState( asynMotorAxis** Axes, int numAxes ) { return asynSuccess; }
+    virtual asynStatus getGlobalState( asynAxisAxis** Axes, int numAxes ) { return asynSuccess; }
     virtual asynStatus getMoving(PIasynAxis* pAxis, int& homing);
     virtual asynStatus getBusy(PIasynAxis* pAxis, int& busy);
     virtual asynStatus getTravelLimits(PIasynAxis* pAxis, double& negLimit, double& posLimit);

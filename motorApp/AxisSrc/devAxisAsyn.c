@@ -69,19 +69,19 @@
 #include <asynGenericPointer.h>
 #include <asynEpicsUtils.h>
 
-#include "motorRecord.h"
-#include "motor.h"
+#include "axisRecord.h"
+#include "axis.h"
 #include "epicsExport.h"
-#include "asynMotorController.h"
-#include "motor_interface.h"
+#include "asynAxisController.h"
+#include "axis_interface.h"
 
 /*Create the dset for devMotor */
 static long init( int after );
-static long init_record(struct motorRecord *);
-static CALLBACK_VALUE update_values(struct motorRecord *);
-static long start_trans(struct motorRecord *);
-static RTN_STATUS build_trans( motor_cmnd, double *, struct motorRecord *);
-static RTN_STATUS end_trans(struct motorRecord *);
+static long init_record(struct axisRecord *);
+static CALLBACK_VALUE update_values(struct axisRecord *);
+static long start_trans(struct axisRecord *);
+static RTN_STATUS build_trans( motor_cmnd, double *, struct axisRecord *);
+static RTN_STATUS end_trans(struct axisRecord *);
 static void asynCallback(asynUser *);
 static void statusCallback(void *, asynUser *, void *);
 
@@ -138,7 +138,7 @@ typedef struct {
 
 typedef struct
 {
-    struct motorRecord * pmr;
+    struct axisRecord * pmr;
     int moveRequestPending;
     struct MotorStatus status;
     motorCommand move_cmd;
@@ -170,7 +170,7 @@ static long init( int after )
     return 0;
 }
 
-static void init_controller(struct motorRecord *pmr, asynUser *pasynUser )
+static void init_controller(struct axisRecord *pmr, asynUser *pasynUser )
 {
     /* This routine is copied out of the old motordevCom and initialises the controller
        based on the record values. I think most of it should be transferred to init_record
@@ -217,7 +217,7 @@ static void init_controller(struct motorRecord *pmr, asynUser *pasynUser )
 
 }
 
-static long findDrvInfo(motorRecord *pmotor, asynUser *pasynUser, char *drvInfoString, int command)
+static long findDrvInfo(axisRecord *pmotor, asynUser *pasynUser, char *drvInfoString, int command)
 {
     motorAsynPvt *pPvt = (motorAsynPvt *)pmotor->dpvt;
 
@@ -232,7 +232,7 @@ static long findDrvInfo(motorRecord *pmotor, asynUser *pasynUser, char *drvInfoS
     return(0);
 }
 
-static long init_record(struct motorRecord * pmr )
+static long init_record(struct axisRecord * pmr )
 {
     asynUser *pasynUser;
     char *port, *userParam;
@@ -403,7 +403,7 @@ bad:
 
 
 
-CALLBACK_VALUE update_values(struct motorRecord * pmr)
+CALLBACK_VALUE update_values(struct axisRecord * pmr)
 {
     motorAsynPvt * pPvt = (motorAsynPvt *) pmr->dpvt;
     CALLBACK_VALUE rc;
@@ -447,14 +447,14 @@ CALLBACK_VALUE update_values(struct motorRecord * pmr)
     return (rc);
 }
 
-static long start_trans(struct motorRecord * pmr )
+static long start_trans(struct axisRecord * pmr )
 {
     return(OK);
 }
 
 static RTN_STATUS build_trans( motor_cmnd command, 
                    double * param,
-                   struct motorRecord * pmr )
+                   struct axisRecord * pmr )
 {
     RTN_STATUS rtnind = OK;
     asynStatus status;
@@ -616,7 +616,7 @@ static RTN_STATUS build_trans( motor_cmnd command,
     return(rtnind);
 }
 
-static RTN_STATUS end_trans(struct motorRecord * pmr )
+static RTN_STATUS end_trans(struct axisRecord * pmr )
 {
   return(OK);
 }
@@ -629,7 +629,7 @@ static RTN_STATUS end_trans(struct motorRecord * pmr )
 static void asynCallback(asynUser *pasynUser)
 {
     motorAsynPvt *pPvt = (motorAsynPvt *)pasynUser->userPvt;
-    motorRecord *pmr = pPvt->pmr;
+    axisRecord *pmr = pPvt->pmr;
     motorAsynMessage *pmsg = pasynUser->userData;
     int status;
     int commandIsMove = 0;
@@ -716,7 +716,7 @@ static void statusCallback(void *drvPvt, asynUser *pasynUser,
                void *pValue)
 {
     motorAsynPvt *pPvt = (motorAsynPvt *)drvPvt;
-    motorRecord *pmr = pPvt->pmr;
+    axisRecord *pmr = pPvt->pmr;
     MotorStatus *value = (MotorStatus *)pValue;
 
     asynPrint(pasynUser, ASYN_TRACEIO_DEVICE,

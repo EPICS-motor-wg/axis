@@ -23,7 +23,7 @@ of this distribution.
 #include <string.h>
 #include <stdio.h>
 #include <iocsh.h>
-#include "motor.h"
+#include "axis.h"
 #include "drvPIE816.h"
 #include "epicsExport.h"
 

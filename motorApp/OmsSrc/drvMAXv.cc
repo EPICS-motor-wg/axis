@@ -111,8 +111,8 @@ USAGE...        Motor record driver level support for OMS model MAXv.
 #include <epicsExit.h>
 #include <cantProceed.h>
 
-#include "motorRecord.h" /* For Driver Power Monitor feature only. */
-#include "motor.h"
+#include "axisRecord.h" /* For Driver Power Monitor feature only. */
+#include "axis.h"
 #include "motordevCom.h" /* For Driver Power Monitor feature only. */
 #include "drvMAXv.h"
 
@@ -1305,7 +1305,7 @@ static int motor_init()
                 motor_info = (struct mess_info *) &pmotorState->motor_info[motor_index];
                 STATUS1 flag1;
 
-                /* Test if motor has an encoder. */
+                /* Test if axis.has an encoder. */
                 send_mess(card_index, ENCODER_QUERY, MAXv_axis[motor_index]);
                 while (!pmotor->status1_flag.Bits.done) /* Wait for command to complete. */
                     epicsThreadSleep(quantum);
@@ -1324,7 +1324,7 @@ static int motor_init()
                     recv_mess(card_index, encoder_pos, 1);
                 }
                 
-                /* Test if motor has PID parameters. */
+                /* Test if axis.has PID parameters. */
                 send_mess(card_index, PID_QUERY, MAXv_axis[motor_index]);
                 while (!pmotor->status1_flag.Bits.done) /* Wait for command to complete. */
                     epicsThreadSleep(quantum);

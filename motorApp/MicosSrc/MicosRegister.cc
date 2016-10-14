@@ -20,7 +20,7 @@ of this distribution.
 #include <string.h>
 #include <stdio.h>
 #include <iocsh.h>
-#include "motor.h"
+#include "axis.h"
 #include "drvMicos.h"
 #include "epicsExport.h"
 

@@ -13,13 +13,13 @@ March 28, 2010
 #include <epicsTime.h>
 #include <epicsThread.h>
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 #include "route.h"
 
 #define NUM_SIM_CONTROLLER_PARAMS 0
 
-class epicsShareClass motorSimAxis : public asynMotorAxis
+class epicsShareClass motorSimAxis : public asynAxisAxis
 {
 public:
 
@@ -59,7 +59,7 @@ private:
 friend class motorSimController;
 };
 
-class epicsShareClass motorSimController : asynMotorController {
+class epicsShareClass motorSimController : asynAxisController {
 public:
 
   /* These are the fucntions we override from the base class */
@@ -76,7 +76,7 @@ public:
 
 private:
   asynStatus processDeferredMoves();
-  epicsThreadId motorThread_;
+  epicsThreadId axisThread_;
   epicsTimeStamp prevTime_;
   int movesDeferred_;
   

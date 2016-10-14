@@ -7,16 +7,16 @@ August 14, 2013
 
 */
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
-#define MAX_MVP2001_AXES 32     /* motor.h sets the maximum number of axes */
+#define MAX_MVP2001_AXES 32     /* axis.h sets the maximum number of axes */
 #define BUFF_SIZE 20		/* Maximum length of string to/from MVP2001 */
 
 // No controller-specific parameters yet
 #define NUM_MVP2001_PARAMS 0  
 
-class epicsShareClass MVP2001Axis : public asynMotorAxis
+class epicsShareClass MVP2001Axis : public asynAxisAxis
 {
 public:
   /* These are the methods we override from the base class */
@@ -34,7 +34,7 @@ public:
   asynStatus setClosedLoop(bool closedLoop);
 
 private:
-  MVP2001Controller *pC_;          /**< Pointer to the asynMotorController to which this axis belongs.
+  MVP2001Controller *pC_;          /**< Pointer to the asynAxisController to which this axis belongs.
                                    *   Abbreviated because it is used very frequently */
   int axisIndex_;
   double stepsPerRev_;
@@ -47,7 +47,7 @@ private:
 friend class MVP2001Controller;
 };
 
-class epicsShareClass MVP2001Controller : public asynMotorController {
+class epicsShareClass MVP2001Controller : public asynAxisController {
 public:
   MVP2001Controller(const char *portName, const char *MVP2001PortName, int numAxes, double movingPollPeriod, double idlePollPeriod);
 

@@ -53,8 +53,8 @@ NOTES...
 #include        <dbEvent.h>
 #include        <recSup.h>
 
-#include        "motorRecord.h"
-#include        "motor.h"
+#include        "axisRecord.h"
+#include        "axis.h"
 #include        "devSoft.h"
 
 #include        "epicsExport.h"

@@ -6,8 +6,8 @@ USAGE...        Newport XPS EPICS asyn motor device driver
 #ifndef XPSController_H
 #define XPSController_H
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 #include "XPSAxis.h"
 
 #define XPS_MAX_AXES 8
@@ -52,14 +52,14 @@ typedef enum {
 #define XPSTclScriptString                    "XPS_TCL_SCRIPT"
 #define XPSTclScriptExecuteString             "XPS_TCL_SCRIPT_EXECUTE"
 
-class epicsShareClass XPSController : public asynMotorController {
+class epicsShareClass XPSController : public asynAxisController {
 
   public:
   XPSController(const char *portName, const char *IPAddress, int IPPort,
                 int numAxes, double movingPollPeriod, double idlePollPeriod,
                 int enableSetPosition, double setPositionSettlingTime);
 
-  /* These are the methods that we override from asynMotorDriver */
+  /* These are the methods that we override from asynAxisAxisDriver */
   asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value);
   asynStatus writeFloat64(asynUser *pasynUser, epicsFloat64 value);
   void report(FILE *fp, int level);

@@ -59,7 +59,7 @@ asynStatus PIHexapodController::init(void)
 }
 
 
-asynStatus PIHexapodController::getGlobalState(asynMotorAxis** pAxes, int numAxes)
+asynStatus PIHexapodController::getGlobalState(asynAxisAxis** pAxes, int numAxes)
 {
 	// do not call moving here, at least simulation software does return
 	// values != 0 with bit 1 not set (e.g. "2")
@@ -161,7 +161,7 @@ asynStatus PIHexapodController::moveCts( PIasynAxis* pAxis, int targetCts )
     	return status;
     }
     epicsThreadSleep( 0.2 ); // TODO test if we do need this
-    asynMotorAxis* pAsynAxis = (asynMotorAxis*)pAxis;
+    asynAxisAxis* pAsynAxis = (asynAxisAxis*)pAxis;
     status = getGlobalState(&pAsynAxis, 1);
     if (asynSuccess != status)
     {
@@ -204,7 +204,7 @@ asynStatus PIHexapodController::moveCts( PIasynAxis** pAxesArray, int* pTargetCt
     	return status;
     }
     epicsThreadSleep(0.2);
-    status = getGlobalState((asynMotorAxis**)pAxesArray, numAxes);
+    status = getGlobalState((asynAxisAxis**)pAxesArray, numAxes);
     if (asynSuccess != status)
     {
     	return status;

@@ -16,7 +16,7 @@ SRCS += devMVP2001.cc drvMVP2001.cc
 # MVP2001 asyn model 3 driver
 SRCS += MVP2001Driver.cpp
 
-MicroMo_LIBS += motor asyn
+MicroMo_LIBS += axis asyn
 MicroMo_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 include $(TOP)/configure/RULES

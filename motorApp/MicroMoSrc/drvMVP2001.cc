@@ -117,7 +117,7 @@ MORE DESIGN LIMITATIONS
     C.  The motor_info array of the controller structure in motordrvCom.h
       For a chain to work correctly, there needs to be one element in the
       motor_info array for every controller on the chain.  The limit is
-      set by the constant MAX_AXIS, which is defined in motor.h.  The end
+      set by the constant MAX_AXIS, which is defined in axis.h.  The end
       result is that the number of controllers is limited by the motor
       record.  The current maximum number of controllers is 10.
 */
@@ -125,7 +125,7 @@ MORE DESIGN LIMITATIONS
 #include <string.h>
 #include <epicsThread.h>
 #include <drvSup.h>
-#include "motor.h"
+#include "axis.h"
 #include "drvMVP2001.h"
 #include "epicsExport.h"
 

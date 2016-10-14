@@ -37,7 +37,7 @@ USAGE... This file contains Aerotech Ensemble Asyn driver "include" information.
 #ifndef DRV_MOTOR_ENSEMBLE_ASYN_H
 #define DRV_MOTOR_ENSEMBLE_ASYN_H
 
-#include "motor.h"
+#include "axis.h"
 
 /* Axis Status Register Bitmap */
 typedef union

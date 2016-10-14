@@ -43,7 +43,7 @@ USAGE...    Motor record driver level support for Newport MM3000.
  *                  Reworked travel limit processing so that direction
  *                  status bit matches limit switch.  Copied recv_mess()
  *                  logic from drvMM4000.c.  Use TPE command to determine
- *                  if motor has an encoder.
+ *                  if axis.has an encoder.
  * .06 10/02/01 rls - allow one retry after a communication error.
  *                  - use motor status response bit-field.
  * .07 05-22-03 rls - Converted to R3.14.2.
@@ -68,7 +68,7 @@ USAGE...    Motor record driver level support for Newport MM3000.
 #include <epicsThread.h>
 #include <epicsString.h>
 #include <drvSup.h>
-#include "motor.h"
+#include "axis.h"
 #include "NewportRegister.h"
 #include "drvMMCom.h"
 #include "asynOctetSyncIO.h"

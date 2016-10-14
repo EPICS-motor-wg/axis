@@ -35,7 +35,7 @@ endif
 # The following is required for all OMS device drivers.
 SRCS += devOmsCom.cc
 
-oms_LIBS += motor
+oms_LIBS += axis
 ifdef ASYN
 oms_LIBS += asyn
 endif

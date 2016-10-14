@@ -90,8 +90,8 @@ using std::endl;
 #include <epicsString.h>
 #include <iocsh.h>
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 #include <epicsExport.h>
 #include "XPSController.h"
 #include "XPS_C8_drivers.h"
@@ -136,7 +136,7 @@ static void shutdownCallback(void *pPvt)
 
 // These are the XPSAxis:: methods
 XPSAxis::XPSAxis(XPSController *pC, int axisNo, const char *positionerName, double stepSize)
-  :   asynMotorAxis(pC, axisNo),
+  :   asynAxisAxis(pC, axisNo),
       pC_(pC)
 {
   static const char *functionName = "XPSAxis";
@@ -1542,7 +1542,7 @@ asynStatus XPSAxis::defineProfile(double *positions, size_t numPoints)
   //static const char *functionName = "defineProfile";
   
   // Call the base class function
-  status = asynMotorAxis::defineProfile(positions, numPoints);
+  status = asynAxisAxis::defineProfile(positions, numPoints);
   if (status) return status;
   
   // Convert to XPS units from steps
@@ -1575,7 +1575,7 @@ asynStatus XPSAxis::readbackProfile()
     profileFollowingErrors_[i] /= stepSize_;
   }
   // Call the base class method
-  asynMotorAxis::readbackProfile();
+  asynAxisAxis::readbackProfile();
   return asynSuccess;
 }
 

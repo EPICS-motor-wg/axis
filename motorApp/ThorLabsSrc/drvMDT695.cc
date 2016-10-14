@@ -44,7 +44,7 @@ USAGE...	Motor record driver level support for ThorLabs
 #include <stdio.h>
 #include <epicsThread.h>
 #include <drvSup.h>
-#include "motor.h"
+#include "axis.h"
 #include "ThorLabsRegister.h"
 #include "drvMDT695.h"
 #include "asynOctetSyncIO.h"

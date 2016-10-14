@@ -44,8 +44,8 @@ Last Modified:	2004/12/20 21:10:53
 
 
 #include <string.h>
-#include "motorRecord.h"
-#include "motor.h"
+#include "axisRecord.h"
+#include "axis.h"
 #include "motordevCom.h"
 #include "drvPMNCCom.h"
 #include "epicsExport.h"
@@ -77,7 +77,7 @@ extern "C" {epicsExportAddress(dset,devPMNC87xx);}
 /* --------------------------- program data --------------------- */
 
 /* This table is used to define the command types */
-/* WARNING! this must match "motor_cmnd" in motor.h */
+/* WARNING! this must match "motor_cmnd" in axis.h */
 
 static msg_types PMNC87xx_table[] = {
     MOTION, 	/* MOVE_ABS */

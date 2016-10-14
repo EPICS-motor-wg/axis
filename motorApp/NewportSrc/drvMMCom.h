@@ -40,7 +40,7 @@ USAGE... This file contains Newport Motion Master (MM) driver "include"
 #ifndef	INCdrvMMComh
 #define	INCdrvMMComh 1
 
-#include "motor.h"
+#include "axis.h"
 #include "motordrvCom.h"
 #include "asynDriver.h"
 #include "asynOctetSyncIO.h"

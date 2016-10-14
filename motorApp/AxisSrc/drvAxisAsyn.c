@@ -1,5 +1,5 @@
 /*
- * drvMotorAsyn.c
+ * drvAxisAsyn.c
  * 
  * Motor record common Asyn driver support layer
  *
@@ -54,8 +54,8 @@
 #include <drvSup.h>
 #include <registryDriverSupport.h>
 
-#include "asynMotorController.h"
-#include "motor_interface.h"
+#include "asynAxisController.h"
+#include "axis_interface.h"
 #include <limits.h>
 #include <epicsExport.h>
 
@@ -74,7 +74,7 @@
 
 /* Note, these values must not be used for pasynUser->reason in device support  */
 typedef enum {
-    /* Parameters - these must match the definitions in motor_interface.h */
+    /* Parameters - these must match the definitions in axis_interface.h */
     motorPosition = motorAxisPosition,
     motorEncRatio = motorAxisEncoderRatio,
     motorResolution = motorAxisResolution,
@@ -436,7 +436,7 @@ static asynStatus readInt32(void *drvPvt, asynUser *pasynUser,
     drvmotorPvt *pPvt = (drvmotorPvt *)drvPvt;
     drvmotorAxisPvt *pAxis;
     int channel;
-    motorCommand command = pasynUser->reason;
+    int command = pasynUser->reason;
 
     pasynManager->getAddr(pasynUser, &channel);
     if (channel >= pPvt->numAxes) {
@@ -479,7 +479,7 @@ static asynStatus readUInt32Digital(void *drvPvt, asynUser *pasynUser,
     drvmotorPvt *pPvt = (drvmotorPvt *)drvPvt;
     drvmotorAxisPvt *pAxis;
     int channel;
-    motorCommand command = pasynUser->reason;
+    int command = pasynUser->reason;
 
     pasynManager->getAddr(pasynUser, &channel);
     if (channel >= pPvt->numAxes) {
@@ -519,7 +519,7 @@ static asynStatus readFloat64(void *drvPvt, asynUser *pasynUser,
     drvmotorPvt *pPvt = (drvmotorPvt *)drvPvt;
     drvmotorAxisPvt *pAxis;
     int channel;
-    motorCommand command = pasynUser->reason;
+    int command = pasynUser->reason;
     asynStatus status = asynSuccess;
 
     pasynManager->getAddr(pasynUser, &channel);
@@ -579,7 +579,7 @@ static asynStatus writeInt32(void *drvPvt, asynUser *pasynUser,
     drvmotorPvt *pPvt = (drvmotorPvt *)drvPvt;
     drvmotorAxisPvt *pAxis;
     int channel;
-    motorCommand command = pasynUser->reason;
+    int command = pasynUser->reason;
     asynStatus status=asynSuccess;
 
     pasynManager->getAddr(pasynUser, &channel);
@@ -634,7 +634,7 @@ static asynStatus writeUInt32Digital(void *drvPvt, asynUser *pasynUser,
     drvmotorPvt *pPvt = (drvmotorPvt *)drvPvt;
     drvmotorAxisPvt *pAxis;
     int channel;
-    motorCommand command = pasynUser->reason;
+    int command = pasynUser->reason;
     asynStatus status;
     epicsUInt32 temp = 0;
 
@@ -677,7 +677,7 @@ static asynStatus writeFloat64(void *drvPvt, asynUser *pasynUser,
     drvmotorPvt *pPvt = (drvmotorPvt *)drvPvt;
     drvmotorAxisPvt *pAxis;
     int channel;
-    motorCommand command = pasynUser->reason;
+    int command = pasynUser->reason;
     asynStatus status = asynError;
 
     pasynManager->getAddr(pasynUser, &channel);
@@ -985,7 +985,7 @@ static asynStatus drvUserCreate(void *drvPvt, asynUser *pasynUser,
 static asynStatus drvUserGetType(void *drvPvt, asynUser *pasynUser,
                                  const char **pptypeName, size_t *psize)
 {
-    motorCommand command = pasynUser->reason;
+    int command = pasynUser->reason;
 
     asynPrint(pasynUser, ASYN_TRACE_FLOW,
               "drvMotorAsyn::drvUserGetType entered");
@@ -1090,9 +1090,9 @@ static void initCallFunc(const iocshArgBuf *args)
                           args[3].ival);
 }
 
-void motorRegister(void)
+void axisRegister(void)
 {
     iocshRegister(&initFuncDef,initCallFunc);
 }
 
-epicsExportRegistrar(motorRegister);
+epicsExportRegistrar(axisRegister);

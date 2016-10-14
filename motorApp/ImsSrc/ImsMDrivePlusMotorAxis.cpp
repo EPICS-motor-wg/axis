@@ -1,7 +1,7 @@
 //! @File : ImsMDrivePlusMotorAxis.cpp
 //!         Motor record driver level support for Intelligent Motion Systems, Inc.
 //!         MDrivePlus series; M17, M23, M34.
-//!         Use "model 3" asyn motor, asynMotorController and asynMotorAxis classes.
+//!         Use "model 3" asyn motor, asynAxisController and asynAxisAxis classes.
 //!
 //! Original Author : Nia Fong
 //! Date : 11-21-2011
@@ -22,8 +22,8 @@
 #include <iocsh.h>
 #include <asynOctetSyncIO.h>
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 #include <epicsExport.h>
 #include "ImsMDrivePlusMotorController.h"
@@ -36,7 +36,7 @@
 //! @param[in] axisNum axis number
 ////////////////////////////////////////////////////////
 ImsMDrivePlusMotorAxis::ImsMDrivePlusMotorAxis(ImsMDrivePlusMotorController *pC, int axisNum)
-  : asynMotorAxis(pC, axisNum), pController(pC)
+  : asynAxisAxis(pC, axisNum), pController(pC)
 {
 	static const char *functionName = "ImsMDrivePlusMotorAxis()";
 	asynPrint(pC->pasynUserSelf, ASYN_TRACEIO_DRIVER, "%s:%s: Create Axis %d\n", DRIVER_NAME, functionName, axisNum);
@@ -155,7 +155,7 @@ asynStatus ImsMDrivePlusMotorAxis::setAxisMoveParameters(double minVelocity, dou
 
 ////////////////////////////////////////////////////////
 //! move()
-//! Override asynMotorAxis class implementation
+//! Override asynAxisAxis class implementation
 // Based on smarActMCSMotorDriver.cpp
 //
 //! @param[in] position
@@ -197,7 +197,7 @@ asynStatus ImsMDrivePlusMotorAxis::move(double position, int relative, double mi
 
 ////////////////////////////////////////////////////////
 //! moveVelocity()
-//! Override asynMotorAxis class implementation
+//! Override asynAxisAxis class implementation
 // Based on smarActMCSMotorDriver.cpp
 //! move at a fixed velocity until stop() called
 //
@@ -234,7 +234,7 @@ asynStatus ImsMDrivePlusMotorAxis::moveVelocity(double minVelocity, double maxVe
 
 ////////////////////////////////////////////////////////
 //! stop()
-//! Override asynMotorAxis class implementation
+//! Override asynAxisAxis class implementation
 // Based on smarActMCSMotorDriver.cpp
 //
 //! @param[in] acceleration
@@ -270,7 +270,7 @@ asynStatus ImsMDrivePlusMotorAxis::stop(double acceleration)
 
 ////////////////////////////////////////////////////////
 //! home()
-//! Override asynMotorAxis class implementation
+//! Override asynAxisAxis class implementation
 // Based on smarActMCSMotorDriver.cpp
 //
 //! direction=1: slew at maxVelocity in the minus direction (until switch activates) then creep at vi in the plus direction (until switch becomes inactive again)
@@ -333,7 +333,7 @@ asynStatus ImsMDrivePlusMotorAxis::home(double minVelocity, double maxVelocity, 
 
 ////////////////////////////////////////////////////////
 //! setPosition()
-//! Override asynMotorAxis class implementation
+//! Override asynAxisAxis class implementation
 // Based on smarActMCSMotorDriver.cpp
 //
 //! @param[in] position value to set motor's internal position
@@ -364,7 +364,7 @@ asynStatus ImsMDrivePlusMotorAxis::setPosition(double position)
 
 ////////////////////////////////////////////////////////
 //! poll()
-//! Override asynMotorAxis class implementation
+//! Override asynAxisAxis class implementation
 // Based on smarActMCSMotorDriver.cpp
 //
 //! Set position and moving flag

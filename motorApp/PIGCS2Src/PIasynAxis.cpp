@@ -26,7 +26,7 @@ Based on drvMotorSim.c, Mark Rivers, December 13, 2009
 #include <epicsMutex.h>
 #include <ellLib.h>
 #include <iocsh.h>
-#include <motor_interface.h>
+#include <axis_interface.h>
 
 #include "PIasynAxis.h"
 #include "PIasynController.h"
@@ -41,7 +41,7 @@ Based on drvMotorSim.c, Mark Rivers, December 13, 2009
 static const char *driverName = "PIasynAxis";
 
 PIasynAxis::PIasynAxis(PIasynController *pController, PIGCSController* pGCSController, int axis, const char* szName )
-: asynMotorAxis((asynMotorController*)pController, axis)
+: asynAxisAxis((asynAxisController*)pController, axis)
 , pController_(pController)
 , m_szAxisName(NULL)
 , m_isHoming(0)

@@ -73,7 +73,7 @@ USAGE...        Motor record driver level support for OMS PC68 serial device.
 #include <drvSup.h>
 #include <iocsh.h>
 
-#include "motor.h"
+#include "axis.h"
 #include "drvOmsPC68Com.h"
 #include "epicsExport.h"
 
@@ -807,7 +807,7 @@ static int motor_init()
                 else
                     pmotorState->motor_info[motor_index].encoder_present = YES;
 
-                /* Test if motor has PID parameters. */
+                /* Test if axis.has PID parameters. */
                 send_mess(card_index, PID_QUERY, oms_axis[motor_index]);
                 if (recv_mess(card_index, encoder_pos, 1) == -1)
                     pmotorState->motor_info[motor_index].pid_present = NO;

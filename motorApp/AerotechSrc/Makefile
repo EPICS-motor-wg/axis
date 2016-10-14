@@ -26,7 +26,7 @@ ifdef SNCSEQ
 SRCS += EnsembleTrajectoryScan.st
 endif
 
-Aerotech_LIBS += motor asyn
+Aerotech_LIBS += axis asyn
 ifdef SNCSEQ
 Aerotech_LIBS += seq pv
 endif

@@ -56,7 +56,7 @@ DESIGN LIMITATIONS...
 #include <string.h>
 #include <epicsThread.h>
 #include <drvSup.h>
-#include "motor.h"
+#include "axis.h"
 #include "drvIM483.h"
 #include "asynOctetSyncIO.h"
 #include "epicsExport.h"

@@ -7,8 +7,8 @@ March 28, 2011
 
 */
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 /** drvInfo strings for extra parameters that the ACR controller supports */
 #define ACRJerkString           "ACR_JERK"
@@ -17,7 +17,7 @@ March 28, 2011
 #define ACRBinaryOutString      "ACR_BINARY_OUT"
 #define ACRBinaryOutRBVString   "ACR_BINARY_OUT_RBV"
 
-class epicsShareClass ACRAxis : public asynMotorAxis
+class epicsShareClass ACRAxis : public asynAxisAxis
 {
 public:
   /* These are the methods we override from the base class */
@@ -32,7 +32,7 @@ public:
   asynStatus setClosedLoop(bool closedLoop);
 
 private:
-  ACRController *pC_;      /**< Pointer to the asynMotorController to which this axis belongs.
+  ACRController *pC_;      /**< Pointer to the asynAxisController to which this axis belongs.
                                 *   Abbreviated because it is used very frequently */
   char axisName_[10];      /**< Name of each axis, used in commands to ACR controller */ 
   double pulsesPerUnit_;   /**< Pulses per engineering unit, which is what ACR controller uses */ 
@@ -48,14 +48,14 @@ private:
 friend class ACRController;
 };
 
-class epicsShareClass ACRController : public asynMotorController {
+class epicsShareClass ACRController : public asynAxisController {
 public:
   ACRController(const char *portName, const char *ACRPortName, int numAxes, double movingPollPeriod, double idlePollPeriod);
 
   /* These are the methods that we override from asynPortDriver */
   asynStatus writeUInt32Digital(asynUser *pasynUser, epicsUInt32 value, epicsUInt32 mask);
   
-  /* These are the methods that we override from asynMotorDriver */
+  /* These are the methods that we override from asynAxisAxisDriver */
   asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value);
   asynStatus writeFloat64(asynUser *pasynUser, epicsFloat64 value);
   void report(FILE *fp, int level);

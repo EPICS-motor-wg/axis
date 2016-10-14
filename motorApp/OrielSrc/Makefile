@@ -15,7 +15,7 @@ LIBRARY_IOC = Oriel
 SRCS += OrielRegister.cc
 SRCS += devEMC18011.cc drvEMC18011.cc
 
-Oriel_LIBS += motor asyn
+Oriel_LIBS += axis asyn
 Oriel_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 include $(TOP)/configure/RULES

@@ -10,14 +10,14 @@ include $(TOP)/configure/CONFIG
 
 LIBRARY_IOC += ACRMotor
 
-# motorRecord.h will be created from motorRecord.dbd
+# axisRecord.h will be created from axisRecord.dbd
 # install devMotorSoft.dbd into <top>/dbd
 DBD += ACRMotorSupport.dbd
 
 # The following are compiled and added to the Support library
 ACRMotor_SRCS += ACRMotorDriver.cpp
 
-ACRMotor_LIBS += motor
+ACRMotor_LIBS += axis
 ACRMotor_LIBS += asyn
 ACRMotor_LIBS += $(EPICS_BASE_IOC_LIBS)
 

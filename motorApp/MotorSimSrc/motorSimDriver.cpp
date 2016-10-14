@@ -22,8 +22,8 @@ December 13, 2009
 #include <ellLib.h>
 #include <iocsh.h>
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 #include <epicsExport.h>
 #include "motorSimDriver.h"
@@ -47,7 +47,7 @@ static ELLLIST motorSimControllerList;
 static int motorSimControllerListInitialized = 0;
 
 motorSimAxis::motorSimAxis(motorSimController *pController, int axis, double lowHardLimit, double hiHardLimit, double home, double start )
-  : asynMotorAxis(pController, axis),
+  : asynAxisAxis(pController, axis),
     pC_(pController),
     lowHardLimit_(lowHardLimit), hiHardLimit_(hiHardLimit), home_(home)
 {
@@ -71,7 +71,7 @@ motorSimAxis::motorSimAxis(motorSimController *pController, int axis, double low
 
 
 motorSimController::motorSimController(const char *portName, int numAxes, int priority, int stackSize)
-  :  asynMotorController(portName, numAxes, NUM_SIM_CONTROLLER_PARAMS, 
+  :  asynAxisController(portName, numAxes, NUM_SIM_CONTROLLER_PARAMS, 
                          asynInt32Mask | asynFloat64Mask, 
                          asynInt32Mask | asynFloat64Mask,
                          ASYN_CANBLOCK | ASYN_MULTIDEVICE, 
@@ -100,7 +100,7 @@ motorSimController::motorSimController(const char *portName, int numAxes, int pr
     setDoubleParam(axis, this->motorPosition_, DEFAULT_START);
   }
 
-  this->motorThread_ = epicsThreadCreate("motorSimThread", 
+  this->axisThread_ = epicsThreadCreate("motorSimThread", 
                                          epicsThreadPriorityLow,
                                          epicsThreadGetStackSize(epicsThreadStackMedium),
                                          (EPICSTHREADFUNC) motorSimTaskC, (void *) this);
@@ -144,7 +144,7 @@ void motorSimController::report(FILE *fp, int level)
   }
 
   // Call the base class method
-  asynMotorController::report(fp, level);
+  asynAxisController::report(fp, level);
 }
 
 asynStatus motorSimController::processDeferredMoves()
@@ -196,7 +196,7 @@ asynStatus motorSimController::writeInt32(asynUser *pasynUser, epicsInt32 value)
     movesDeferred_ = value;
   } else {
     /* Call base class call its method (if we have our parameters check this here) */
-    status = asynMotorController::writeInt32(pasynUser, value);
+    status = asynAxisController::writeInt32(pasynUser, value);
   }
   
   /* Do callbacks so higher layers see any changes */
@@ -214,12 +214,12 @@ asynStatus motorSimController::writeInt32(asynUser *pasynUser, epicsInt32 value)
 
 motorSimAxis* motorSimController::getAxis(asynUser *pasynUser)
 {
-  return static_cast<motorSimAxis*>(asynMotorController::getAxis(pasynUser));
+  return static_cast<motorSimAxis*>(asynAxisController::getAxis(pasynUser));
 }
 
 motorSimAxis* motorSimController::getAxis(int axisNo)
 {
-  return static_cast<motorSimAxis*>(asynMotorController::getAxis(axisNo));
+  return static_cast<motorSimAxis*>(asynAxisController::getAxis(axisNo));
 }
 
 asynStatus motorSimController::profileMove(asynUser *pasynUser, int npoints, double positions[], double times[], int relative, int trigger )

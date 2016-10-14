@@ -13,10 +13,10 @@
 #include "drvSup.h"
 /* #include "callback.h" */
 
-#include "motorRecord.h"
-#include "motor.h"
+#include "axisRecord.h"
+#include "axis.h"
 #include "epicsExport.h"
-#include "motor_interface.h"
+#include "axis_interface.h"
 
 /*Create the dset for devMotor */
 static long init_record(struct motorRecord *);
@@ -53,7 +53,7 @@ epicsExportAddress(dset,devMotorSim);
 */
 typedef struct motorStatus_t 
 {
-    epicsUInt32 status;  /**< bit mask of errors and other binary information. The bit positions are in motor.h */
+    epicsUInt32 status;  /**< bit mask of errors and other binary information. The bit positions are in axis.h */
     epicsInt32  position;         /**< Current motor position in motor steps (if not servoing) or demand position (if servoing) */
     epicsInt32  encoder_position; /**< Current motor position in encoder units (only available if a servo system). */
 } motorStatus_t;

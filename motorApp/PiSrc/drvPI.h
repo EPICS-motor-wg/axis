@@ -41,7 +41,7 @@ Physik Instrumente (PI) GmbH & Co. motor controller driver support.
 #ifndef	INCdrvPIh
 #define	INCdrvPIh 1
 
-#include "motor.h"
+#include "axis.h"
 #include "motordrvCom.h"
 #include "asynDriver.h"
 #include "asynOctetSyncIO.h"

@@ -55,7 +55,7 @@ extern "C" {epicsExportAddress(dset,devMXmotor);}
 
 
 /* This table is used to define the command types */
-/* WARNING! this must match "motor_cmnd" in motor.h */
+/* WARNING! this must match "motor_cmnd" in axis.h */
 
 static msg_types MXmotor_table[] = {
     MOTION, 	/* MOVE_ABS */

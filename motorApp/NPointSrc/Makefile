@@ -10,14 +10,14 @@ include $(TOP)/configure/CONFIG
 
 LIBRARY_IOC += NPointMotor
 
-# motorRecord.h will be created from motorRecord.dbd
+# axisRecord.h will be created from axisRecord.dbd
 # install devMotorSoft.dbd into <top>/dbd
 DBD += NPointMotorSupport.dbd
 
 # The following are compiled and added to the Support library
 NPointMotor_SRCS += C300MotorDriver.cpp
 
-NPointMotor_LIBS += motor
+NPointMotor_LIBS += axis
 NPointMotor_LIBS += asyn
 NPointMotor_LIBS += $(EPICS_BASE_IOC_LIBS)
 

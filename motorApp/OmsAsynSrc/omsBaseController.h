@@ -19,7 +19,7 @@ USAGE...        Pro-Dex OMS asyn motor base controller support
 #include <ellLib.h>
 #include <iocsh.h>
 #include <errlog.h>
-#include "asynMotorController.h"
+#include "asynAxisController.h"
 #include "omsBaseAxis.h"
 #include <epicsExport.h>
 
@@ -27,7 +27,7 @@ USAGE...        Pro-Dex OMS asyn motor base controller support
 #define OMSBASE_MAXNUMBERLEN 12
 #define OMSINPUTBUFFERLEN OMSBASE_MAXNUMBERLEN * OMS_MAX_AXES + 2
 
-class omsBaseController : public asynMotorController {
+class omsBaseController : public asynAxisController {
 public:
     omsBaseController(const char *portName, int numAxes, int priority, int stackSize, int extMotorParams);
     virtual asynStatus readInt32(asynUser *pasynUser, epicsInt32 *value);
@@ -77,7 +77,7 @@ private:
     asynStatus sendReceiveReplace(omsBaseAxis*, char *, char *, int);
     asynStatus getSubstring(unsigned int , char* , char *, unsigned int);
     int sanityCounter;
-    epicsThreadId motorThread;
+    epicsThreadId axisThread;
     char inputBuffer[OMSINPUTBUFFERLEN];
     char pollInputBuffer[OMSINPUTBUFFERLEN];
     omsBaseAxis** pAxes;

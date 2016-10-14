@@ -5,19 +5,19 @@
 #ifndef ImsMDrivePlusMotorController_H
 #define ImsMDrivePlusMotorController_H
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 #include "ImsMDrivePlusMotorAxis.h"
 
 ////////////////////////////////////
 //  ImsMDrivePlusMotorController class
-//! derived from asynMotorController class
+//! derived from asynAxisController class
 ////////////////////////////////////
-class epicsShareClass ImsMDrivePlusMotorController : public asynMotorController
+class epicsShareClass ImsMDrivePlusMotorController : public asynAxisController
 {
 public:
 	/////////////////////////////////////////
-	// Override asynMotorController functions
+	// Override asynAxisController functions
 	/////////////////////////////////////////
 	ImsMDrivePlusMotorController(const char *motorPortName, const char *IOPortName, const char *deviceName, double movingPollPeriod, double idlePollPeriod);
 	ImsMDrivePlusMotorAxis* getAxis(asynUser *pasynUser);

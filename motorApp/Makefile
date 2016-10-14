@@ -1,109 +1,109 @@
 TOP = ..
 include $(TOP)/configure/CONFIG
 
-# MotorSrc is required for all motor record configurations.  It MUST appear
+# AxisSrc is required for all motor record configurations.  It MUST appear
 # 1st in this list of directories.
 
-DIRS += MotorSrc
+DIRS += AxisSrc
 
 # Select/deselect individual device driver modules by removing/adding a
 # "#" comment.
 
-DIRS += DeltaTauSrc
-DeltaTauSrc_DEPEND_DIRS = MotorSrc
+#DIRS += DeltaTauSrc
+#DeltaTauSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += OmsSrc
-OmsSrc_DEPEND_DIRS   = MotorSrc
+#DIRS += OmsSrc
+#OmsSrc_DEPEND_DIRS   = AxisSrc
 
-DIRS += SoftMotorSrc
-SoftMotorSrc_DEPEND_DIRS = MotorSrc
+#DIRS += SoftAxisSrc
+#SoftAxisSrc_DEPEND_DIRS = AxisSrc
 
 # All the following modules require ASYN.
 ifdef ASYN
 
 DIRS += OmsAsynSrc
-OmsAsynSrc_DEPEND_DIRS   = MotorSrc
+OmsAsynSrc_DEPEND_DIRS   = AxisSrc
 
-DIRS += MotorSimSrc
-MotorSimSrc_DEPEND_DIRS = MotorSrc
+#DIRS += MotorSimSrc
+#MotorSimSrc_DEPEND_DIRS = AxisSrc
 
 DIRS += NewportSrc
-NewportSrc_DEPEND_DIRS = MotorSrc
+NewportSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += ImsSrc
-ImsSrc_DEPEND_DIRS = MotorSrc
+#DIRS += ImsSrc
+#ImsSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += AcsSrc
-AcsSrc_DEPEND_DIRS = MotorSrc
+#DIRS += AcsSrc
+#AcsSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += MclennanSrc
-MclennanSrc_DEPEND_DIRS = MotorSrc
+#DIRS += MclennanSrc
+#MclennanSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += PiSrc
-PiSrc_DEPEND_DIRS = MotorSrc
+#DIRS += PiSrc
+#PiSrc_DEPEND_DIRS = AxisSrc
 
 DIRS += PIGCS2Src
-PIGCS2Src_DEPEND_DIRS = MotorSrc
+PIGCS2Src_DEPEND_DIRS = AxisSrc
 
-DIRS += MicroMoSrc
-MicroMoSrc_DEPEND_DIRS = MotorSrc
+#DIRS += MicroMoSrc
+#MicroMoSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += MicosSrc
-MicosSrc_DEPEND_DIRS = MotorSrc
+#DIRS += MicosSrc
+#MicosSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += FaulhaberSrc
-FaulhaberSrc_DEPEND_DIRS = MotorSrc
+#DIRS += FaulhaberSrc
+#FaulhaberSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += PC6KSrc
-PC6KSrc_DEPEND_DIRS = MotorSrc
+#DIRS += PC6KSrc
+#PC6KSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += NewFocusSrc
-NewFocusSrc_DEPEND_DIRS = MotorSrc
+#DIRS += NewFocusSrc
+#NewFocusSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += AcsTech80Src
-AcsTech80Src_DEPEND_DIRS = MotorSrc
+#DIRS += AcsTech80Src
+#AcsTech80Src_DEPEND_DIRS = AxisSrc
 
-DIRS += OrielSrc
-OrielSrc_DEPEND_DIRS = MotorSrc
+#DIRS += OrielSrc
+#OrielSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += ThorLabsSrc
-ThorLabsSrc_DEPEND_DIRS = MotorSrc
+#DIRS += ThorLabsSrc
+#ThorLabsSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += SmartMotorSrc
-SmartMotorSrc_DEPEND_DIRS = MotorSrc
+#DIRS += SmartMotorSrc
+#SmartAxisSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += PiJenaSrc
-PiJenaSrc_DEPEND_DIRS = MotorSrc
+#DIRS += PiJenaSrc
+#PiJenaSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += KohzuSrc
-KohzuSrc_DEPEND_DIRS = MotorSrc
+#DIRS += KohzuSrc
+#KohzuSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += AttocubeSrc
-AttocubeSrc_DEPEND_DIRS = MotorSrc
+#DIRS += AttocubeSrc
+#AttocubeSrc_DEPEND_DIRS = AxisSrc
 
-DIRS += AerotechSrc
-AerotechSrc_DEPEND_DIRS = MotorSrc
+#DIRS += AerotechSrc
+#AerotechSrc_DEPEND_DIRS = AxisSrc
 
 # The Hytec support requires ipac
 ifdef IPAC
 DIRS += HytecSrc
-HytecSrc_DEPEND_DIRS = MotorSrc
+HytecSrc_DEPEND_DIRS = AxisSrc
 endif
 
 DIRS += ACRSrc
-ACRSrc_DEPEND_DIRS = MotorSrc
+ACRSrc_DEPEND_DIRS = AxisSrc
 
 DIRS += SmarActMCSSrc
-SmarActMCSSrc_DEPEND_DIRS = MotorSrc
+SmarActMCSSrc_DEPEND_DIRS = AxisSrc
 
 DIRS += NPointSrc
-NPointSrc_DEPEND_DIRS = MotorSrc
+NPointSrc_DEPEND_DIRS = AxisSrc
 
 DIRS += MicronixSrc
-MicronixSrc_DEPEND_DIRS = MotorSrc
+MicronixSrc_DEPEND_DIRS = AxisSrc
 
 DIRS += PhytronSrc
-PhytronSrc_DEPEND_DIRS = MotorSrc
+PhytronSrc_DEPEND_DIRS = AxisSrc
 
 endif
 

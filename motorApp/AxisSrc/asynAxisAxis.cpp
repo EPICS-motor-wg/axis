@@ -1,8 +1,8 @@
-/* asynMotorAxis.cpp 
+/* asynAxisAxis.cpp 
  * 
  * Mark Rivers
  *
- * This file defines the base class for an asynMotorAxis.  It is the class
+ * This file defines the base class for an asynAxisAxis.  It is the class
  * from which real motor axes are derived.
  */
 #include <stdlib.h>
@@ -13,24 +13,24 @@
 #include <asynPortDriver.h>
 #define epicsExportSharedSymbols
 #include <shareLib.h>
-#include "asynMotorAxis.h"
-#include "asynMotorController.h"
+#include "asynAxisAxis.h"
+#include "asynAxisController.h"
 
-static const char *driverName = "asynMotorAxis";
+static const char *driverName = "asynAxisAxis";
 
 
-/** Creates a new asynMotorAxis object.
-  * \param[in] pC Pointer to the asynMotorController to which this axis belongs. 
+/** Creates a new asynAxisAxis object.
+  * \param[in] pC Pointer to the asynAxisController to which this axis belongs. 
   * \param[in] axisNo Index number of this axis, range 0 to pC->numAxes_-1.
   * 
   * Checks that pC is not null, and that axisNo is in the valid range.
   * Sets a pointer to itself in pC->pAxes[axisNo_].
   * Connects pasynUser_ to this asyn port and axisNo.
   */
-asynMotorAxis::asynMotorAxis(class asynMotorController *pC, int axisNo)
+asynAxisAxis::asynAxisAxis(class asynAxisController *pC, int axisNo)
   : pC_(pC), axisNo_(axisNo), statusChanged_(1)
 {
-  static const char *functionName = "asynMotorAxis";
+  static const char *functionName = "asynAxisAxis";
 
   if (!pC) {
     printf("%s:%s: Error, controller is NULL\n",
@@ -62,7 +62,7 @@ asynMotorAxis::asynMotorAxis(class asynMotorController *pC, int axisNo)
   pasynManager->connectDevice(pasynUser_, pC->portName, axisNo);
 }
 
-asynMotorAxis::~asynMotorAxis()
+asynAxisAxis::~asynAxisAxis()
 {
 }
 
@@ -73,7 +73,7 @@ asynMotorAxis::~asynMotorAxis()
   * \param[in] minVelocity The initial velocity, often called the base velocity. Units=steps/sec.
   * \param[in] maxVelocity The maximum velocity, often called the slew velocity. Units=steps/sec.
   * \param[in] acceleration The acceleration value. Units=steps/sec/sec. */
-asynStatus asynMotorAxis::move(double position, int relative, double minVelocity, double maxVelocity, double acceleration)
+asynStatus asynAxisAxis::move(double position, int relative, double minVelocity, double maxVelocity, double acceleration)
 {
   return asynSuccess;
 }
@@ -83,7 +83,7 @@ asynStatus asynMotorAxis::move(double position, int relative, double minVelocity
   * \param[in] minVelocity The initial velocity, often called the base velocity. Units=steps/sec.
   * \param[in] maxVelocity The maximum velocity, often called the slew velocity. Units=steps/sec.
   * \param[in] acceleration The acceleration value. Units=steps/sec/sec. */
-asynStatus asynMotorAxis::moveVelocity(double minVelocity, double maxVelocity, double acceleration)
+asynStatus asynAxisAxis::moveVelocity(double minVelocity, double maxVelocity, double acceleration)
 {
   return asynSuccess;
 }
@@ -95,7 +95,7 @@ asynStatus asynMotorAxis::moveVelocity(double minVelocity, double maxVelocity, d
   * \param[in] acceleration The acceleration value. Units=steps/sec/sec.
   * \param[in] forwards  Flag indicating to move the motor in the forward direction(1) or reverse direction(0).
   *                      Some controllers need to be told the direction, others know which way to go to home. */
-asynStatus asynMotorAxis::home(double minVelocity, double maxVelocity, double acceleration, int forwards)
+asynStatus asynAxisAxis::home(double minVelocity, double maxVelocity, double acceleration, int forwards)
 {
   return asynSuccess;
 }
@@ -103,7 +103,7 @@ asynStatus asynMotorAxis::home(double minVelocity, double maxVelocity, double ac
 
 /** Stop the motor.
   * \param[in] acceleration The acceleration value. Units=steps/sec/sec. */
-asynStatus asynMotorAxis::stop(double acceleration)
+asynStatus asynAxisAxis::stop(double acceleration)
 {
   return asynSuccess;
 }
@@ -114,7 +114,7 @@ asynStatus asynMotorAxis::stop(double acceleration)
   * as the hardware supports.  It should call setIntegerParam() and setDoubleParam() for each item that it polls,
   * and then call callParamCallbacks() at the end.
   * \param[out] moving A flag that the function must set indicating that the axis is moving (1) or done (0). */
-asynStatus asynMotorAxis::poll(bool *moving)
+asynStatus asynAxisAxis::poll(bool *moving)
 {
   return asynSuccess;
 }
@@ -122,7 +122,7 @@ asynStatus asynMotorAxis::poll(bool *moving)
 
 /** Set the current position of the motor.
   * \param[in] position The new absolute motor position that should be set in the hardware. Units=steps.*/
-asynStatus asynMotorAxis::setPosition(double position)
+asynStatus asynAxisAxis::setPosition(double position)
 {
   return asynSuccess;
 }
@@ -130,7 +130,7 @@ asynStatus asynMotorAxis::setPosition(double position)
 
 /** Set the current encoder position of the motor.
   * \param[in] position The new absolute encoder position that should be set in the hardware. Units=steps.*/
-asynStatus asynMotorAxis::setEncoderPosition(double position)
+asynStatus asynAxisAxis::setEncoderPosition(double position)
 {
   return asynSuccess;
 }
@@ -138,7 +138,7 @@ asynStatus asynMotorAxis::setEncoderPosition(double position)
 
 /** Set the high limit position of the motor.
   * \param[in] highLimit The new high limit position that should be set in the hardware. Units=steps.*/
-asynStatus asynMotorAxis::setHighLimit(double highLimit)
+asynStatus asynAxisAxis::setHighLimit(double highLimit)
 {
   return asynSuccess;
 }
@@ -146,7 +146,7 @@ asynStatus asynMotorAxis::setHighLimit(double highLimit)
 
 /** Set the low limit position of the motor.
   * \param[in] lowLimit The new low limit position that should be set in the hardware. Units=steps.*/
-asynStatus asynMotorAxis::setLowLimit(double lowLimit)
+asynStatus asynAxisAxis::setLowLimit(double lowLimit)
 {
   return asynSuccess;
 }
@@ -154,7 +154,7 @@ asynStatus asynMotorAxis::setLowLimit(double lowLimit)
 
 /** Set the proportional gain of the motor.
   * \param[in] pGain The new proportional gain. */
-asynStatus asynMotorAxis::setPGain(double pGain)
+asynStatus asynAxisAxis::setPGain(double pGain)
 {
   return asynSuccess;
 }
@@ -162,7 +162,7 @@ asynStatus asynMotorAxis::setPGain(double pGain)
 
 /** Set the integral gain of the motor.
   * \param[in] iGain The new integral gain. */
-asynStatus asynMotorAxis::setIGain(double iGain)
+asynStatus asynAxisAxis::setIGain(double iGain)
 {
   return asynSuccess;
 }
@@ -170,7 +170,7 @@ asynStatus asynMotorAxis::setIGain(double iGain)
 
 /** Set the derivative gain of the motor.
   * \param[in] dGain The new derivative gain. */
-asynStatus asynMotorAxis::setDGain(double dGain)
+asynStatus asynAxisAxis::setDGain(double dGain)
 {
   return asynSuccess;
 }
@@ -178,7 +178,7 @@ asynStatus asynMotorAxis::setDGain(double dGain)
 
 /** Set the motor closed loop status. 
   * \param[in] closedLoop true = close loop, false = open looop. */
-asynStatus asynMotorAxis::setClosedLoop(bool closedLoop)
+asynStatus asynAxisAxis::setClosedLoop(bool closedLoop)
 {
   return asynSuccess;
 }
@@ -186,12 +186,12 @@ asynStatus asynMotorAxis::setClosedLoop(bool closedLoop)
 
 /** Set the motor encoder ratio. 
   * \param[in] ratio The new encoder ratio */
-asynStatus asynMotorAxis::setEncoderRatio(double ratio)
+asynStatus asynAxisAxis::setEncoderRatio(double ratio)
 {
   return asynSuccess;
 }
 
-void asynMotorAxis::report(FILE *fp, int details)
+void asynAxisAxis::report(FILE *fp, int details)
 {
 }
 
@@ -201,7 +201,7 @@ void asynMotorAxis::report(FILE *fp, int details)
  * Derived classes need to implement this to actually perform the 
  * axis move to the home position.
  */
-asynStatus asynMotorAxis::doMoveToHome()
+asynStatus asynAxisAxis::doMoveToHome()
 {
   static const char *functionName="doMoveToHome";
   
@@ -215,7 +215,7 @@ asynStatus asynMotorAxis::doMoveToHome()
 /**
  * Set method for referencingModeMove_
  */
-void  asynMotorAxis::setReferencingModeMove(int distance)
+void  asynAxisAxis::setReferencingModeMove(int distance)
 {
   referencingModeMove_ = distance; 
 }
@@ -224,7 +224,7 @@ void  asynMotorAxis::setReferencingModeMove(int distance)
 /**
  * Get method for referencingModeMove_
  */
-int  asynMotorAxis::getReferencingModeMove() 
+int  asynAxisAxis::getReferencingModeMove() 
 {
   return referencingModeMove_;
 }
@@ -242,7 +242,7 @@ int  asynMotorAxis::getReferencingModeMove()
   * do callbacks to devMotorAsyn when callParamCallbacks() is called.
   * \param[in] function The function (parameter) number 
   * \param[in] value Value to set */
-asynStatus asynMotorAxis::setIntegerParam(int function, int value)
+asynStatus asynAxisAxis::setIntegerParam(int function, int value)
 {
   int mask;
   epicsUInt32 status=0;
@@ -271,7 +271,7 @@ asynStatus asynMotorAxis::setIntegerParam(int function, int value)
   * then sets a flag to do callbacks to devMotorAsyn when callParamCallbacks() is called.
   * \param[in] function The function (parameter) number 
   * \param[in] value Value to set */
-asynStatus asynMotorAxis::setDoubleParam(int function, double value)
+asynStatus asynAxisAxis::setDoubleParam(int function, double value)
 {
   if (function == pC_->motorPosition_) {
     if (value != status_.position) {
@@ -292,7 +292,7 @@ asynStatus asynMotorAxis::setDoubleParam(int function, double value)
   * Sets the value for a string for this axis in the parameter library.
   * \param[in] function The function (parameter) number 
   * \param[in] value Value to set */
-asynStatus asynMotorAxis::setStringParam(int function, const char *value)
+asynStatus asynAxisAxis::setStringParam(int function, const char *value)
 {
   // Call the base class method
   return pC_->setStringParam(axisNo_, function, value);
@@ -303,7 +303,7 @@ asynStatus asynMotorAxis::setStringParam(int function, const char *value)
 /** Calls the callbacks for any parameters that have changed for this axis in the parameter library.
   * This function takes special action if the aggregate MotorStatus structure has changed.
   * In that case it does callbacks on the asynGenericPointer interface, typically to devMotorAsyn. */  
-asynStatus asynMotorAxis::callParamCallbacks()
+asynStatus asynAxisAxis::callParamCallbacks()
 {
   if (statusChanged_) {
     statusChanged_ = 0;
@@ -313,7 +313,7 @@ asynStatus asynMotorAxis::callParamCallbacks()
 }
 
 /* These are the functions for profile moves */
-asynStatus asynMotorAxis::initializeProfile(size_t maxProfilePoints)
+asynStatus asynAxisAxis::initializeProfile(size_t maxProfilePoints)
 {
   if (profilePositions_)       free(profilePositions_);
   profilePositions_ =         (double *)calloc(maxProfilePoints, sizeof(double));
@@ -333,7 +333,7 @@ asynStatus asynMotorAxis::initializeProfile(size_t maxProfilePoints)
   * \param[in] positions Array of profile positions for this axis in user units.
   * \param[in] numPoints The number of positions in the array.
   */
-asynStatus asynMotorAxis::defineProfile(double *positions, size_t numPoints)
+asynStatus asynAxisAxis::defineProfile(double *positions, size_t numPoints)
 {
   size_t i;
   double resolution;
@@ -373,7 +373,7 @@ asynStatus asynMotorAxis::defineProfile(double *positions, size_t numPoints)
 
 
 /** Function to build a coordinated move of multiple axes. */
-asynStatus asynMotorAxis::buildProfile()
+asynStatus asynAxisAxis::buildProfile()
 {
   // static const char *functionName = "buildProfile";
 
@@ -383,7 +383,7 @@ asynStatus asynMotorAxis::buildProfile()
 
 
 /** Function to execute a coordinated move of multiple axes. */
-asynStatus asynMotorAxis::executeProfile()
+asynStatus asynAxisAxis::executeProfile()
 {
   // static const char *functionName = "executeProfile";
 
@@ -393,7 +393,7 @@ asynStatus asynMotorAxis::executeProfile()
 
 
 /** Function to abort a profile. */
-asynStatus asynMotorAxis::abortProfile()
+asynStatus asynAxisAxis::abortProfile()
 {
   // static const char *functionName = "abortProfile";
 
@@ -408,7 +408,7 @@ asynStatus asynMotorAxis::abortProfile()
   * Caution: this function modifies the readbacks in place, so it must only be called
   * once per readback operation.
  */
-asynStatus asynMotorAxis::readbackProfile()
+asynStatus asynAxisAxis::readbackProfile()
 {
   int i;
   double resolution;
@@ -437,12 +437,12 @@ asynStatus asynMotorAxis::readbackProfile()
 
 /****************************************************************************/
 /* The following functions are used by the automatic drive power control in the 
-   base class poller in the asynMotorController class.*/
+   base class poller in the asynAxisController class.*/
 
 /**
  * Read the flag that indicates if the last poll was moving.
  */
-int asynMotorAxis::getWasMovingFlag(void)
+int asynAxisAxis::getWasMovingFlag(void)
 {
   return wasMovingFlag_;
 }
@@ -450,7 +450,7 @@ int asynMotorAxis::getWasMovingFlag(void)
 /**
  * Set this to 1 if the previous poll indicated moving state 
  */
-void asynMotorAxis::setWasMovingFlag(int wasMovingFlag)
+void asynAxisAxis::setWasMovingFlag(int wasMovingFlag)
 {
   wasMovingFlag_ = wasMovingFlag;
 }
@@ -459,7 +459,7 @@ void asynMotorAxis::setWasMovingFlag(int wasMovingFlag)
  * Read the flag that indicates if the drive should be automatically
  * disabled.
  */
-int asynMotorAxis::getDisableFlag(void)
+int asynAxisAxis::getDisableFlag(void)
 {
   return disableFlag_;
 }
@@ -467,7 +467,7 @@ int asynMotorAxis::getDisableFlag(void)
 /**
  * Set this to 1 if the drive should be automatically disabled.
  */
-void asynMotorAxis::setDisableFlag(int disableFlag)
+void asynAxisAxis::setDisableFlag(int disableFlag)
 {
   disableFlag_ = disableFlag;
 }
@@ -475,7 +475,7 @@ void asynMotorAxis::setDisableFlag(int disableFlag)
 /**
  * Read the time in seconds of the last end of move.
  */
-double asynMotorAxis::getLastEndOfMoveTime(void)
+double asynAxisAxis::getLastEndOfMoveTime(void)
 {
   return lastEndOfMoveTime_;
 }
@@ -483,7 +483,7 @@ double asynMotorAxis::getLastEndOfMoveTime(void)
 /**
  * Set this to the current time at the end of a move.
  */
-void asynMotorAxis::setLastEndOfMoveTime(double time)
+void asynAxisAxis::setLastEndOfMoveTime(double time)
 {
   lastEndOfMoveTime_ = time;
 }

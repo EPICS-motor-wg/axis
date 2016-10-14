@@ -17,7 +17,7 @@ SRCS += omsMAXnet.cpp
 SRCS += omsMAXv.cpp
 #SRCS += omsMAXvEncFunc.cpp
 
-omsAsyn_LIBS += motor
+omsAsyn_LIBS += axis
 omsAsyn_LIBS += asyn
 omsAsyn_LIBS += $(EPICS_BASE_IOC_LIBS)
 

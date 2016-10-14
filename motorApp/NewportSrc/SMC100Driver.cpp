@@ -23,8 +23,8 @@ K. Goetze 2012-03-23  Initial version
 
 #include <asynOctetSyncIO.h>
 
-#include <asynMotorController.h>
-#include <asynMotorAxis.h>
+#include <asynAxisController.h>
+#include <asynAxisAxis.h>
 
 #include <epicsExport.h>
 #include "SMC100Driver.h"
@@ -40,7 +40,7 @@ K. Goetze 2012-03-23  Initial version
   */
 SMC100Controller::SMC100Controller(const char *portName, const char *SMC100PortName, int numAxes, 
                                  double movingPollPeriod, double idlePollPeriod, double stepSize)
-  :  asynMotorController(portName, numAxes, NUM_SMC100_PARAMS, 
+  :  asynAxisController(portName, numAxes, NUM_SMC100_PARAMS, 
                          0, // No additional interfaces beyond those in base class
                          0, // No additional callback interfaces beyond those in base class
                          ASYN_CANBLOCK | ASYN_MULTIDEVICE, 
@@ -98,7 +98,7 @@ extern "C" int SMC100CreateController(const char *portName, const char *SMC100Po
   * \param[in] level The level of report detail desired
   *
   * If details > 0 then information is printed about each axis.
-  * After printing controller-specific information it calls asynMotorController::report()
+  * After printing controller-specific information it calls asynAxisController::report()
   */
 void SMC100Controller::report(FILE *fp, int level)
 {
@@ -106,7 +106,7 @@ void SMC100Controller::report(FILE *fp, int level)
     this->portName, numAxes_, movingPollPeriod_, idlePollPeriod_);
 
   // Call the base class method
-  asynMotorController::report(fp, level);
+  asynAxisController::report(fp, level);
 }
 
 /** Returns a pointer to an SMC100Axis object.
@@ -114,7 +114,7 @@ void SMC100Controller::report(FILE *fp, int level)
   * \param[in] pasynUser asynUser structure that encodes the axis index number. */
 SMC100Axis* SMC100Controller::getAxis(asynUser *pasynUser)
 {
-  return static_cast<SMC100Axis*>(asynMotorController::getAxis(pasynUser));
+  return static_cast<SMC100Axis*>(asynAxisController::getAxis(pasynUser));
 }
 
 /** Returns a pointer to an SMC100Axis object.
@@ -122,7 +122,7 @@ SMC100Axis* SMC100Controller::getAxis(asynUser *pasynUser)
   * \param[in] No Axis index number. */
 SMC100Axis* SMC100Controller::getAxis(int axisNo)
 {
-  return static_cast<SMC100Axis*>(asynMotorController::getAxis(axisNo));
+  return static_cast<SMC100Axis*>(asynAxisController::getAxis(axisNo));
 }
 
 
@@ -135,7 +135,7 @@ SMC100Axis* SMC100Controller::getAxis(int axisNo)
   * Initializes register numbers, etc.
   */
 SMC100Axis::SMC100Axis(SMC100Controller *pC, int axisNo, double stepSize)
-  : asynMotorAxis(pC, axisNo),
+  : asynAxisAxis(pC, axisNo),
     pC_(pC), stepSize_(stepSize)
 { 
 
@@ -145,7 +145,7 @@ SMC100Axis::SMC100Axis(SMC100Controller *pC, int axisNo, double stepSize)
   * \param[in] fp The file pointer on which report information will be written
   * \param[in] level The level of report detail desired
   *
-  * After printing device-specific information calls asynMotorAxis::report()
+  * After printing device-specific information calls asynAxisAxis::report()
   */
 void SMC100Axis::report(FILE *fp, int level)
 {
@@ -155,7 +155,7 @@ void SMC100Axis::report(FILE *fp, int level)
   }
 
   // Call the base class method
-  asynMotorAxis::report(fp, level);
+  asynAxisAxis::report(fp, level);
 }
 
 asynStatus SMC100Axis::sendAccelAndVelocity(double acceleration, double velocity) 

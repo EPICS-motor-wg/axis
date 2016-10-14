@@ -18,8 +18,8 @@ April 11, 2013
 
 #include <asynOctetSyncIO.h>
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 #include <epicsExport.h>
 #include "AG_CONEX.h"
@@ -38,7 +38,7 @@ April 11, 2013
   */
 AG_CONEXController::AG_CONEXController(const char *portName, const char *serialPortName, int controllerID, 
                                  double movingPollPeriod, double idlePollPeriod)
-  :  asynMotorController(portName, 1, NUM_AG_CONEX_PARAMS, 
+  :  asynAxisController(portName, 1, NUM_AG_CONEX_PARAMS, 
                          0, // No additional interfaces beyond those in base class
                          0, // No additional callback interfaces beyond those in base class
                          ASYN_CANBLOCK | ASYN_MULTIDEVICE, 
@@ -129,7 +129,7 @@ asynStatus AG_CONEXController::writeCONEX(const char *output, double timeout)
   * \param[in] level The level of report detail desired
   *
   * If details > 0 then information is printed about each axis.
-  * After printing controller-specific information it calls asynMotorController::report()
+  * After printing controller-specific information it calls asynAxisController::report()
   */
 void AG_CONEXController::report(FILE *fp, int level)
 {
@@ -138,7 +138,7 @@ void AG_CONEXController::report(FILE *fp, int level)
     this->portName, controllerID_, controllerVersion_, movingPollPeriod_, idlePollPeriod_);
 
   // Call the base class method
-  asynMotorController::report(fp, level);
+  asynAxisController::report(fp, level);
 }
 
 /** Returns a pointer to an AG_CONEXAxis object.
@@ -146,7 +146,7 @@ void AG_CONEXController::report(FILE *fp, int level)
   * \param[in] pasynUser asynUser structure that encodes the axis index number. */
 AG_CONEXAxis* AG_CONEXController::getAxis(asynUser *pasynUser)
 {
-  return static_cast<AG_CONEXAxis*>(asynMotorController::getAxis(pasynUser));
+  return static_cast<AG_CONEXAxis*>(asynAxisController::getAxis(pasynUser));
 }
 
 /** Returns a pointer to an AG_CONEXAxis object.
@@ -154,7 +154,7 @@ AG_CONEXAxis* AG_CONEXController::getAxis(asynUser *pasynUser)
   * \param[in] axisNo Axis index number. */
 AG_CONEXAxis* AG_CONEXController::getAxis(int axisNo)
 {
-  return static_cast<AG_CONEXAxis*>(asynMotorController::getAxis(axisNo));
+  return static_cast<AG_CONEXAxis*>(asynAxisController::getAxis(axisNo));
 }
 
 
@@ -167,7 +167,7 @@ AG_CONEXAxis* AG_CONEXController::getAxis(int axisNo)
   * Initializes register numbers, etc.
   */
 AG_CONEXAxis::AG_CONEXAxis(AG_CONEXController *pC)
-  : asynMotorAxis(pC, 0),
+  : asynAxisAxis(pC, 0),
     pC_(pC), 
     currentPosition_(0.)
 {
@@ -231,7 +231,7 @@ AG_CONEXAxis::AG_CONEXAxis(AG_CONEXController *pC)
   * \param[in] fp The file pointer on which report information will be written
   * \param[in] level The level of report detail desired
   *
-  * After printing device-specific information calls asynMotorAxis::report()
+  * After printing device-specific information calls asynAxisAxis::report()
   */
 void AG_CONEXAxis::report(FILE *fp, int level)
 {
@@ -265,7 +265,7 @@ void AG_CONEXAxis::report(FILE *fp, int level)
   }
 
   // Call the base class method
-  asynMotorAxis::report(fp, level);
+  asynAxisAxis::report(fp, level);
 }
 
 asynStatus AG_CONEXAxis::move(double position, int relative, double minVelocity, double maxVelocity, double acceleration)

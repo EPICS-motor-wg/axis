@@ -9,8 +9,8 @@ file "../../db/Phytron_motor.db"
 {
 pattern
 {P,       N,      M,     DTYP,         PORT,           ADDR, DESC,          EGU,   DIR,  VELO,  VBAS, VMAX,  ACCL,  BDST,  BVEL,  BACC,  MRES,  ERES,   PREC,  DHLM,  DLLM,   INIT}
-{PHYIOC:,  1,  "m$(N)",  "asynMotor",  phyMotionPort,  11,   "motor $(N)",  Deg,   Pos,  360,   180,  720,   .5,    0,     180,   .2,    1.8,   0.18,   5,     1440,  -1440,  ""}
-{PHYIOC:,  2,  "m$(N)",  "asynMotor",  phyMotionPort,  21,   "motor $(N)",  Deg,   Pos,  360,   180,  720,   .5,    0,     180,   .2,    1.8,   0.18,   5,     1440,  -1440,  ""}
+{PHYIOC:,  1,  "m$(N)",  "asynAxis",  phyMotionPort,  11,   "motor $(N)",  Deg,   Pos,  360,   180,  720,   .5,    0,     180,   .2,    1.8,   0.18,   5,     1440,  -1440,  ""}
+{PHYIOC:,  2,  "m$(N)",  "asynAxis",  phyMotionPort,  21,   "motor $(N)",  Deg,   Pos,  360,   180,  720,   .5,    0,     180,   .2,    1.8,   0.18,   5,     1440,  -1440,  ""}
 
 }
 
@@ -46,5 +46,5 @@ file "../../db/Phytron_MCM01.db"
 {
 pattern
 {P,      DTYP,         PORT,             ADDR, TIMEOUT}
-{PHYIOC, "asynMotor",  phyMotionPort,    0,    10    }
+{PHYIOC, "asynAxis",  phyMotionPort,    0,    10    }
 }

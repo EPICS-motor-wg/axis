@@ -16,7 +16,7 @@
 #ifndef	INCdrvMicosh
 #define	INCdrvMicosh 1
 
-#include "motor.h"
+#include "axis.h"
 #include "motordrvCom.h"
 #include "asynDriver.h"
 #include "asynOctetSyncIO.h"

@@ -7,8 +7,8 @@ April 11, 2013
 
 */
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 typedef enum {
   ModelAG_UC2,
@@ -19,7 +19,7 @@ typedef enum {
 // No controller-specific parameters yet
 #define NUM_AG_UC_PARAMS 0  
 
-class epicsShareClass AG_UCAxis : public asynMotorAxis
+class epicsShareClass AG_UCAxis : public asynAxisAxis
 {
 public:
   /* These are the methods we override from the base class */
@@ -36,7 +36,7 @@ private:
   int velocityToSpeedCode(double velocity);
   asynStatus writeAgilis();
   asynStatus writeAgilis(const char *output, double timeout);
-  AG_UCController *pC_;          /**< Pointer to the asynMotorController to which this axis belongs.
+  AG_UCController *pC_;          /**< Pointer to the asynAxisController to which this axis belongs.
                                    *   Abbreviated because it is used very frequently */
   bool hasLimits_;
   int forwardAmplitude_;
@@ -49,7 +49,7 @@ private:
 friend class AG_UCController;
 };
 
-class epicsShareClass AG_UCController : public asynMotorController {
+class epicsShareClass AG_UCController : public asynAxisController {
 public:
   AG_UCController(const char *portName, const char *serialPortName, int numAxes, double movingPollPeriod, double idlePollPeriod);
 

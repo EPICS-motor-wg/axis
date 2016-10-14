@@ -16,8 +16,8 @@
 #define VERSION 2.00
 
 #include <string.h>
-#include "motorRecord.h"
-#include "motor.h"
+#include "axisRecord.h"
+#include "axis.h"
 #include "motordevCom.h"
 #include "drvMicos.h"
 #include "epicsExport.h"

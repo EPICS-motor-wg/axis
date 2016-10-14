@@ -39,7 +39,7 @@ USAGE...    This file contains ThorLabs Piezo Control Module (MDT695)
 #ifndef	INCdrvMDT695h
 #define	INCdrvMDT695h 1
 
-#include "motor.h"
+#include "axis.h"
 #include "motordrvCom.h"
 #include "asynDriver.h"
 #include "asynOctetSyncIO.h"

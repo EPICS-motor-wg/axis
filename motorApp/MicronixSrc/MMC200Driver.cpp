@@ -30,7 +30,7 @@ July 10, 2013
   */
 MMC200Controller::MMC200Controller(const char *portName, const char *MMC200PortName, int numAxes, 
                                  double movingPollPeriod, double idlePollPeriod, int ignoreLimits)
-  :  asynMotorController(portName, numAxes, NUM_MMC200_PARAMS, 
+  :  asynAxisController(portName, numAxes, NUM_MMC200_PARAMS, 
                          0, // No additional interfaces beyond those in base class
                          0, // No additional callback interfaces beyond those in base class
                          ASYN_CANBLOCK | ASYN_MULTIDEVICE, 
@@ -85,7 +85,7 @@ extern "C" int MMC200CreateController(const char *portName, const char *MMC200Po
   * \param[in] level The level of report detail desired
   *
   * If details > 0 then information is printed about each axis.
-  * After printing controller-specific information it calls asynMotorController::report()
+  * After printing controller-specific information it calls asynAxisController::report()
   */
 void MMC200Controller::report(FILE *fp, int level)
 {
@@ -97,7 +97,7 @@ void MMC200Controller::report(FILE *fp, int level)
   fprintf(fp, "  ignore limits=%d\n", ignoreLimits_);
 
   // Call the base class method
-  asynMotorController::report(fp, level);
+  asynAxisController::report(fp, level);
 }
 
 /** Returns a pointer to an MMC200Axis object.
@@ -105,7 +105,7 @@ void MMC200Controller::report(FILE *fp, int level)
   * \param[in] pasynUser asynUser structure that encodes the axis index number. */
 MMC200Axis* MMC200Controller::getAxis(asynUser *pasynUser)
 {
-  return static_cast<MMC200Axis*>(asynMotorController::getAxis(pasynUser));
+  return static_cast<MMC200Axis*>(asynAxisController::getAxis(pasynUser));
 }
 
 /** Returns a pointer to an MMC200Axis object.
@@ -113,7 +113,7 @@ MMC200Axis* MMC200Controller::getAxis(asynUser *pasynUser)
   * \param[in] axisNo Axis index number. */
 MMC200Axis* MMC200Controller::getAxis(int axisNo)
 {
-  return static_cast<MMC200Axis*>(asynMotorController::getAxis(axisNo));
+  return static_cast<MMC200Axis*>(asynAxisController::getAxis(axisNo));
 }
 
 
@@ -126,7 +126,7 @@ MMC200Axis* MMC200Controller::getAxis(int axisNo)
   * Initializes register numbers, etc.
   */
 MMC200Axis::MMC200Axis(MMC200Controller *pC, int axisNo)
-  : asynMotorAxis(pC, axisNo),
+  : asynAxisAxis(pC, axisNo),
     pC_(pC)
 {
   int errorFlag = 0;
@@ -226,7 +226,7 @@ MMC200Axis::MMC200Axis(MMC200Controller *pC, int axisNo)
   * \param[in] fp The file pointer on which report information will be written
   * \param[in] level The level of report detail desired
   *
-  * After printing device-specific information calls asynMotorAxis::report()
+  * After printing device-specific information calls asynAxisAxis::report()
   */
 void MMC200Axis::report(FILE *fp, int level)
 {
@@ -242,7 +242,7 @@ void MMC200Axis::report(FILE *fp, int level)
   }
 
   // Call the base class method
-  asynMotorAxis::report(fp, level);
+  asynAxisAxis::report(fp, level);
 }
 
 asynStatus MMC200Axis::sendAccelAndVelocity(double acceleration, double velocity) 

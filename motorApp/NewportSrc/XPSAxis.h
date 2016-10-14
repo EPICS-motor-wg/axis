@@ -5,8 +5,8 @@ USAGE...        Newport XPS EPICS asyn motor device driver
 #ifndef XPSMotorAxis_H
 #define XPSMotorAxis_H
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 /** Struct that contains information about the XPS corrector loop.*/ 
 typedef struct
@@ -29,7 +29,7 @@ typedef struct
 
 class XPSController;
 
-class epicsShareClass XPSAxis : public asynMotorAxis
+class epicsShareClass XPSAxis : public asynAxisAxis
 {
   public:
   /* These are the methods we override from the base class */

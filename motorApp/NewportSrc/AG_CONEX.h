@@ -7,8 +7,8 @@ April 11, 2013
 
 */
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 typedef enum {
   ModelConexAGP,
@@ -18,7 +18,7 @@ typedef enum {
 // No controller-specific parameters yet
 #define NUM_AG_CONEX_PARAMS 0  
 
-class epicsShareClass AG_CONEXAxis : public asynMotorAxis
+class epicsShareClass AG_CONEXAxis : public asynAxisAxis
 {
 public:
   /* These are the methods we override from the base class */
@@ -36,7 +36,7 @@ public:
   asynStatus setDGain(double dGain);
 
 private:
-  AG_CONEXController *pC_;        /**< Pointer to the asynMotorController to which this axis belongs.
+  AG_CONEXController *pC_;        /**< Pointer to the asynAxisController to which this axis belongs.
                                    *   Abbreviated because it is used very frequently */
   asynStatus getClosedLoop(bool *closedLoop);
   double currentPosition_;
@@ -59,7 +59,7 @@ private:
 friend class AG_CONEXController;
 };
 
-class epicsShareClass AG_CONEXController : public asynMotorController {
+class epicsShareClass AG_CONEXController : public asynAxisController {
 public:
   AG_CONEXController(const char *portName, const char *serialPortName, int controllerID, double movingPollPeriod, double idlePollPeriod);
 

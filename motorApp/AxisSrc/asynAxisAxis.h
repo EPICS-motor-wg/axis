@@ -1,12 +1,12 @@
-/* asynMotorAxis.h 
+/* asynAxisAxis.h 
  * 
  * Mark Rivers
  *
- * This file defines the base class for an asynMotorAxis.  It is the class
+ * This file defines the base class for an asynAxisAxis.  It is the class
  * from which real motor axes are derived.
  */
-#ifndef asynMotorAxis_H
-#define asynMotorAxis_H
+#ifndef asynAxisAxis_H
+#define asynAxisAxis_H
 
 #include <epicsEvent.h>
 #include <epicsTypes.h>
@@ -14,15 +14,15 @@
 #ifdef __cplusplus
 #include <asynPortDriver.h>
 
-#include "asynMotorController.h"
+#include "asynAxisController.h"
 
 /** Class from which motor axis objects are derived. */
-class epicsShareClass asynMotorAxis {
+class epicsShareClass asynAxisAxis {
 
   public:
   /* This is the constructor for the class. */
-  asynMotorAxis(class asynMotorController *pController, int axisNumber);
-  virtual ~asynMotorAxis();
+  asynAxisAxis(class asynAxisController *pController, int axisNumber);
+  virtual ~asynAxisAxis();
 
   virtual asynStatus setIntegerParam(int index, int value);
   virtual asynStatus setDoubleParam(int index, double value);
@@ -64,7 +64,7 @@ class epicsShareClass asynMotorAxis {
   void setLastEndOfMoveTime(double time);
 
   protected:
-  class asynMotorController *pC_;    /**< Pointer to the asynMotorController to which this axis belongs.
+  class asynAxisController *pC_;    /**< Pointer to the asynAxisController to which this axis belongs.
                                       *   Abbreviated because it is used very frequently */
   int axisNo_;                       /**< Index number of this axis (0 - pC_->numAxes_-1) */
   asynUser *pasynUser_;              /**< asynUser connected to this axis for asynTrace debugging */
@@ -81,8 +81,8 @@ class epicsShareClass asynMotorAxis {
   int disableFlag_;
   double lastEndOfMoveTime_;
   
-  friend class asynMotorController;
+  friend class asynAxisController;
 };
 
 #endif /* _cplusplus */
-#endif /* asynMotorAxis_H */
+#endif /* asynAxisAxis_H */

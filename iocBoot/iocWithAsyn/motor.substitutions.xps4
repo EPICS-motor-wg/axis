@@ -2,12 +2,12 @@ file "$(TOP)/db/basic_asyn_motor.db"
 {
 pattern
 {P,    N,   M,         DTYP,     PORT, ADDR, DESC,      EGU,     DIR,   VELO,  VBAS, ACCL, BDST, BVEL, BACC,    MRES, PREC,   DHLM,   DLLM, INIT}
-{IOC:, 1, "m$(N)", "asynMotor",  XPS1,  0,  "Phi",     degrees,  Pos,   15.9,   0.1,    1,    0,    1,   .2,    .001,    5,    180,   -180, ""}
-{IOC:, 2, "m$(N)", "asynMotor",  XPS1,  1,  "Kappa",   degrees,  Pos,   15.9,   0.1,    1,    0,    1,   .2,    .0002,   5,    180,   -180, ""}
-{IOC:, 3, "m$(N)", "asynMotor",  XPS1,  2,  "Omega",   degrees,  Pos,   15.9,   0.1,    1,    0,    1,   .2,    .0002,   5,    360,   -180, ""}
-{IOC:, 4, "m$(N)", "asynMotor",  XPS1,  3,  "Psi",     degrees,  Pos,    3.9,   0.1,   .5,    0,    1,   .2,    .00025,  5,    230,   -230, ""}
-{IOC:, 5, "m$(N)", "asynMotor",  XPS1,  4,  "2theta",  degrees,  Pos,    7.9,   0.1,    1,    0,    1,   .2,    .0001,   5,    190,    -10, ""}
-{IOC:, 6, "m$(N)", "asynMotor",  XPS1,  5,  "Nu",      degrees,  Pos,    3.9,   0.1,   .5,    0,    1,   .2,    .00025,  5,    230,   -230, ""}
+{IOC:, 1, "m$(N)", "asynAxis",  XPS1,  0,  "Phi",     degrees,  Pos,   15.9,   0.1,    1,    0,    1,   .2,    .001,    5,    180,   -180, ""}
+{IOC:, 2, "m$(N)", "asynAxis",  XPS1,  1,  "Kappa",   degrees,  Pos,   15.9,   0.1,    1,    0,    1,   .2,    .0002,   5,    180,   -180, ""}
+{IOC:, 3, "m$(N)", "asynAxis",  XPS1,  2,  "Omega",   degrees,  Pos,   15.9,   0.1,    1,    0,    1,   .2,    .0002,   5,    360,   -180, ""}
+{IOC:, 4, "m$(N)", "asynAxis",  XPS1,  3,  "Psi",     degrees,  Pos,    3.9,   0.1,   .5,    0,    1,   .2,    .00025,  5,    230,   -230, ""}
+{IOC:, 5, "m$(N)", "asynAxis",  XPS1,  4,  "2theta",  degrees,  Pos,    7.9,   0.1,    1,    0,    1,   .2,    .0001,   5,    190,    -10, ""}
+{IOC:, 6, "m$(N)", "asynAxis",  XPS1,  5,  "Nu",      degrees,  Pos,    3.9,   0.1,   .5,    0,    1,   .2,    .00025,  5,    230,   -230, ""}
 }
 
 

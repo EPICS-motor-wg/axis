@@ -18,13 +18,13 @@ December 13, 2009
 #ifndef PI_ASYN_DRIVER_INCLUDED_
 #define PI_ASYN_DRIVER_INCLUDED_
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 class PIasynAxis;
 class PIGCSController;
 
-class PIasynController : asynMotorController {
+class PIasynController : asynAxisController {
 public:
     PIasynController(const char *portName, const char* asynPort, int numAxes, int priority, int stackSize, int movingPollPeriod, int idlePollPeriod);
     asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value);
@@ -34,8 +34,8 @@ public:
     asynStatus triggerProfile(asynUser *pasynUser);
     asynStatus configAxis(PIasynAxis *pAxis);
 
-    PIasynAxis* getPIAxis(asynUser *pasynUser) { return (PIasynAxis*)asynMotorController::getAxis(pasynUser); }
-    PIasynAxis* getPIAxis(int axisNo) { return (PIasynAxis*)asynMotorController::getAxis(axisNo); }
+    PIasynAxis* getPIAxis(asynUser *pasynUser) { return (PIasynAxis*)asynAxisController::getAxis(pasynUser); }
+    PIasynAxis* getPIAxis(int axisNo) { return (PIasynAxis*)asynAxisController::getAxis(axisNo); }
 
     virtual asynStatus poll();
 
@@ -43,7 +43,7 @@ public:
 
 private:
 //    void process(PIasynAxis *pAxis);
-    epicsThreadId motorThread;
+    epicsThreadId axisThread;
     int movesDeferred;
     //int numAxes;
     asynStatus processDeferredMoves();

@@ -6,8 +6,8 @@
 
 #include <epicsTime.h>
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 #define DRIVER_NAME "ImsMDrivePlusMotorDriver"
 
@@ -24,13 +24,13 @@ class epicsShareClass ImsMDrivePlusMotorController;
 
 ////////////////////////////////////
 // ImsMDrivePlusMotorAxis class
-// derived from asynMotorAxis class
+// derived from asynAxisAxis class
 ////////////////////////////////////
-class ImsMDrivePlusMotorAxis : public asynMotorAxis
+class ImsMDrivePlusMotorAxis : public asynAxisAxis
 {
 public:
 	///////////////////////////////////
-	// Override asynMotorAxis functions
+	// Override asynAxisAxis functions
 	///////////////////////////////////
 	ImsMDrivePlusMotorAxis(ImsMDrivePlusMotorController *pC, int axis);
 	asynStatus move(double position, int relative, double min_velocity, double max_velocity, double acceleration);
@@ -53,7 +53,7 @@ private:
 	//int useEncoder;                         //! using encoder flag
 	// FIXME handle lost position in driver or ioc??
 //	epicsTime idleTimeStart;                //! timer used to track idle time for saving to NVM
-//	double prevPosition;                    //! previous position used to see if motor has moved and need to update position in NVM in case of power failure
+//	double prevPosition;                    //! previous position used to see if axis.has moved and need to update position in NVM in case of power failure
 //	int prevMovingState;                    //! saves previous moving value
 
 	////////////////////////////////////////////////////

@@ -1,12 +1,12 @@
-/* asynMotorController.h 
+/* asynAxisController.h 
  * 
  * Mark Rivers
  *
- * This file defines the base class for an asynMotorController.  It is the class
+ * This file defines the base class for an asynAxisController.  It is the class
  * from which real motor controllers are derived.  It derives from asynPortDriver.
  */
-#ifndef asynMotorController_H
-#define asynMotorController_H
+#ifndef asynAxisController_H
+#define asynAxisController_H
 
 #include <epicsEvent.h>
 #include <epicsTypes.h>
@@ -150,17 +150,17 @@ enum ProfileStatus {
 #ifdef __cplusplus
 #include <asynPortDriver.h>
 
-class asynMotorAxis;
+class asynAxisAxis;
 
-class epicsShareClass asynMotorController : public asynPortDriver {
+class epicsShareClass asynAxisController : public asynPortDriver {
 
   public:
   /* This is the constructor for the class. */
-  asynMotorController(const char *portName, int numAxes, int numParams,
+  asynAxisController(const char *portName, int numAxes, int numParams,
                       int interfaceMask, int interruptMask,
                       int asynFlags, int autoConnect, int priority, int stackSize);
                       
-  virtual ~asynMotorController();
+  virtual ~asynAxisController();
 
   /* These are the methods that we override from asynPortDriver */
   virtual asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value);
@@ -171,8 +171,8 @@ class epicsShareClass asynMotorController : public asynPortDriver {
   virtual void report(FILE *fp, int details);
 
   /* These are the methods that are new to this class */
-  virtual asynMotorAxis* getAxis(asynUser *pasynUser);
-  virtual asynMotorAxis* getAxis(int axisNo);
+  virtual asynAxisAxis* getAxis(asynUser *pasynUser);
+  virtual asynAxisAxis* getAxis(int axisNo);
   virtual asynStatus startPoller(double movingPollPeriod, double idlePollPeriod, int forcedFastPolls);
   virtual asynStatus wakeupPoller();
   virtual asynStatus poll();
@@ -286,7 +286,7 @@ class epicsShareClass asynMotorController : public asynPortDriver {
   #define LAST_MOTOR_PARAM profileFollowingErrors_
 
   int numAxes_;                 /**< Number of axes this controller supports */
-  asynMotorAxis **pAxes_;       /**< Array of pointers to axis objects */
+  asynAxisAxis **pAxes_;       /**< Array of pointers to axis objects */
   epicsEventId pollEventId_;    /**< Event ID to wake up poller */
   epicsEventId moveToHomeId_;    /**< Event ID to wake up move to home thread */
   double idlePollPeriod_;       /**< The time between polls when no axes are moving */
@@ -307,9 +307,9 @@ class epicsShareClass asynMotorController : public asynPortDriver {
   char outString_[MAX_CONTROLLER_STRING_SIZE];
   char inString_[MAX_CONTROLLER_STRING_SIZE];
 
-  friend class asynMotorAxis;
+  friend class asynAxisAxis;
 };
 #define NUM_MOTOR_DRIVER_PARAMS (&LAST_MOTOR_PARAM - &FIRST_MOTOR_PARAM + 1)
 
 #endif /* _cplusplus */
-#endif /* asynMotorController_H */
+#endif /* asynAxisController_H */

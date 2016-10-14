@@ -44,8 +44,8 @@ USAGE...	Motor record device level support for Intelligent Motion
 
 #include <string.h>
 
-#include "motorRecord.h"
-#include "motor.h"
+#include "axisRecord.h"
+#include "axis.h"
 #include "motordevCom.h"
 #include "drvIM483.h"
 #include "epicsExport.h"
@@ -76,7 +76,7 @@ extern "C" {epicsExportAddress(dset,devMDrive);}
 /* --------------------------- program data --------------------- */
 
 /* This table is used to define the command types */
-/* WARNING! this must match "motor_cmnd" in motor.h */
+/* WARNING! this must match "motor_cmnd" in axis.h */
 
 static msg_types MDrive_table[] = {
     MOTION, 	/* MOVE_ABS */

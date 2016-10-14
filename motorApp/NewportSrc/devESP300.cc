@@ -38,8 +38,8 @@ USAGE...	Motor record device level support for Newport ESP300.
 
 #include <string.h>
 #include <math.h>
-#include "motorRecord.h"
-#include "motor.h"
+#include "axisRecord.h"
+#include "axis.h"
 #include "motordevCom.h"
 #include "drvMMCom.h"
 #include "epicsExport.h"
@@ -69,7 +69,7 @@ extern "C" {epicsExportAddress(dset,devESP300);}
 /* --------------------------- program data --------------------- */
 
 /* This table is used to define the command types */
-/* WARNING! this must match "motor_cmnd" in motor.h */
+/* WARNING! this must match "motor_cmnd" in axis.h */
 
 static msg_types ESP300_table[] = {
     MOTION, 	/* MOVE_ABS */

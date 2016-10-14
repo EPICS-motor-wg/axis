@@ -34,7 +34,7 @@ USAGE... This file contains Delta Tau PMAC driver "include" information.
 #ifndef	INCdrvPmach
 #define	INCdrvPmach 1
 
-#include "motor.h"
+#include "axis.h"
 #include "motordrvCom.h"
 
 /* Define for return test on devNoResponseProbe() */

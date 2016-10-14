@@ -36,7 +36,7 @@ Last Modified:	2004/07/16 19:06:58
  * -----------------
  */
 
-#include "motor.h"
+#include "axis.h"
 #include "motordrvCom.h"
 
 /* Function prototypes. */

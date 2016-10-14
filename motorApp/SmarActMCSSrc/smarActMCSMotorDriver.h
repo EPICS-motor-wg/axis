@@ -9,8 +9,8 @@
 
 #ifdef __cplusplus
 
-#include <asynMotorController.h>
-#include <asynMotorAxis.h>
+#include <asynAxisController.h>
+#include <asynAxisAxis.h>
 #include <stdarg.h>
 #include <exception>
 
@@ -40,7 +40,7 @@ protected:
 };
 
 
-class SmarActMCSAxis : public asynMotorAxis
+class SmarActMCSAxis : public asynAxisAxis
 {
 public:
 	SmarActMCSAxis(class SmarActMCSController *cnt_p, int axis, int channel);
@@ -62,7 +62,7 @@ protected:
 	asynStatus  setSpeed(double velocity);
 
 private:
-	SmarActMCSController   *c_p_;  // pointer to asynMotorController for this axis
+	SmarActMCSController   *c_p_;  // pointer to asynAxisController for this axis
 	asynStatus             comStatus_;
 	int                    vel_;
 	unsigned               holdTime_;
@@ -73,7 +73,7 @@ private:
 friend class SmarActMCSController;
 };
 
-class SmarActMCSController : public asynMotorController
+class SmarActMCSController : public asynAxisController
 {
 public:
 	SmarActMCSController(const char *portName, const char *IOPortName, int numAxes, double movingPollPeriod, double idlePollPeriod);

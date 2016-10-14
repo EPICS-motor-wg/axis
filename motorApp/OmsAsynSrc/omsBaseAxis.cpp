@@ -22,7 +22,7 @@ USAGE...        Pro-Dex OMS asyn motor base axes support
 static const char *driverName = "omsBaseAxisDriver";
 
 omsBaseAxis::omsBaseAxis(omsBaseController *pController, int axis, char axisChar)
-    : asynMotorAxis(pController, axis), axisChar(axisChar)
+    : asynAxisAxis(pController, axis), axisChar(axisChar)
 {
     pC_ = pController;
     stepper = 1;
@@ -205,7 +205,7 @@ asynStatus omsBaseAxis::setPosition(double position)
 }
 
 /** we need to implement this, because we need to use the motorUpdateStatus_ function
- * in asynMotorController, because we cannot access statusChanged_ (shouldn't be private)
+ * in asynAxisController, because we cannot access statusChanged_ (shouldn't be private)
  * ignore moving flag, since we have our own poller.
  */
 asynStatus omsBaseAxis::poll(bool *moving)

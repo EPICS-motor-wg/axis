@@ -39,18 +39,18 @@
 /*  2.1         New interfaces 			Jim Chen       	 04/04/2011             */
 /*  	        This version follows the asyn motor model 3 latest interface	*/
 /*				changes that include:											*/
-/*				a).New asynMotorAxis base class									*/
+/*				a).New asynAxisAxis base class									*/
 /*				b).Moves the axis specific functions from the motor controller 	*/
 /*				   class to individual axis class								*/
-/*				c).Changes asynMotorDriver.cpp to asynMotorController.cpp.		*/
+/*				c).Changes asynAxisAxisDriver.cpp to asynAxisController.cpp.		*/
 /*  2.2         Bugs fix 				Jim Chen       	 14/04/2011             */
 /*  	        Fixed setPosition bug											*/
 /*				Added firmware version parameter								*/
 /*                                                                              */
 /********************************************************************************/
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 static const char *driverName = "HytecMotorDriver";
 
@@ -124,7 +124,7 @@ static const char *driverName = "HytecMotorDriver";
 #define HytecMoveAllString			"HYTEC_MOVEALL"
 
 
-class HytecMotorAxis : public asynMotorAxis
+class HytecMotorAxis : public asynAxisAxis
 {
 public:
   	HytecMotorAxis(class HytecMotorController *pC, int axis, double ratio, int vector);
@@ -160,7 +160,7 @@ friend class HytecMotorController;
 };
 
 
-class HytecMotorController : asynMotorController 
+class HytecMotorController : asynAxisController 
 {
 public:
 	HytecMotorController(const char *portName, int numAxes, double movingPollPeriod, 
@@ -168,7 +168,7 @@ public:
 				int vector, int useencoder, double encoderRatio0, double encoderRatio1, 
 				double encoderRatio2, double encoderRatio3);
 
-    // These are the methods that we override from asynMotorDriver
+    // These are the methods that we override from asynAxisAxisDriver
     asynStatus readInt32(asynUser *pasynUser, epicsInt32 *value);
     asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value);
     asynStatus writeFloat64(asynUser *pasynUser, epicsFloat64 value);
@@ -216,7 +216,7 @@ private:
     int useencoder;
     volatile char *regbase;
 
-    epicsThreadId motorThread;
+    epicsThreadId axisThread;
 
 friend class HytecMotorAxis;
 };

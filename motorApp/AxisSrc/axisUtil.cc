@@ -1,12 +1,12 @@
 /*
-FILENAME...     motorUtil.cc
-USAGE...        Motor Record Utility Support.
+FILENAME...     axisUtil.cc
+USAGE...        Axis Record Utility Support.
 
 */
 
 
 /*
-*  motorUtil_A.c -- version 1.0
+*  axisUtil_A.c -- version 1.0
 *
 *  Original Author: Kevin Peterson (kmpeters@anl.gov)
 *  Date: December 11, 2002
@@ -36,66 +36,66 @@ USAGE...        Motor Record Utility Support.
 #include <epicsExport.h>
 #include <errlog.h>
 
-#include <motor.h>
+#include <axis.h>
 
 #define TIMEOUT 60 /* seconds */
 
 /* ----- External Declarations ----- */
-extern char **getMotorList();
+extern char **getAxisList();
 /* ----- --------------------- ----- */
 
 /* ----- Function Declarations ----- */
-RTN_STATUS motorUtilInit(char *);
-static int motorUtil_task(void *);
+RTN_STATUS axisUtilInit(char *);
+static int axisUtil_task(void *);
 static chid getChID(char *);
 static long pvMonitor(int, chid, int);
 static void dmov_handler(struct event_handler_args);
 static void allstop_handler(struct event_handler_args);
 static void stopAll(chid, char *);
-static int motorMovingCount();
+static int axisMovingCount();
 static void moving(int, chid, short);
 /* ----- --------------------- ----- */
 
 
-typedef struct motor_pv_info
+typedef struct axis_pv_info
 {
     char name[PVNAME_SZ];      /* pv names limited to 60 chars + term. in dbDefs.h */
-    chid chid_dmov;     /* Channel id for <motor name>.DMOV */
-    chid chid_stop;     /* Channel id for <motor name>.STOP */
+    chid chid_dmov;     /* Channel id for <axis name>.DMOV */
+    chid chid_stop;     /* Channel id for <axis name>.STOP */
     int in_motion;
     int index;          /* Call to ca_add_event() must have ptr to argument. */
-} Motor_pv_info;
+} Axis_pv_info;
 
 
 /* ----- Global Variables ----- */
-int motorUtil_debug = 0;
-int numMotors = 0;
+int axisUtil_debug = 0;
+int numAxiss = 0;
 /* ----- ---------------- ----- */
 
 /* ----- Local Variables  ----- */
-static Motor_pv_info *motorArray;
-static char **motorlist = 0;
+static Axis_pv_info *axisArray;
+static char **axislist = 0;
 static char *vme;
-static int old_numMotorsMoving = 0;
+static int old_numAxissMoving = 0;
 static short old_alldone_value = 1;
 static chid chid_allstop, chid_moving, chid_alldone, chid_movingdiff;
 /* ----- ---------------- ----- */
 
 
-RTN_STATUS motorUtilInit(char *vme_name)
+RTN_STATUS axisUtilInit(char *vme_name)
 {
     RTN_STATUS status = OK;
-    static bool initialized = false;	/* motorUtil initialized indicator. */
+    static bool initialized = false;	/* axisUtil initialized indicator. */
     
     if (initialized == true)
     {
-        printf( "motorUtil already initialized. Exiting\n");
+        printf( "axisUtil already initialized. Exiting\n");
         return ERROR;
     }
 
     if (strlen(vme_name) > PVNAME_SZ - 7 )
     {
-        printf( "motorUtilInit: Prefix %s has more than %d characters. Exiting\n",
+        printf( "axisUtilInit: Prefix %s has more than %d characters. Exiting\n",
                 vme_name, PVNAME_SZ - 7 );
         return ERROR;
     }
@@ -103,30 +103,30 @@ RTN_STATUS motorUtilInit(char *vme_name)
     initialized = true;
     vme = epicsStrDup(vme_name);
 
-    epicsThreadCreate((char *) "motorUtil", epicsThreadPriorityMedium,
+    epicsThreadCreate((char *) "axisUtil", epicsThreadPriorityMedium,
                       epicsThreadGetStackSize(epicsThreadStackMedium),
-                      (EPICSTHREADFUNC) motorUtil_task, (void *) NULL);
+                      (EPICSTHREADFUNC) axisUtil_task, (void *) NULL);
     return(status);
 }
 
 
-static int motorUtil_task(void *arg)
+static int axisUtil_task(void *arg)
 {
     char temp[PVNAME_STRINGSZ+5];
     int itera, status;
     epicsEventId wait_forever;
 
     SEVCHK(ca_context_create(ca_enable_preemptive_callback),
-           "motorUtil: ca_context_create() error");
+           "axisUtil: ca_context_create() error");
 
-    motorlist = getMotorList();
-    if (motorUtil_debug)
-        errlogPrintf("There are %i motors\n", numMotors);
+    axislist = getAxisList();
+    if (axisUtil_debug)
+        errlogPrintf("There are %i axiss\n", numAxiss);
     
-    if (numMotors > 0)
+    if (numAxiss > 0)
     {
-        motorArray = (Motor_pv_info *) callocMustSucceed(numMotors,
-                                   sizeof(Motor_pv_info), "motorUtil:init()");
+        axisArray = (Axis_pv_info *) callocMustSucceed(numAxiss,
+                                   sizeof(Axis_pv_info), "axisUtil:init()");
    
         /* setup $(P)moving */
         strcpy(temp, vme);
@@ -150,22 +150,22 @@ static int motorUtil_task(void *arg)
 	    return ERROR;
 	}
 
-        /* loop over motors in motorlist and fill in motorArray */
-        for (itera=0; itera < numMotors; itera++)
+        /* loop over axiss in axislist and fill in axisArray */
+        for (itera=0; itera < numAxiss; itera++)
         {
-            motorArray[itera].index = itera;
+            axisArray[itera].index = itera;
 
             /* Setup .DMOVs */
-            strcpy(motorArray[itera].name, motorlist[itera]);
-            strcpy(temp, motorlist[itera]);
+            strcpy(axisArray[itera].name, axislist[itera]);
+            strcpy(temp, axislist[itera]);
             strcat(temp, ".DMOV");
-            motorArray[itera].chid_dmov = getChID(temp);
-            status = pvMonitor(1, motorArray[itera].chid_dmov, itera);
+            axisArray[itera].chid_dmov = getChID(temp);
+            status = pvMonitor(1, axisArray[itera].chid_dmov, itera);
                     
             /* Setup .STOPs */
-            strcpy(temp, motorlist[itera]);
+            strcpy(temp, axislist[itera]);
             strcat(temp, ".STOP");
-            motorArray[itera].chid_stop = getChID(temp);        
+            axisArray[itera].chid_stop = getChID(temp);        
         }
 
         /* setup $(P)allstop */
@@ -195,7 +195,7 @@ static chid getChID(char *PVname)
     chid channelID = 0;
     int status;
 
-    if (motorUtil_debug)
+    if (axisUtil_debug)
 	errlogPrintf("getChID(%s)\n", PVname);
 
     /* In R3.14 ca_create_channel() will replace ca_search_and_connect() */
@@ -208,21 +208,21 @@ static chid getChID(char *PVname)
     if (status != ECA_NORMAL)
     {
         SEVCHK(status, "ca_search_and_connect");
-        errlogPrintf("motorUtil.cc: getChID(%s) error: %i\n", PVname, status);
+        errlogPrintf("axisUtil.cc: getChID(%s) error: %i\n", PVname, status);
 	channelID = 0;
     }
     return channelID;
 }
 
 
-static long pvMonitor(int eventType, chid channelID, int motor_index)
+static long pvMonitor(int eventType, chid channelID, int axis_index)
 {
     int status; 
 
     /* Create monitor */
     if (eventType)      /* moving() */
         status = ca_add_event(DBR_SHORT, channelID, &dmov_handler,
-                              &(motorArray[motor_index].index), 0);
+                              &(axisArray[axis_index].index), 0);
     else                /* stopAll() */
         status = ca_add_event(DBR_STRING, channelID, &allstop_handler, 0, 0);
     status = ca_pend_io(TIMEOUT);
@@ -255,24 +255,24 @@ static void stopAll(chid callback_chid, char *callback_value)
     
     if (strcmp(callback_value, "release") != 0)
     {
-        /* if at least one motor is moving, then continue with stop all */
-        if (motorMovingCount())
+        /* if at least one axis is moving, then continue with stop all */
+        if (axisMovingCount())
         {
-            for(itera=0; itera < numMotors; itera++)
-	        /* Only stop a motor that is moving.  This should avoid problems caused by trying
-		to stop motor records for which device and driver support have not been loaded.*/
-                if (motorArray[itera].in_motion == 1)
-		    ca_put(DBR_SHORT, motorArray[itera].chid_stop, &val);
+            for(itera=0; itera < numAxiss; itera++)
+	        /* Only stop a axis that is moving.  This should avoid problems caused by trying
+		to stop axis records for which device and driver support have not been loaded.*/
+                if (axisArray[itera].in_motion == 1)
+		    ca_put(DBR_SHORT, axisArray[itera].chid_stop, &val);
             status = ca_flush_io(); 
         }
 
         /* reset allstop so that it may be called again */
         ca_put(DBR_SHORT, chid_allstop, &release_val);
         status = ca_flush_io();
-        if (motorUtil_debug)
+        if (axisUtil_debug)
             errlogPrintf("reset allstop to \"release\"\n");
     }
-    else if (motorUtil_debug)
+    else if (axisUtil_debug)
 	errlogPrintf("didn't need to reset allstop\n");
 }
 
@@ -283,40 +283,40 @@ static void dmov_handler(struct event_handler_args args)
 }
 
 
-static void moving(int callback_motor_index, chid callback_chid,
+static void moving(int callback_axis_index, chid callback_chid,
                    short callback_dmov)
 {
     short new_alldone_value, done = 1, not_done = 0;
-    int numMotorsMoving, status;
+    int numAxissMoving, status;
     char diffChar;
     char diffStr[PVNAME_STRINGSZ+1];
 
-    if (motorUtil_debug)            
-        errlogPrintf("%s is %s\n", motorArray[callback_motor_index].name,
+    if (axisUtil_debug)            
+        errlogPrintf("%s is %s\n", axisArray[callback_axis_index].name,
                (callback_dmov) ? "STOPPED" : "MOVING");
 
     if (callback_dmov)
     {                      
-        motorArray[callback_motor_index].in_motion = 0;
+        axisArray[callback_axis_index].in_motion = 0;
         diffChar = '-';
     }
     else
     {
-        motorArray[callback_motor_index].in_motion = 1;
+        axisArray[callback_axis_index].in_motion = 1;
         diffChar = '+';
     }
     
-    numMotorsMoving = motorMovingCount();
+    numAxissMoving = axisMovingCount();
 
-    new_alldone_value = (numMotorsMoving) ? 0 : 1;
+    new_alldone_value = (numAxissMoving) ? 0 : 1;
     
     /* check to see if $(P)alldone needs to be updated */
     if (new_alldone_value != old_alldone_value)
     {
         /* give $(P)alldone the appropriate value */
-        if (numMotorsMoving == 0)
+        if (numAxissMoving == 0)
         {
-            if (motorUtil_debug)
+            if (axisUtil_debug)
                 errlogPrintf("sending alldone = TRUE\n");
 
             ca_put(DBR_SHORT, chid_alldone, &done);
@@ -324,60 +324,60 @@ static void moving(int callback_motor_index, chid callback_chid,
         }
         else
         {
-            if (motorUtil_debug)
+            if (axisUtil_debug)
                 errlogPrintf("sending alldone = FALSE\n");
 
             ca_put(DBR_SHORT, chid_alldone, &not_done);
             old_alldone_value = new_alldone_value;
         }
     }
-    else if (motorUtil_debug)
+    else if (axisUtil_debug)
 	errlogPrintf("the alldone value remains the same.\n");
 
     /* check to see if $(P)moving needs to be updated */
-    if (numMotorsMoving != old_numMotorsMoving)
+    if (numAxissMoving != old_numAxissMoving)
     {
-        if (motorUtil_debug)
-            errlogPrintf("updating number of motors moving\n");
+        if (axisUtil_debug)
+            errlogPrintf("updating number of axiss moving\n");
 
         /* give $(P)moving the appropriate value */
-        ca_put(DBR_LONG, chid_moving, &numMotorsMoving);
+        ca_put(DBR_LONG, chid_moving, &numAxissMoving);
 	
-	/* Tell which motor's dmov changed */
-	sprintf(diffStr, "%c%s", diffChar, motorArray[callback_motor_index].name);
+	/* Tell which axis's dmov changed */
+	sprintf(diffStr, "%c%s", diffChar, axisArray[callback_axis_index].name);
 	ca_array_put(DBR_CHAR, strlen(diffStr)+1, chid_movingdiff, diffStr); 
 
-        old_numMotorsMoving = numMotorsMoving;
+        old_numAxissMoving = numAxissMoving;
     }
-    else if (motorUtil_debug)
-	errlogPrintf("the number of motors moving remains the same.\n");
+    else if (axisUtil_debug)
+	errlogPrintf("the number of axiss moving remains the same.\n");
     
     /* send the ca_puts */
     status = ca_flush_io();
 }
 
 
-static int motorMovingCount()
+static int axisMovingCount()
 {
     int itera, in_motion_count=0;
 
-    for (itera=0; itera < numMotors; itera++)
-        in_motion_count += motorArray[itera].in_motion;
+    for (itera=0; itera < numAxiss; itera++)
+        in_motion_count += axisArray[itera].in_motion;
 
     return in_motion_count;
 }
 
 
-void listMovingMotors()
+void listMovingAxiss()
 {
     int itera;
   
-    errlogPrintf("\nThe following motors are moving:\n");
+    errlogPrintf("\nThe following axiss are moving:\n");
     
-    for (itera=0; itera < numMotors; itera++)
-        if (motorArray[itera].in_motion == 1)
-            errlogPrintf("%s, index = %i\n", motorArray[itera].name,
-                   motorArray[itera].index);
+    for (itera=0; itera < numAxiss; itera++)
+        if (axisArray[itera].in_motion == 1)
+            errlogPrintf("%s, index = %i\n", axisArray[itera].name,
+                   axisArray[itera].index);
 }
 
 
@@ -385,13 +385,13 @@ void printChIDlist()
 {
     int itera;
 
-    for (itera=0; itera < numMotors; itera++)
+    for (itera=0; itera < numAxiss; itera++)
     {
         errlogPrintf("i = %i,\tname = %s\tchid_dmov = %p\tchid_stop = \
                %p\tin_motion = %i\tindex = %i\n", itera,
-               motorArray[itera].name, motorArray[itera].chid_dmov,
-               motorArray[itera].chid_stop, motorArray[itera].in_motion,
-               motorArray[itera].index);
+               axisArray[itera].name, axisArray[itera].chid_dmov,
+               axisArray[itera].chid_stop, axisArray[itera].in_motion,
+               axisArray[itera].index);
     }
     
     errlogPrintf("chid_allstop = %p\n", chid_allstop);
@@ -404,15 +404,15 @@ extern "C"
 {
 
 static const iocshArg Arg = {"IOC name", iocshArgString};
-static const iocshArg * const motorUtilArg[1]  = {&Arg};
-static const iocshFuncDef motorUtilDef  = {"motorUtilInit", 1, motorUtilArg};
+static const iocshArg * const axisUtilArg[1]  = {&Arg};
+static const iocshFuncDef axisUtilDef  = {"axisUtilInit", 1, axisUtilArg};
 
-static void motorUtilCallFunc(const iocshArgBuf *args)
+static void axisUtilCallFunc(const iocshArgBuf *args)
 {
-    motorUtilInit(args[0].sval);
+    axisUtilInit(args[0].sval);
 }
 
-static const iocshArg ArgP = {"Print motorUtil chid list", iocshArgString};
+static const iocshArg ArgP = {"Print axisUtil chid list", iocshArgString};
 static const iocshArg * const printChIDArg[1]  = {&ArgP};
 static const iocshFuncDef printChIDDef  = {"printChIDlist", 1, printChIDArg};
 
@@ -421,24 +421,24 @@ static void printChIDCallFunc(const iocshArgBuf *args)
     printChIDlist();
 }
 
-static const iocshArg ArgL = {"List moving motors", iocshArgString};
-static const iocshArg * const listMovingMotorsArg[1]  = {&ArgL};
-static const iocshFuncDef listMovingMotorsDef  = {"listMovingMotors", 1, listMovingMotorsArg};
+static const iocshArg ArgL = {"List moving axiss", iocshArgString};
+static const iocshArg * const listMovingAxissArg[1]  = {&ArgL};
+static const iocshFuncDef listMovingAxissDef  = {"listMovingAxiss", 1, listMovingAxissArg};
 
-static void listMovingMotorsCallFunc(const iocshArgBuf *args)
+static void listMovingAxissCallFunc(const iocshArgBuf *args)
 {
-    listMovingMotors();
+    listMovingAxiss();
 }
 
-static void motorUtilRegister(void)
+static void axisUtilRegister(void)
 {
-    iocshRegister(&motorUtilDef,  motorUtilCallFunc);
+    iocshRegister(&axisUtilDef,  axisUtilCallFunc);
     iocshRegister(&printChIDDef,  printChIDCallFunc);
-    iocshRegister(&listMovingMotorsDef,  listMovingMotorsCallFunc);
+    iocshRegister(&listMovingAxissDef,  listMovingAxissCallFunc);
 }
 
-epicsExportRegistrar(motorUtilRegister);
-epicsExportAddress(int, motorUtil_debug);
+epicsExportRegistrar(axisUtilRegister);
+epicsExportAddress(int, axisUtil_debug);
 
 } // extern "C"
 

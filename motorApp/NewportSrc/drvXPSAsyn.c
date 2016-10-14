@@ -105,7 +105,7 @@ Modification Log:
 #include "drvSup.h"
 #include "epicsExport.h"
 #define DEFINE_MOTOR_PROTOTYPES 1
-#include "motor_interface.h"
+#include "axis_interface.h"
 #include "XPS_C8_drivers.h"
 #include "XPSAsynInterpose.h"
 #include "tclCall.h"
@@ -210,7 +210,7 @@ typedef struct motorAxisHandle
 typedef struct
 {
   AXIS_HDL pFirst;
-  epicsThreadId motorThread;
+  epicsThreadId axisThread;
   motorAxisLogFunc print;
   void *logParam;
   epicsTimeStamp now;

@@ -39,7 +39,7 @@ USAGE... This file contains Aerotech Soloist driver "include" information.
 #ifndef	INCdrvSoloisth
 #define	INCdrvSploisth 1
 
-#include "motor.h"
+#include "axis.h"
 #include "motordrvCom.h"
 #include "asynDriver.h"
 #include "asynOctetSyncIO.h"

@@ -17,7 +17,7 @@ SRCS += devMDrive.cc  drvMDrive.cc
 # model3 driver
 SRCS += ImsMDrivePlusMotorController.cpp ImsMDrivePlusMotorAxis.cpp
 
-Ims_LIBS += motor asyn
+Ims_LIBS += axis asyn
 Ims_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 include $(TOP)/configure/RULES

@@ -17,8 +17,8 @@ August 14, 2013
 
 #include <asynOctetSyncIO.h>
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 #include <epicsExport.h>
 #include "MVP2001Driver.h"
@@ -34,7 +34,7 @@ August 14, 2013
   */
 MVP2001Controller::MVP2001Controller(const char *portName, const char *MVP2001PortName, int numAxes, 
                                  double movingPollPeriod,double idlePollPeriod)
-  :  asynMotorController(portName, numAxes, NUM_MVP2001_PARAMS, 
+  :  asynAxisController(portName, numAxes, NUM_MVP2001_PARAMS, 
                          0, // No additional interfaces beyond those in base class
                          0, // No additional callback interfaces beyond those in base class
                          ASYN_CANBLOCK | ASYN_MULTIDEVICE, 
@@ -80,7 +80,7 @@ extern "C" int MVP2001CreateController(const char *portName, const char *MVP2001
   * \param[in] level The level of report detail desired
   *
   * If details > 0 then information is printed about each axis.
-  * After printing controller-specific information it calls asynMotorController::report()
+  * After printing controller-specific information it calls asynAxisController::report()
   */
 void MVP2001Controller::report(FILE *fp, int level)
 {
@@ -88,7 +88,7 @@ void MVP2001Controller::report(FILE *fp, int level)
     this->portName, numAxes_, movingPollPeriod_, idlePollPeriod_);
 
   // Call the base class method
-  asynMotorController::report(fp, level);
+  asynAxisController::report(fp, level);
 }
 
 /** Returns a pointer to an MVP2001Axis object.
@@ -96,7 +96,7 @@ void MVP2001Controller::report(FILE *fp, int level)
   * \param[in] pasynUser asynUser structure that encodes the axis index number. */
 MVP2001Axis* MVP2001Controller::getAxis(asynUser *pasynUser)
 {
-  return static_cast<MVP2001Axis*>(asynMotorController::getAxis(pasynUser));
+  return static_cast<MVP2001Axis*>(asynAxisController::getAxis(pasynUser));
 }
 
 /** Returns a pointer to an MVP2001Axis object.
@@ -104,7 +104,7 @@ MVP2001Axis* MVP2001Controller::getAxis(asynUser *pasynUser)
   * \param[in] axisNo Axis index number. */
 MVP2001Axis* MVP2001Controller::getAxis(int axisNo)
 {
-  return static_cast<MVP2001Axis*>(asynMotorController::getAxis(axisNo));
+  return static_cast<MVP2001Axis*>(asynAxisController::getAxis(axisNo));
 }
 
 /** Writes a string to the controller and reads the response.
@@ -159,7 +159,7 @@ void MVP2001Controller::parseReply(char *inString, int *val, int nchars)
   * Initializes register numbers, etc.
   */
 MVP2001Axis::MVP2001Axis(MVP2001Controller *pC, int axisNo, int encLPR, int maxCurr, int limPol)
-  : asynMotorAxis(pC, axisNo),
+  : asynAxisAxis(pC, axisNo),
     pC_(pC)
 {
   asynStatus status;
@@ -187,7 +187,7 @@ MVP2001Axis::MVP2001Axis(MVP2001Controller *pC, int axisNo, int encLPR, int maxC
   sprintf(pC_->outString_, "%d HO", axisIndex_);
   status = pC_->writeController();
 
-  /* The old driver enabled the motor here. Doing so causes problems.
+  /* The old driver enabled the axis.here. Doing so causes problems.
      Specifically, if enabling the motor causes the readback position to be 
      non-zero, then the autosaved position is NOT restored at iocInit */
   //sprintf(pC_->outString_, "%d EN", axisIndex_);
@@ -230,7 +230,7 @@ extern "C" int MVP2001CreateAxis(const char *MVP2001Name, int axisNo, int encLPR
   * \param[in] fp The file pointer on which report information will be written
   * \param[in] level The level of report detail desired
   *
-  * After printing device-specific information calls asynMotorAxis::report()
+  * After printing device-specific information calls asynAxisAxis::report()
   */
 void MVP2001Axis::report(FILE *fp, int level)
 {
@@ -244,7 +244,7 @@ void MVP2001Axis::report(FILE *fp, int level)
  }
 
   // Call the base class method
-  asynMotorAxis::report(fp, level);
+  asynAxisAxis::report(fp, level);
 }
 
 asynStatus MVP2001Axis::sendAccelAndVelocity(double acceleration, double velocity) 

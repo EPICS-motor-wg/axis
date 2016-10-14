@@ -40,7 +40,7 @@ USAGE...    This file contains Kohzu SC800 motorRecord driver information.
 #ifndef	INCdrvSC800h
 #define	INCdrvSC800h 1
 
-#include "motor.h"
+#include "axis.h"
 #include "motordrvCom.h"
 #include "asynDriver.h"
 #include "asynOctetSyncIO.h"

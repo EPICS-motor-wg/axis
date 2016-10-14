@@ -47,7 +47,7 @@ extern "C" {epicsExportAddress(int, motorOMSBASEdebug);}
 
 
 omsBaseController::omsBaseController(const char *portName, int maxAxes, int prio, int stackSz, int extMotorParams=0)
-    :   asynMotorController(portName, maxAxes, extMotorParams + MOTOR_OMS_PARAMS_COUNT,
+    :   asynAxisController(portName, maxAxes, extMotorParams + MOTOR_OMS_PARAMS_COUNT,
             asynInt32Mask | asynFloat64Mask | asynOctetMask,
             asynInt32Mask | asynFloat64Mask | asynOctetMask,
             ASYN_CANBLOCK | ASYN_MULTIDEVICE,
@@ -114,7 +114,7 @@ asynStatus omsBaseController::startPoller(double movingPollPeriod, double idlePo
     forcedFastPolls_  = forcedFastPolls;
 
     epicsSnprintf(threadName, sizeof(threadName), "OMSPoller-%d", controllerNumber);
-    this->motorThread = epicsThreadCreate(threadName,
+    this->axisThread = epicsThreadCreate(threadName,
             priority, stackSize,
             (EPICSTHREADFUNC) &omsBaseController::callPoller, (void *) this);
   return asynSuccess;
@@ -157,7 +157,7 @@ void omsBaseController::report(FILE *fp, int level)
         }
     }
     // Call the base class method
-    asynMotorController::report(fp, level);
+    asynAxisController::report(fp, level);
 }
 
 omsBaseAxis * omsBaseController::getAxis(asynUser *pasynUser)
@@ -246,7 +246,7 @@ asynStatus omsBaseController::readInt32(asynUser *pasynUser, epicsInt32 *value)
          }
      } else {
           // Call base class
-   	      status = asynMotorController::readInt32(pasynUser, value);
+   	      status = asynAxisController::readInt32(pasynUser, value);
      }
 
 
@@ -289,7 +289,7 @@ asynStatus omsBaseController::writeInt32(asynUser *pasynUser, epicsInt32 value)
         }
     }
     else if (function == motorMoveToHome_) {
-        /* avoid  asynMotorController::writeInt32 to handle this*/
+        /* avoid  asynAxisController::writeInt32 to handle this*/
     }
     else if (function == pollIndex)
     {
@@ -298,7 +298,7 @@ asynStatus omsBaseController::writeInt32(asynUser *pasynUser, epicsInt32 value)
     	 }
     }
     else {
-        return asynMotorController::writeInt32(pasynUser, value);
+        return asynAxisController::writeInt32(pasynUser, value);
     }
 
     pAxis->callParamCallbacks();
@@ -402,7 +402,7 @@ asynStatus omsBaseController::writeFloat64(asynUser *pasynUser, epicsFloat64 val
     }
      else {
          /* Call base classes method (if we have our parameters check this here) */
-         status = asynMotorController::writeFloat64(pasynUser, value);
+         status = asynAxisController::writeFloat64(pasynUser, value);
     }
 
     pAxis->callParamCallbacks();

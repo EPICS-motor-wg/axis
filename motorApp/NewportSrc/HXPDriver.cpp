@@ -18,8 +18,8 @@ Note: This driver was tested with the v1.3.x of the firmware
 
 #include <asynOctetSyncIO.h>
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 #include <epicsExport.h>
 #include "hxp_drivers.h"
@@ -41,7 +41,7 @@ static const char *driverName = "HXPDriver";
   */
 HXPController::HXPController(const char *portName, const char *IPAddress, int IPPort,
                                  double movingPollPeriod, double idlePollPeriod)
-  :  asynMotorController(portName, NUM_AXES, NUM_HXP_PARAMS, 
+  :  asynAxisController(portName, NUM_AXES, NUM_HXP_PARAMS, 
                          0, // No additional interfaces beyond those in base class
                          0, // No additional callback interfaces beyond those in base class
                          ASYN_CANBLOCK | ASYN_MULTIDEVICE, 
@@ -136,7 +136,7 @@ extern "C" int HXPCreateController(const char *portName, const char *IPAddress, 
   * \param[in] level The level of report detail desired
   *
   * If details > 0 then information is printed about each axis.
-  * After printing controller-specific information it calls asynMotorController::report()
+  * After printing controller-specific information it calls asynAxisController::report()
   */
 void HXPController::report(FILE *fp, int level)
 {
@@ -148,7 +148,7 @@ void HXPController::report(FILE *fp, int level)
     this->portName, NUM_AXES, movingPollPeriod_, idlePollPeriod_, coordSys);
 
   // Call the base class method
-  asynMotorController::report(fp, level);
+  asynAxisController::report(fp, level);
 }
 
 /** Returns a pointer to an HXPAxis object.
@@ -156,7 +156,7 @@ void HXPController::report(FILE *fp, int level)
   * \param[in] pasynUser asynUser structure that encodes the axis index number. */
 HXPAxis* HXPController::getAxis(asynUser *pasynUser)
 {
-  return static_cast<HXPAxis*>(asynMotorController::getAxis(pasynUser));
+  return static_cast<HXPAxis*>(asynAxisController::getAxis(pasynUser));
 }
 
 /** Returns a pointer to an HXPAxis object.
@@ -164,7 +164,7 @@ HXPAxis* HXPController::getAxis(asynUser *pasynUser)
   * \param[in] axisNo Axis index number. */
 HXPAxis* HXPController::getAxis(int axisNo)
 {
-  return static_cast<HXPAxis*>(asynMotorController::getAxis(axisNo));
+  return static_cast<HXPAxis*>(asynAxisController::getAxis(axisNo));
 }
 
 
@@ -172,7 +172,7 @@ HXPAxis* HXPController::getAxis(int axisNo)
   * Extracts the function and axis number from pasynUser.
   * Sets the value in the parameter library.
   * If the function is HXPMoveAll_ then it calls moves all motors with a single command
-  * For all other functions it calls asynMotorController::writeInt32.
+  * For all other functions it calls asynAxisController::writeInt32.
   * Calls any registered callbacks for this pasynUser->reason and address.  
   * \param[in] pasynUser asynUser structure that encodes the reason and address.
   * \param[in] value     Value to write. */
@@ -213,7 +213,7 @@ asynStatus HXPController::writeInt32(asynUser *pasynUser, epicsInt32 value)
   else 
   {
     /* Call base class method */
-    status = asynMotorController::writeInt32(pasynUser, value);
+    status = asynAxisController::writeInt32(pasynUser, value);
   }
   
   /* Do callbacks so higher layers see any changes */
@@ -373,7 +373,7 @@ void HXPController::postError(HXPAxis *pAxis, int status)
   * Initializes register numbers, etc.
   */
 HXPAxis::HXPAxis(HXPController *pC, int axisNo)
-  : asynMotorAxis(pC, axisNo),
+  : asynAxisAxis(pC, axisNo),
     pC_(pC)
 {  
   axisName_ = pC_->axisNames_[axisNo];
@@ -397,7 +397,7 @@ HXPAxis::HXPAxis(HXPController *pC, int axisNo)
   * \param[in] fp The file pointer on which report information will be written
   * \param[in] level The level of report detail desired
   *
-  * After printing device-specific information calls asynMotorAxis::report()
+  * After printing device-specific information calls asynAxisAxis::report()
   */
 void HXPAxis::report(FILE *fp, int level)
 {
@@ -407,7 +407,7 @@ void HXPAxis::report(FILE *fp, int level)
   }
 
   // Call the base class method
-  asynMotorAxis::report(fp, level);
+  asynAxisAxis::report(fp, level);
 }
 
 asynStatus HXPAxis::move(double position, int relative, double baseVelocity, double slewVelocity, double acceleration)

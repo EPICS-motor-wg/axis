@@ -36,7 +36,7 @@ USAGE... This file contains information common to all OMS PC68/78 controllers.
 #ifndef INCdrvOmsPC68Comh
 #define INCdrvOmsPC68Comh 1
 
-#include "motor.h"
+#include "axis.h"
 #include "motordrvCom.h"
 #include "asynDriver.h"
 #include "asynOctet.h"

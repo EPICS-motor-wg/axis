@@ -17,8 +17,8 @@ March 4, 2011
 
 #include <asynOctetSyncIO.h>
 
-#include "asynMotorController.h"
-#include "asynMotorAxis.h"
+#include "asynAxisController.h"
+#include "asynAxisAxis.h"
 
 #include <epicsExport.h>
 #include "ACRMotorDriver.h"
@@ -36,7 +36,7 @@ static const char *driverName = "ACRMotorDriver";
   */
 ACRController::ACRController(const char *portName, const char *ACRPortName, int numAxes, 
                              double movingPollPeriod, double idlePollPeriod)
-  :  asynMotorController(portName, numAxes, NUM_ACR_PARAMS, 
+  :  asynAxisController(portName, numAxes, NUM_ACR_PARAMS, 
                          asynUInt32DigitalMask, 
                          asynUInt32DigitalMask,
                          ASYN_CANBLOCK | ASYN_MULTIDEVICE, 
@@ -103,7 +103,7 @@ extern "C" int ACRCreateController(const char *portName, const char *ACRPortName
   * \param[in] level The level of report detail desired
   *
   * If details > 0 then information is printed about each axis.
-  * After printing controller-specific information calls asynMotorController::report()
+  * After printing controller-specific information calls asynAxisController::report()
   */
 void ACRController::report(FILE *fp, int level)
 {
@@ -117,7 +117,7 @@ void ACRController::report(FILE *fp, int level)
 
 
   // Call the base class method
-  asynMotorController::report(fp, level);
+  asynAxisController::report(fp, level);
 }
 
 /** Returns a pointer to an ACRMotorAxis object.
@@ -125,7 +125,7 @@ void ACRController::report(FILE *fp, int level)
   * \param[in] pasynUser asynUser structure that encodes the axis index number. */
 ACRAxis* ACRController::getAxis(asynUser *pasynUser)
 {
-  return static_cast<ACRAxis*>(asynMotorController::getAxis(pasynUser));
+  return static_cast<ACRAxis*>(asynAxisController::getAxis(pasynUser));
 }
 
 /** Returns a pointer to an ACRMotorAxis object.
@@ -133,7 +133,7 @@ ACRAxis* ACRController::getAxis(asynUser *pasynUser)
   * \param[in] axisNo Axis index number. */
 ACRAxis* ACRController::getAxis(int axisNo)
 {
-  return static_cast<ACRAxis*>(asynMotorController::getAxis(axisNo));
+  return static_cast<ACRAxis*>(asynAxisController::getAxis(axisNo));
 }
 
 
@@ -142,7 +142,7 @@ ACRAxis* ACRController::getAxis(int axisNo)
   * Sets the value in the parameter library.
   * If the function is motorSetClosedLoop_ then it turns the drive power on or off.
   * If the function is ACRReadBinaryIO_ then it reads the binary I/O registers on the controller.
-  * For all other functions it calls asynMotorController::writeInt32.
+  * For all other functions it calls asynAxisController::writeInt32.
   * Calls any registered callbacks for this pasynUser->reason and address.  
   * \param[in] pasynUser asynUser structure that encodes the reason and address.
   * \param[in] value     Value to write. */
@@ -164,7 +164,7 @@ asynStatus ACRController::writeInt32(asynUser *pasynUser, epicsInt32 value)
   else 
   {
     /* Call base class method */
-    status = asynMotorController::writeInt32(pasynUser, value);
+    status = asynAxisController::writeInt32(pasynUser, value);
   }
   
   /* Do callbacks so higher layers see any changes */
@@ -185,7 +185,7 @@ asynStatus ACRController::writeInt32(asynUser *pasynUser, epicsInt32 value)
   * Sets the value in the parameter library.
   * If the function is ACRJerk_ it sets the jerk value in the controller.
   * Calls any registered callbacks for this pasynUser->reason and address.  
-  * For all other functions it calls asynMotorController::writeFloat64.
+  * For all other functions it calls asynAxisController::writeFloat64.
   * \param[in] pasynUser asynUser structure that encodes the reason and address.
   * \param[in] value Value to write. */
 asynStatus ACRController::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
@@ -206,7 +206,7 @@ asynStatus ACRController::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
     
   } else {
     /* Call base class method */
-    status = asynMotorController::writeFloat64(pasynUser, value);
+    status = asynAxisController::writeFloat64(pasynUser, value);
   }
   
   /* Do callbacks so higher layers see any changes */
@@ -283,7 +283,7 @@ asynStatus ACRController::readBinaryIO()
   * Initializes register numbers, etc.
   */
 ACRAxis::ACRAxis(ACRController *pC, int axisNo)
-  : asynMotorAxis(pC, axisNo),
+  : asynAxisAxis(pC, axisNo),
     pC_(pC)
 {
   asynStatus status;
@@ -312,7 +312,7 @@ ACRAxis::ACRAxis(ACRController *pC, int axisNo)
   * \param[in] level The level of report detail desired
   *
   * If details > 0 then information is printed about each axis.
-  * After printing controller-specific information calls asynMotorController::report()
+  * After printing controller-specific information calls asynAxisController::report()
   */
 void ACRAxis::report(FILE *fp, int level)
 {
@@ -329,7 +329,7 @@ void ACRAxis::report(FILE *fp, int level)
   }
 
   // Call the base class method
-  asynMotorAxis::report(fp, level);
+  asynAxisAxis::report(fp, level);
 }
 
 

@@ -39,7 +39,7 @@ USAGE...    This file contains Parker Compumotor driver "include"
 #ifndef	INCdrvPC6Kh
 #define	INCdrvPC6Kh 1
 
-#include "motor.h"
+#include "axis.h"
 #include "motordrvCom.h"
 #include "asynDriver.h"
 #include "asynOctetSyncIO.h"

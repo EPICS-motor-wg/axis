@@ -46,7 +46,7 @@ extern "C" {epicsExportAddress(int, C300Tolerance);}
   */
 C300Controller::C300Controller(const char *portName, const char *C300PortName, int numAxes, 
                              double movingPollPeriod, double idlePollPeriod)
-  :  asynMotorController(portName, numAxes, NUM_C300_PARAMS, 
+  :  asynAxisController(portName, numAxes, NUM_C300_PARAMS, 
                          asynUInt32DigitalMask, 
                          asynUInt32DigitalMask,
                          ASYN_CANBLOCK | ASYN_MULTIDEVICE, 
@@ -103,7 +103,7 @@ extern "C" int C300CreateController(const char *portName, const char *C300PortNa
   * \param[in] level The level of report detail desired
   *
   * If details > 0 then information is printed about each axis.
-  * After printing controller-specific information calls asynMotorController::report()
+  * After printing controller-specific information calls asynAxisController::report()
   */
 void C300Controller::report(FILE *fp, int level)
 {
@@ -128,7 +128,7 @@ void C300Controller::report(FILE *fp, int level)
   }
 
   // Call the base class method
-  asynMotorController::report(fp, level);
+  asynAxisController::report(fp, level);
 }
 
 
@@ -137,7 +137,7 @@ void C300Controller::report(FILE *fp, int level)
   * \param[in] pasynUser asynUser structure that encodes the axis index number. */
 C300Axis* C300Controller::getAxis(asynUser *pasynUser)
 {
-  return static_cast<C300Axis*>(asynMotorController::getAxis(pasynUser));
+  return static_cast<C300Axis*>(asynAxisController::getAxis(pasynUser));
 }
 
 /** Returns a pointer to an C300MotorAxis object.
@@ -145,7 +145,7 @@ C300Axis* C300Controller::getAxis(asynUser *pasynUser)
   * \param[in] axisNo Axis index number. */
 C300Axis* C300Controller::getAxis(int axisNo)
 {
-  return static_cast<C300Axis*>(asynMotorController::getAxis(axisNo));
+  return static_cast<C300Axis*>(asynAxisController::getAxis(axisNo));
 }
 
 
@@ -216,7 +216,7 @@ asynStatus C300Controller::writeReadController(const char *output, char *input, 
   * Initializes register numbers, etc.
   */
 C300Axis::C300Axis(C300Controller *pC, int axisNo)
-  : asynMotorAxis(pC, axisNo),
+  : asynAxisAxis(pC, axisNo),
     pC_(pC)
 {
   asynStatus status;
