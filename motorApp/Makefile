@@ -21,9 +21,6 @@ OmsAsynSrc_DEPEND_DIRS   = AxisSrc
 DIRS += NewportSrc
 NewportSrc_DEPEND_DIRS = AxisSrc
 
-#DIRS += PiSrc
-#PiSrc_DEPEND_DIRS = AxisSrc
-
 DIRS += PIGCS2Src
 PIGCS2Src_DEPEND_DIRS = AxisSrc
 
