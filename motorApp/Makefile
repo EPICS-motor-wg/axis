@@ -9,9 +9,6 @@ DIRS += AxisSrc
 # Select/deselect individual device driver modules by removing/adding a
 # "#" comment.
 
-#DIRS += OmsSrc
-#OmsSrc_DEPEND_DIRS   = AxisSrc
-
 #DIRS += SoftAxisSrc
 #SoftAxisSrc_DEPEND_DIRS = AxisSrc
 
