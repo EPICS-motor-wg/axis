@@ -24,9 +24,6 @@ NewportSrc_DEPEND_DIRS = AxisSrc
 DIRS += PIGCS2Src
 PIGCS2Src_DEPEND_DIRS = AxisSrc
 
-#DIRS += MicroMoSrc
-#MicroMoSrc_DEPEND_DIRS = AxisSrc
-
 #DIRS += MicosSrc
 #MicosSrc_DEPEND_DIRS = AxisSrc
 
