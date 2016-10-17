@@ -1,5 +1,5 @@
 include axisRecord.dbd
-registrar(motorUtilRegister)
+registrar(axisUtilRegister)
 #variable(axisRecordDebug)
 #variable(motordrvComdebug)
 #variable(motorUtil_debug)

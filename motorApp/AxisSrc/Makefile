@@ -22,8 +22,8 @@ LIBRARY_IOC += axis
 
 # The following are required for all axis record configurations.
 axis_SRCS += axisRecord.cc
-#axis_SRCS += axisUtilAux.cc
-#axis_SRCS += axisUtil.cc
+axis_SRCS += axisUtilAux.cc
+axis_SRCS += axisUtil.cc
 
 axis_SRCS += drvAxisAsyn.c
 axis_SRCS += devAxisAsyn.c
