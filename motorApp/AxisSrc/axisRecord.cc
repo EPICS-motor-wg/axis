@@ -185,7 +185,7 @@ USAGE...        Motor Record Support.
  *                    Changed error checks from dial to user limits.
  */                                                          
 
-#define VERSION 6.10
+#define VERSION 10.00000
 
 #include    <stdlib.h>
 #include    <string.h>
@@ -530,6 +530,9 @@ static long init_record(dbCommon* arg, int pass)
 
     if (pass == 0)
     {
+#ifdef AXIS_RECORD_MOTOR_TYPE      
+        (void)dbPutAttribute("axis", "RTYP", "motor");
+#endif
         pmr->vers = VERSION;
         return(OK);
     }
@@ -3223,7 +3226,7 @@ static long get_precision(const DBADDR *paddr, long *precision)
         break;
 
     case axisRecordVERS:
-        *precision = 5;
+        *precision = 6;
         break;
 
     default:
