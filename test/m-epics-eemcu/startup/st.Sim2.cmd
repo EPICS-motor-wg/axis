@@ -26,11 +26,11 @@ epicsEnvSet("DHLM",          "$(SM_DHLM=135)")
 epicsEnvSet("HOMEPROC",      "$(SM_HOMEPROC=3)")
 
 
-< snippets/eemcuController.cmd
-< snippets/eemcuAxis.cmd
+< eemcuController.cmd
+< eemcuAxis.cmd
 
 epicsEnvSet("MOTOR_NAME",    "$(SM_MOTOR_NAME2=m2)")
 epicsEnvSet("R",             "$(SM_R2=m2-)")
 epicsEnvSet("AXIS_NO",       "$(SM_AXIS_NO2=2)")
 epicsEnvSet("DESC",          "$(SM_DESC2=motor2)")
-< snippets/eemcuAxis.cmd
+< eemcuAxis.cmd
