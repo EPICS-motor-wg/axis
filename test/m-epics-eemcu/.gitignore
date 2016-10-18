@@ -1,0 +1,14 @@
+.set*.txt
+bin/
+builddir/
+configure/RELEASE
+dbd/
+db/*.db
+eemcuApp/Db/eemcu.substitutions
+include/
+iocBoot/ioceemcu/*.cmd
+lib/
+startup/st.cmd.*.EEE.tmp
+O.*/
+*.pyc
+*~

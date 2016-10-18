@@ -1,0 +1,5 @@
+INSTALLED_EPICS=../../../.epics.torbogair.Darwin.x86_64
+TABX= X
+fileswscheck=eemcuApp/src/eemcu.h eemcuApp/src/eemcuAxis.cpp eemcuApp/src/eemcuController.cpp eemcuApp/src/eemcuMain.cpp
+cmd=egrep -n "$TAB| \$" eemcuApp/src/eemcu.h eemcuApp/src/eemcuAxis.cpp eemcuApp/src/eemcuController.cpp eemcuApp/src/eemcuMain.cpp
+./doit.sh  SolAxis|TwoAxis|Sim8 <ip>[:port]

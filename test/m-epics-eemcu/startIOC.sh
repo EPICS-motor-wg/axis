@@ -1,0 +1,233 @@
+#!/bin/sh
+APPXX=eemcu
+export APPXX
+
+uname_s=$(uname -s 2>/dev/null || echo unknown)
+uname_m=$(uname -m 2>/dev/null || echo unknown)
+
+INSTALLED_EPICS=../../../.epics.$(hostname).$uname_s.$uname_m
+
+if test -r $INSTALLED_EPICS; then
+  echo INSTALLED_EPICS=$INSTALLED_EPICS
+. $INSTALLED_EPICS
+else
+  echo not found: INSTALLED_EPICS=$INSTALLED_EPICS
+fi
+
+
+if test -z "$EPICS_BASE";then
+  echo >&2 "EPICS_BASE" is not set
+  exit 1
+fi
+
+makeCleanClean() {
+  echo makeCleanClean
+  test -d builddir && rm -rf builddir/
+  make -f  Makefile.epics clean
+  make -f  Makefile.epics uninstall
+  make -f  Makefile.epics clean || :
+}
+
+./checkws.sh || {
+  echo >&2 whitespace damage
+  exit 2
+}
+MOTORIP=127.0.0.1
+MOTORPORT=5024
+
+
+cd startup &&
+if ! test -f st.${1}.cmd; then
+	CMDS=$(echo st.*.cmd | sed -e "s/st\.//g" -e "s/\.cmd//g")
+	#echo CMDS=$CMDS
+	test -n "$1" && echo >&2 "not found st.${1}.cmd" 
+	echo >&2 "try one of these:" 
+	for cmd in $CMDS; do
+		echo >&2 $0 " $cmd" " <ip>[:port]"
+	done
+	exit 1
+fi &&
+cd ..
+
+#Need a add a dot, needs to be improved later
+MOTORCFG=".$1"
+export MOTORCFG
+echo MOTORCFG=$MOTORCFG
+shift
+
+if test -n "$1"; then
+  # allow doit.sh host:port
+  PORT=${1##*:}
+  HOST=${1%:*}
+  echo HOST=$HOST PORT=$PORT
+  if test "$PORT" != "$HOST"; then
+    MOTORPORT=$PORT
+  fi
+  echo HOST=$HOST MOTORPORT=$MOTORPORT
+  MOTORIP=$HOST
+  echo MOTORIP=$MOTORIP
+fi
+export MOTORIP MOTORPORT
+setttings_file=./.set_${uname_s}_${uname_m}.txt
+oldsetttings_file=./.set_${uname_s}_${uname_m}.old.txt
+export setttings_file oldsetttings_file
+
+set | grep EPICS_ | sort >"$setttings_file"
+if ! test -f "$oldsetttings_file"; then
+  make_clean_uninstall=y
+  (
+    makeCleanClean
+  )
+  cp "$setttings_file" "$oldsetttings_file"
+else
+ if ! diff "$oldsetttings_file" "$setttings_file" ; then
+   make_clean_uninstall=y
+   (
+     . "$oldsetttings_file"
+     makeCleanClean
+   )
+   rm -f "$oldsetttings_file"
+ fi
+fi
+
+if ! test -d ${APPXX}App; then
+  makeBaseApp.pl -t ioc $APPXX
+fi &&
+if ! test -d iocBoot; then
+  makeBaseApp.pl -i -t ioc $APPXX
+fi &&
+
+if test -z "$EPICS_HOST_ARCH"; then
+  echo >&2 EPICS_HOST_ARCH is not set
+  exit 1
+fi &&
+TOP=$PWD &&
+if test -d $EPICS_BASE/../modules/axis/Db; then
+  EPICS_AXIS_DB=$EPICS_BASE/../modules/axis/Db
+elif test -d $EPICS_BASE/../modules/axis/db; then
+  EPICS_AXIS_DB=$EPICS_BASE/../modules/axis/db
+elif test -d $EPICS_BASE/../modules/axis/dbd; then
+  EPICS_AXIS_DB=$EPICS_BASE/../modules/axis/dbd
+elif test -n "$EPICS_BASES_PATH"; then
+   echo >&2 found: EPICS_BASES_PATH=$EPICS_BASES_PATH
+   echo >&2        EPICS_BASE=$EPICS_BASE
+   mybasever=$(echo $EPICS_BASE | sed -e "s!^$EPICS_BASES_PATH/base-!!")
+   echo >&2 mybasever=$mybasever
+   EPICS_AXIS_DB=$EPICS_MODULES_PATH/axis/6.8.1/$mybasever/dbd
+   echo >&2 EPICS_AXIS_DB=$EPICS_AXIS_DB
+   if ! test -d "$EPICS_AXIS_DB"; then
+     echo >&2 Not found EPICS_AXIS_DB=$EPICS_AXIS_DB
+     exit 1
+   fi
+   EPICS_EEE=y
+   export EPICS_EEE make_clean_uninstall
+else
+   echo >&2 Not found: $EPICS_BASE/../modules/axis/[dD]b
+   echo >&2 Unsupported EPICS_BASE:$EPICS_BASE
+  exit 1
+fi &&
+if ! test -d "$EPICS_AXIS_DB"; then
+  echo >&2 $EPICS_AXIS_DB does not exist
+  exit 1
+fi
+(
+  cd configure &&
+  if ! test -f RELEASE_usr_local; then
+    git mv RELEASE RELEASE_usr_local
+  fi &&
+  sed <RELEASE_usr_local >RELEASE \
+  -e "s%^EPICS_BASE=.*$%EPICS_BASE=$EPICS_BASE%" &&
+  if  test -f MASTER_RELEASE; then
+    if ! test -f MASTER_RELEASE_usr_local; then
+      git mv MASTER_RELEASE MASTER_RELEASE_usr_local
+    fi &&
+    sed <MASTER_RELEASE_usr_local >MASTER_RELEASE \
+      -e "s%^EPICS_BASE=.*$%EPICS_BASE=$EPICS_BASE%"
+  fi
+) &&
+if test "x$make_clean_uninstall" = xy; then
+  makeCleanClean
+fi &&
+
+if test "x$EPICS_EEE" = "xy"; then
+  make install || {
+    echo >&2 EEE
+    exit 1
+  }
+else
+  make -f Makefile.epics || {
+    rm -f "$oldsetttings_file"
+    make -f  Makefile.epics clean && make -f Makefile.epics  ||  exit 1
+  }
+fi
+(
+  envPathsdst=./envPaths.$EPICS_HOST_ARCH &&
+  stcmddst=./st.cmd.$EPICS_HOST_ARCH &&
+  cd ./iocBoot/ioc${APPXX}/ &&
+  if test "x$EPICS_EEE" = "xy"; then
+		#EEE
+		cd ../../startup &&
+    stcmddst=./st.cmd${MOTORCFG}.EEE.tmp &&
+    rm -f $stcmddst &&
+    cat st${MOTORCFG}.cmd |  \
+      sed                                        \
+      -e "s/eemcu,USER/eemcu,$USER/" \
+      -e "s/^cd /#cd /" \
+      -e "s/127.0.0.1/$MOTORIP/" \
+      -e "s/5024/$MOTORPORT/" |
+    grep -v '^  *#' >$stcmddst || {
+      echo >&2 can not create stcmddst $stcmddst
+      exit 1
+    }
+    chmod -w $stcmddst &&
+    chmod +x $stcmddst &&
+    cmd=$(echo iocsh $stcmddst) &&
+    echo PWD=$PWD cmd=$cmd &&
+    eval $cmd
+  else
+		# classic EPICS, non EEE
+		for src in  ../../startup/*cmd; do
+			dst=${src##*/}
+			dst=$dst
+			echo PWD=$PWD src=$src dst=$dst
+			sed <"$src" >"$dst" \
+				-e "s%dbLoadRecords(\"%dbLoadRecords(\"./${APPXX}App/Db/%"
+		done
+    rm -f $stcmddst &&
+    cat >$stcmddst <<EOF &&
+#!../../bin/$EPICS_HOST_ARCH/${APPXX}
+#This file is autogenerated by doit.sh - do not edit
+epicsEnvSet("ARCH","$EPICS_HOST_ARCH")
+epicsEnvSet("IOC","ioc${APPXX}")
+epicsEnvSet("TOP","$TOP")
+epicsEnvSet("EPICS_BASE","$EPICS_BASE")
+
+cd ${TOP}
+dbLoadDatabase "dbd/${APPXX}.dbd"
+eemcu_registerRecordDeviceDriver pdbbase
+EOF
+      sed <../../startup/st${MOTORCFG}.cmd  \
+      -e "s/__EPICS_HOST_ARCH/$EPICS_HOST_ARCH/" \
+      -e "s/127.0.0.1/$MOTORIP/" \
+      -e "s/5024/$MOTORPORT/" \
+			-e "s%cfgFile=../iocBoot/ioceemcu/%cfgFile=./%"    \
+			-e "s%< %< ${TOP}/iocBoot/ioc${APPXX}/%"    \
+      -e "s%require%#require%" \
+				| grep -v '^  *#' >>$stcmddst &&
+cat >>$stcmddst <<-EOF &&
+	iocInit
+EOF
+    chmod -w $stcmddst &&
+    chmod +x $stcmddst &&
+    egrep -v "^ *#" st.gdb.$EPICS_HOST_ARCH >xx
+    echo PWD=$PWD $stcmddst
+    $stcmddst
+  fi
+)
+
+#	cat >>$stcmddst <<-EOF &&
+#	cd ${TOP}/iocBoot/ioc${APPXX}
+#	iocInit
+#EOF
+
+#      -e "s%snippets/%iocBoot/ioc${APPXX}/snippets/%" \
