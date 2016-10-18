@@ -1,6 +1,7 @@
 *~
 O.*
 *.swp
+*.pyc
 *BAK.adl
 bin/
 db/
