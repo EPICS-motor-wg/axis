@@ -38,14 +38,14 @@ MOTORPORT=5024
 
 cd startup &&
 if ! test -f st.${1}.cmd; then
-	CMDS=$(echo st.*.cmd | sed -e "s/st\.//g" -e "s/\.cmd//g")
-	#echo CMDS=$CMDS
-	test -n "$1" && echo >&2 "not found st.${1}.cmd" 
-	echo >&2 "try one of these:" 
-	for cmd in $CMDS; do
-		echo >&2 $0 " $cmd" " <ip>[:port]"
-	done
-	exit 1
+  CMDS=$(echo st.*.cmd | sed -e "s/st\.//g" -e "s/\.cmd//g")
+  #echo CMDS=$CMDS
+  test -n "$1" && echo >&2 "not found st.${1}.cmd"
+  echo >&2 "try one of these:"
+  for cmd in $CMDS; do
+    echo >&2 $0 " $cmd" " <ip>[:port]"
+  done
+  exit 1
 fi &&
 cd ..
 
@@ -165,8 +165,8 @@ fi
   stcmddst=./st.cmd.$EPICS_HOST_ARCH &&
   cd ./iocBoot/ioc${APPXX}/ &&
   if test "x$EPICS_EEE" = "xy"; then
-		#EEE
-		cd ../../startup &&
+    #EEE
+    cd ../../startup &&
     stcmddst=./st.cmd${MOTORCFG}.EEE.tmp &&
     rm -f $stcmddst &&
     cat st${MOTORCFG}.cmd |  \
@@ -185,14 +185,14 @@ fi
     echo PWD=$PWD cmd=$cmd &&
     eval $cmd
   else
-		# classic EPICS, non EEE
-		for src in  ../../startup/*cmd; do
-			dst=${src##*/}
-			dst=$dst
-			echo PWD=$PWD src=$src dst=$dst
-			sed <"$src" >"$dst" \
-				-e "s%dbLoadRecords(\"%dbLoadRecords(\"./${APPXX}App/Db/%"
-		done
+    # classic EPICS, non EEE
+    for src in  ../../startup/*cmd; do
+      dst=${src##*/}
+      dst=$dst
+      echo PWD=$PWD src=$src dst=$dst
+      sed <"$src" >"$dst" \
+        -e "s%dbLoadRecords(\"%dbLoadRecords(\"./${APPXX}App/Db/%"
+    done
     rm -f $stcmddst &&
     cat >$stcmddst <<EOF &&
 #!../../bin/$EPICS_HOST_ARCH/${APPXX}
@@ -210,12 +210,12 @@ EOF
       -e "s/__EPICS_HOST_ARCH/$EPICS_HOST_ARCH/" \
       -e "s/127.0.0.1/$MOTORIP/" \
       -e "s/5024/$MOTORPORT/" \
-			-e "s%cfgFile=../iocBoot/ioceemcu/%cfgFile=./%"    \
-			-e "s%< %< ${TOP}/iocBoot/ioc${APPXX}/%"    \
+      -e "s%cfgFile=./%cfgFile=./startup/%"    \
+      -e "s%< %< ${TOP}/iocBoot/ioc${APPXX}/%"    \
       -e "s%require%#require%" \
-				| grep -v '^  *#' >>$stcmddst &&
+        | grep -v '^  *#' >>$stcmddst &&
 cat >>$stcmddst <<-EOF &&
-	iocInit
+  iocInit
 EOF
     chmod -w $stcmddst &&
     chmod +x $stcmddst &&
@@ -225,9 +225,9 @@ EOF
   fi
 )
 
-#	cat >>$stcmddst <<-EOF &&
-#	cd ${TOP}/iocBoot/ioc${APPXX}
-#	iocInit
+# cat >>$stcmddst <<-EOF &&
+# cd ${TOP}/iocBoot/ioc${APPXX}
+# iocInit
 #EOF
 
 #      -e "s%snippets/%iocBoot/ioc${APPXX}/snippets/%" \

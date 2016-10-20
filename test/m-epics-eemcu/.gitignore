@@ -7,6 +7,8 @@ db/*.db
 eemcuApp/Db/eemcu.substitutions
 include/
 iocBoot/ioceemcu/*.cmd
+iocBoot/ioceemcu/st.cmd.*
+iocBoot/ioceemcu/xx
 lib/
 startup/st.cmd.*.EEE.tmp
 O.*/

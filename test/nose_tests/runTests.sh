@@ -13,8 +13,8 @@ fi
 if test -z "$PYEPICS_LIBCA"; then
     MYLIB=$EPICS_BASE/lib/$EPICS_HOST_ARCH/libca.so
     if test -r "$MYLIB"; then
-	PYEPICS_LIBCA=$MYLIB
-	export PYEPICS_LIBCA
+      PYEPICS_LIBCA=$MYLIB
+      export PYEPICS_LIBCA
     fi
 fi &&
 if ! python -c 'import epics' >/dev/null 2>&1; then
@@ -113,4 +113,4 @@ while test $numruns -gt 0; do
   fi
   echo Runs left=$numruns
   numruns=$(($numruns - 1))
-done      
+done
