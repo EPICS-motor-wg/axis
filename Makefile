@@ -4,18 +4,18 @@
 TOP = .
 include $(TOP)/configure/CONFIG
 
-DIRS += configure motorApp
-motorApp_DEPEND_DIRS   = configure
+DIRS += configure axisApp
+axisApp_DEPEND_DIRS   = configure
 
-# To build motor examples;
+# To build axis examples;
 # 1st - uncomment lines below.
 # 2nd - uncomment required support module lines at the bottom of
-#       <motor>/configure/RELEASE.
+#       <axis>/configure/RELEASE.
 # 3rd - make clean uninstall
 # 4th - make
 
-#!DIRS += motorExApp iocBoot
-#!motorExApp_DEPEND_DIRS = motorApp
-#!iocBoot_DEPEND_DIRS    = motorExApp
+#!DIRS += axisExApp iocBoot
+#!axisExApp_DEPEND_DIRS = axisApp
+#!iocBoot_DEPEND_DIRS    = axisExApp
 
 include $(TOP)/configure/RULES_TOP
