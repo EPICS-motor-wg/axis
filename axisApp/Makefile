@@ -53,10 +53,6 @@ endif
 # Install the edl files
 #DIRS += opi
 
-ifdef MX
-DIRS += MXmotorSrc
-endif
-
 DIRS += Db
 
 include $(TOP)/configure/RULES_DIRS
