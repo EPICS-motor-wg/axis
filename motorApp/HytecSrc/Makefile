@@ -16,7 +16,7 @@ HytecMotor_SRCS += HytecMotorDriver.cpp
 INC += HytecMotorDriver.h
 
 # We need to link this IOC Application against the EPICS Base libraries
-HytecMotor_LIBS += motor
+HytecMotor_LIBS += axis
 HytecMotor_LIBS += asyn Ipac
 HytecMotor_LIBS += $(EPICS_BASE_IOC_LIBS)
 
