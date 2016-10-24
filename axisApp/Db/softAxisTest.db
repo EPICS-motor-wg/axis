@@ -4,7 +4,7 @@
 #! DBDEND
 
 
-record(motor, "$(user):theta") {
+record(axis, "$(user):theta") {
   field(DTYP, "Soft Channel")
   field(OUT, "$(user):Position.VAL PP MS")
   field(RDBL, "$(user):FeedBack NPP MS")

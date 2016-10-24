@@ -23,7 +23,7 @@ record(calcout, "$(user):convertReadbackValue") {
   field(PREC, "3")
 }
 
-record(motor, "$(user):linear") {
+record(axis, "$(user):linear") {
   field(DTYP, "OMS VME58")
   field(VELO, "25.0")
   field(VBAS, "1.0")
@@ -38,7 +38,7 @@ record(motor, "$(user):linear") {
   field(DMOV, "")
 }
 
-record(motor, "$(user):rotary") {
+record(axis, "$(user):rotary") {
   field(DTYP, "Soft Channel")
   field(OUT, "$(user):convertDriverValue.A  PP MS")
   field(RDBL, "$(user):convertReadbackValue.VAL  NPP MS")

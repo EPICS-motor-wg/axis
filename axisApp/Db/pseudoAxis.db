@@ -6,7 +6,7 @@ grecord(bo,"$(P)$(M)_able")
 	field(ZNAM,"Enable")
 	field(ONAM,"Disable")
 }
-grecord(motor,"$(P)$(M)")
+grecord(axis,"$(P)$(M)")
 {
 	field(DESC,"$(DESC)")
 	field(DTYP,"Soft Channel")

@@ -1,4 +1,4 @@
-# FILE... pseudoMotor_settings.req
+# FILE... pseudoAxis_settings.req
 $(P)$(M).DHLM
 $(P)$(M).DLLM
 $(P)$(M).TWV

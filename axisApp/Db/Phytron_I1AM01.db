@@ -1,6 +1,6 @@
 ################################################################################
 # This database contains records corresponding to additional parameters (not 
-# handled by the motor record) of the I1AM01 motion controller.
+# handled by the axis record) of the I1AM01 motion controller.
 #
 # Output records, used to set the parameter values have a suffix _SET, readback
 # records, used to read the parameters have a suffix _GET.
@@ -403,7 +403,7 @@ record(mbbi, "$(P)$(M)-HOMING_GET")
 
 ################################################################################
 # P01: Controller provides the following modes of movement, however software 
-# limits are always monitored by the motor record, so only modes 0 and 1 are 
+# limits are always monitored by the axis record, so only modes 0 and 1 are 
 # exposed to the user
 # 0: Rotational movement
 # 1: Hardware limit switches are monitored

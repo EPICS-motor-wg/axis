@@ -1,16 +1,16 @@
 # This database implements a generic 2-D coordinate transformation.  Given two
-# real motors (P)(MX) and (P)(MY), which move in the X,Y coordinate system,
-# it will move two soft motors (P)(MXP) and (P)(MYP) in the X',Y'
+# real axes (P)(MX) and (P)(MY), which move in the X,Y coordinate system,
+# it will move two soft axes (P)(MXP) and (P)(MYP) in the X',Y'
 # coordinate system.  The offset between the two coordinate systems is
 # X0 = (P)(MXP)C1 and Y0 = (P)(MYP)C1, and the coordinate systems are 
 # rotated by angle theta = (P)(MYP)C2.
 
-# These two records are where the soft motors write their output.
+# These two records are where the soft axes write their output.
 # They are needed because writing to a transform record field does not
 # cause the record to process?
 # We use forward links to the transform record (rather than making the INPA and
 # INPB fields of the transform record CP) so that the scan record waits 
-# for the motors to move.
+# for the axes to move.
 grecord(ao,"$(P)$(MXP)DVAL") {
 	field(FLNK, "$(P)$(T)Drive")
 }
@@ -18,12 +18,12 @@ grecord(ao,"$(P)$(MYP)DVAL") {
 	field(FLNK, "$(P)$(T)Drive")
 }
 
-# This record is processed whenever the soft motor records XP or YP write
+# This record is processed whenever the soft axis records XP or YP write
 # new values to the DVAL records above.
 # Note: the INPA and INPB fields get their values directly from the .DVAL
-# fields of the soft motor records, rather than from the DVAL record above.
+# fields of the soft axis records, rather than from the DVAL record above.
 # This is because the .DVAL fields are always correct, while the DVAL records
-# do not get updated when the soft motor .DVAL fields are modified in SET mode.
+# do not get updated when the soft axis .DVAL fields are modified in SET mode.
 grecord(transform,"$(P)$(T)Drive") {
 	field(INPA,"$(P)$(MXP).DVAL NPP NMS")
 	field(INPB,"$(P)$(MYP).DVAL NPP NMS")
@@ -39,7 +39,7 @@ grecord(transform,"$(P)$(T)Drive") {
 }
 
 # This record is processed to set the origin of the XP, YP coordinate system
-# to be the current position of the motors.
+# to be the current position of the axes.
 grecord(transform,"$(P)$(T)synch") {
 	field(INPA,"$(P)$(XDRV) NPP NMS")
 	field(INPB,"$(P)$(YDRV) NPP NMS")
@@ -50,8 +50,8 @@ grecord(transform,"$(P)$(T)synch") {
 	field(PREC,"$(PREC)")
 }
 
-# This record calculates the readback positions of the soft motors.  It 
-# processes whenever the readbacks of the real motors change, or whenever
+# This record calculates the readback positions of the soft axes.  It 
+# processes whenever the readbacks of the real axes change, or whenever
 # one of the the geometry constants changes.
 grecord(transform,"$(P)$(T)Readback") {
 	field(INPA,"$(P)$(XRBV) CP MS")
@@ -65,7 +65,7 @@ grecord(transform,"$(P)$(T)Readback") {
 	field(PREC,"$(PREC)")
 }
 
-# This record processes if either of the sof motor STOP fields is set.
+# This record processes if either of the soft axis STOP fields is set.
 grecord(dfanout,"$(P)$(T)Stop") {
         field(VAL,"1")
         field(OUTA,"$(P)$(XSTOP) PP MS")
@@ -73,8 +73,8 @@ grecord(dfanout,"$(P)$(T)Stop") {
 }
 
 # This record computes whether the compound motor is done moving.  
-# It goes to 1 when both real motors are done moving.
-# positions of the real motors.
+# It goes to 1 when both real axes are done moving.
+# positions of the real axes.
 grecord(calcout,"$(P)$(T)Done") {
         field(INPA,"$(P)$(XDONE) CP MS")
         field(INPB,"$(P)$(YDONE) CP MS")

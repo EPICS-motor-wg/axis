@@ -3,8 +3,8 @@
 #! DBDEND
 
 
-# Setting VAL to "stop", stops ALL motorRecord's in this IOC.
-# $(P)allstop.VAL is monitored by motorUtil.
+# Setting VAL to "stop", stops ALL axisRecord's in this IOC.
+# $(P)allstop.VAL is monitored by axisUtil.
 record(bo, "$(P)allstop") {
   field(ZNAM, "release")
   field(ONAM, "stop")
@@ -12,7 +12,7 @@ record(bo, "$(P)allstop") {
 }
 
 # Indicates if all motors in this IOC are done moving.
-# Set by motorUtil when $(P)moving.VAL == 0.
+# Set by axisUtil when $(P)moving.VAL == 0.
 record(bi, "$(P)alldone") {
   field(ZNAM, "moving")
   field(ONAM, "done")
@@ -21,7 +21,7 @@ record(bi, "$(P)alldone") {
 }
 
 # The number of motors moving in this IOC.
-# $(P)moving.VAL is set by motorUtil.
+# $(P)moving.VAL is set by axisUtil.
 record(longout, "$(P)moving") {
   field(DESC, "Motors moving count.")
 }

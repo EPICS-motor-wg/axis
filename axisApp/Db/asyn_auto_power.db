@@ -5,10 +5,10 @@
 # of the amplifier power. This works with the Asyn model 3 
 # based drivers. Amplifier power control is done via the 
 # setClosedLoop driver function (which also maps to the 
-# motor record CNEN field).
+# axis record CNEN field).
 #
 # Macros:
-# P, M - motor name
+# P, M - axis name
 # PORT - asyn port
 # ADDR - asyn addr
 # FRAC - holding current % (optional, default 0)
@@ -52,7 +52,7 @@ record(ao, "$(P)$(M):AutoEnableDelay")
 # ///
 # /// Delay the end of move after the amplifier has been
 # /// automatically disabled.
-# /// This is independent of the motor record DLY
+# /// This is independent of the axis record DLY
 # /// field, but the delay will only start once the driver
 # /// notified that the move is complete (which takes 
 # /// into account any controller specific post move delay).

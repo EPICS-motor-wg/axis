@@ -10,14 +10,14 @@ include $(TOP)/configure/CONFIG
 #----------------------------------------------------
 # Create and install (or just install) dbd files
 # <name>.dbd will be created from <name>Include.dbd
-#DBD += motor.dbd
+#DBD += axis.dbd
 
 #----------------------------------------------------
 # Create and install (or just install)
 # databases, templates, substitutions like this
-DB += motor.db
-DB += basic_motor.db
-DB += basic_asyn_motor.db
+DB += axis.db
+DB += basic_axis.db
+DB += basic_asyn_axis.db
 DB += IMS_extra.db
 DB += XPSAuxAi.db
 DB += XPSAuxAo.db
@@ -37,19 +37,19 @@ DB += ACRAuxBi.template
 DB += ACRAuxBo.template
 DB += ACRAuxBoRBV.template
 DB += TransPos.db
-DB += motorUtil.db
-DB += asyn_motor.db
+DB += axisUtil.db
+DB += asyn_axis.db
 DB += profileMoveController.template
 DB += profileMoveAxis.template
 DB += profileMoveControllerXPS.template
 DB += profileMoveAxisXPS.template
 DB += PI_Support.db PI_SupportCtrl.db
-DB += Phytron_motor.db Phytron_I1AM01.db Phytron_MCM01.db
+DB += Phytron_axis.db Phytron_I1AM01.db Phytron_MCM01.db
 DB += asyn_auto_power.db
 
 #----------------------------------------------------
 # Declare template files which do not show up in DB
-#USES_TEMPLATE += motor.template
+#USES_TEMPLATE += axis.template
 
 include $(TOP)/configure/RULES
 #----------------------------------------

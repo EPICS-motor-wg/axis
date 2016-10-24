@@ -1,4 +1,4 @@
-# FILE... basic_motor_settings.req
+# FILE... basic_axis_settings.req
 
 $(P)$(M).DIR
 $(P)$(M).DHLM
