@@ -15,9 +15,6 @@ ifdef ASYN
 DIRS += OmsAsynSrc
 OmsAsynSrc_DEPEND_DIRS   = AxisSrc
 
-#DIRS += MotorSimSrc
-#MotorSimSrc_DEPEND_DIRS = AxisSrc
-
 DIRS += NewportSrc
 NewportSrc_DEPEND_DIRS = AxisSrc
 
