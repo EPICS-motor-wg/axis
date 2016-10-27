@@ -1,0 +1,84 @@
+include ${EPICS_ENV_PATH}/module.Makefile
+USR_DEPENDENCIES = asyn,4.27.0
+
+TEMPLATES += axisApp/Db/asyn_auto_power.db
+TEMPLATES += axisApp/Db/asyn_axis.db
+TEMPLATES += axisApp/Db/basic_asyn_axis.db
+TEMPLATES += axisApp/Db/basic_axis.db
+TEMPLATES += axisApp/Db/coordTrans2D.db
+TEMPLATES += axisApp/Db/axis.db
+TEMPLATES += axisApp/Db/axisUtil.db
+TEMPLATES += axisApp/Db/pseudoAxis.db
+TEMPLATES += axisApp/Db/softAxisTest.db
+
+DBDS += ./axisApp/AxisSrc/axisSupport.dbd
+
+SUBSTITUTIONS=-none-
+
+OPIS=-none-
+
+SOURCES += axisApp/ACRSrc/ACRMotorDriver.cpp
+SOURCES += axisApp/AttocubeSrc/drvANC150Asyn.cc
+SOURCES += axisApp/AxisSrc/asynAxisAxis.cpp
+SOURCES += axisApp/AxisSrc/asynAxisController.cpp
+SOURCES += axisApp/AxisSrc/axisRecord.cc
+SOURCES += axisApp/AxisSrc/axisUtil.cc
+SOURCES += axisApp/AxisSrc/axisUtilAux.cc
+SOURCES += axisApp/AxisSrc/devAxisAsyn.c
+SOURCES += axisApp/AxisSrc/drvAxisAsyn.c
+SOURCES += axisApp/AxisSrc/paramLib.c
+SOURCES += axisApp/MicronixSrc/MMC200Driver.cpp
+SOURCES += axisApp/NPointSrc/C300MotorDriver.cpp
+ifdef AXIS_DEV
+ SOURCES += axisApp/NewportSrc/AG_CONEX.cpp
+ SOURCES += axisApp/NewportSrc/AG_UC.cpp
+ SOURCES += axisApp/NewportSrc/HXPDriver.cpp
+ SOURCES += axisApp/NewportSrc/NewportRegister.cc
+ SOURCES += axisApp/NewportSrc/SMC100Driver.cpp
+ SOURCES += axisApp/NewportSrc/SMC100Register.cc
+ SOURCES += axisApp/NewportSrc/Socket.cpp
+ SOURCES += axisApp/NewportSrc/XPSAsynInterpose.c
+ SOURCES += axisApp/NewportSrc/XPSAxis.cpp
+ SOURCES += axisApp/NewportSrc/XPSController.cpp
+ SOURCES += axisApp/NewportSrc/XPSGathering.c
+ SOURCES += axisApp/NewportSrc/XPSGathering2.c
+ SOURCES += axisApp/NewportSrc/XPSGatheringMain.c
+ SOURCES += axisApp/NewportSrc/XPSGatheringRegister.c
+ SOURCES += axisApp/NewportSrc/XPS_C8_drivers.cpp
+ SOURCES += axisApp/NewportSrc/asynOctetSocket.cpp
+ SOURCES += axisApp/NewportSrc/devESP300.cc
+ SOURCES += axisApp/NewportSrc/devMM3000.cc
+ SOURCES += axisApp/NewportSrc/devMM4000.cc
+ SOURCES += axisApp/NewportSrc/devPM500.cc
+ SOURCES += axisApp/NewportSrc/drvESP300.cc
+ SOURCES += axisApp/NewportSrc/drvMM3000.cc
+ SOURCES += axisApp/NewportSrc/drvMM4000.cc
+ SOURCES += axisApp/NewportSrc/drvMM4000Asyn.c
+ SOURCES += axisApp/NewportSrc/drvPM500.cc
+ SOURCES += axisApp/NewportSrc/drvXPSAsyn.c
+ SOURCES += axisApp/NewportSrc/drvXPSAsynAux.c
+ SOURCES += axisApp/NewportSrc/hxp_drivers.cpp
+ SOURCES += axisApp/NewportSrc/strtok_r.c
+ SOURCES += axisApp/NewportSrc/tclCall.cc
+ SOURCES += axisApp/NewportSrc/xps_ftp.c
+endif
+SOURCES += axisApp/OmsAsynSrc/omsBaseAxis.cpp
+SOURCES += axisApp/OmsAsynSrc/omsBaseController.cpp
+SOURCES += axisApp/OmsAsynSrc/omsMAXnet.cpp
+SOURCES += axisApp/OmsAsynSrc/omsMAXv.cpp
+SOURCES += axisApp/OmsAsynSrc/omsMAXvEncFunc.cpp
+SOURCES += axisApp/PIGCS2Src/PIC702Controller.cpp
+SOURCES += axisApp/PIGCS2Src/PIE517Controller.cpp
+SOURCES += axisApp/PIGCS2Src/PIE755Controller.cpp
+SOURCES += axisApp/PIGCS2Src/PIGCS2_HexapodController.cpp
+SOURCES += axisApp/PIGCS2Src/PIGCSController.cpp
+SOURCES += axisApp/PIGCS2Src/PIGCSMotorController.cpp
+SOURCES += axisApp/PIGCS2Src/PIGCSPiezoController.cpp
+SOURCES += axisApp/PIGCS2Src/PIHexapodController.cpp
+SOURCES += axisApp/PIGCS2Src/PIInterface.cpp
+SOURCES += axisApp/PIGCS2Src/PIasynAxis.cpp
+SOURCES += axisApp/PIGCS2Src/PIasynController.cpp
+SOURCES += axisApp/PIGCS2Src/translateerror.c
+SOURCES += axisApp/PhytronSrc/phytronAxisMotor.cpp
+SOURCES += axisApp/SmarActMCSSrc/smarActMCSMotorDriver.cpp
+SOURCES += axisExApp/WithAsyn/WithAsynMain.c
