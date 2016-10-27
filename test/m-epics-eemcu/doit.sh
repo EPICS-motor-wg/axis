@@ -33,7 +33,7 @@ makeCleanClean() {
   exit 2
 }
 MOTORIP=127.0.0.1
-MOTORPORT=5024
+MOTORPORT=5000
 
 
 cd startup &&
@@ -174,7 +174,7 @@ fi
       -e "s/eemcu,USER/eemcu,$USER/" \
       -e "s/^cd /#cd /" \
       -e "s/127.0.0.1/$MOTORIP/" \
-      -e "s/5024/$MOTORPORT/" |
+      -e "s/5000/$MOTORPORT/" |
     grep -v '^  *#' >$stcmddst || {
       echo >&2 can not create stcmddst $stcmddst
       exit 1
@@ -209,7 +209,7 @@ EOF
       sed <../../startup/st${MOTORCFG}.cmd  \
       -e "s/__EPICS_HOST_ARCH/$EPICS_HOST_ARCH/" \
       -e "s/127.0.0.1/$MOTORIP/" \
-      -e "s/5024/$MOTORPORT/" \
+      -e "s/5000/$MOTORPORT/" \
       -e "s%cfgFile=./%cfgFile=./startup/%"    \
       -e "s%< %< ${TOP}/iocBoot/ioc${APPXX}/%"    \
       -e "s%require%#require%" \

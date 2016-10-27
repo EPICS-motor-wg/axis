@@ -4,6 +4,5 @@ be controlled via TCP/IP.
 Currently the simulator does basi motion, positionong and
 homing.
 
-It is listening on port 5024 (to be changed to 5000) and
-can be addressed by telnet.
+It is listening on port 5000 and can be accessed by telnet.
 (More info to come)

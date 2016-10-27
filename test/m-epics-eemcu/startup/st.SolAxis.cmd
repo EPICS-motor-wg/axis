@@ -5,7 +5,7 @@ require eemcu,USER
 epicsEnvSet("MOTOR_PORT",    "$(SM_MOTOR_PORT=MCU1)")
 
 epicsEnvSet("IPADDR",        "$(SM_IPADDR=127.0.0.1)")
-epicsEnvSet("IPPORT",        "$(SM_IPPORT=5024)")
+epicsEnvSet("IPPORT",        "$(SM_IPPORT=5000)")
 epicsEnvSet("ASYN_PORT",     "$(SM_ASYN_PORT=MC_CPU1)")
 #epicsEnvSet("AXISCONFIG",    "cfgFile=../iocBoot/ioceemcu/SolAxis-48-1.cfg")
 epicsEnvSet("AXISCONFIG",    "")
