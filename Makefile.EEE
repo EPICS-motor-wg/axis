@@ -13,8 +13,11 @@ TEMPLATES += axisApp/Db/axis.db
 TEMPLATES += axisApp/Db/axisUtil.db
 TEMPLATES += axisApp/Db/pseudoAxis.db
 TEMPLATES += axisApp/Db/softAxisTest.db
+TEMPLATES += axisApp/Db/EthercatMC.template
 
-DBDS += ./axisApp/AxisSrc/axisSupport.dbd
+
+DBDS += axisApp/AxisSrc/axisSupport.dbd
+DBDS += axisApp/EthercatSrc/EthercatMCController.dbd
 
 SUBSTITUTIONS=-none-
 
@@ -30,6 +33,8 @@ SOURCES += axisApp/AxisSrc/devAxisAsyn.c
 SOURCES += axisApp/AxisSrc/drvAxisAsyn.c
 SOURCES += axisApp/AxisSrc/paramLib.c
 SOURCES += axisExApp/WithAsyn/WithAsynMain.c
+SOURCES += axisApp/EthercatSrc/EthercatMCAxis.cpp
+SOURCES += axisApp/EthercatSrc/EthercatMCController.cpp
 
 # What we don't need at ESS, but we may want to test-compile
 ifdef AXIS_DEV

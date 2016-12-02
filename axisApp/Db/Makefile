@@ -18,6 +18,7 @@ include $(TOP)/configure/CONFIG
 DB += axis.db
 DB += basic_axis.db
 DB += basic_asyn_axis.db
+DB += EthercatMC.template
 DB += IMS_extra.db
 DB += XPSAuxAi.db
 DB += XPSAuxAo.db

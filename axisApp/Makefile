@@ -11,6 +11,8 @@ DIRS += AxisSrc
 
 # All the following modules require ASYN.
 ifdef ASYN
+DIRS += EthercatSrc
+EthercatSrc_DEPEND_DIRS   = AxisSrc
 
 DIRS += OmsAsynSrc
 OmsAsynSrc_DEPEND_DIRS   = AxisSrc
