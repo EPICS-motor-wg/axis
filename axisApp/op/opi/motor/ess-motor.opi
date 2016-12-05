@@ -315,19 +315,24 @@ $(pv_value)</tooltip>
     <state_color_3>
       <color name="Minor" red="255" green="128" blue="0" />
     </state_color_3>
+    <state_color_4>
+      <color name="Disconnected" red="255" green="0" blue="255" />
+    </state_color_4>
     <state_color_fallback>
       <color red="230" green="230" blue="230" />
     </state_color_fallback>
-    <state_count>4</state_count>
+    <state_count>5</state_count>
     <state_label_0>INVALID</state_label_0>
     <state_label_1>OK</state_label_1>
     <state_label_2>ERROR</state_label_2>
     <state_label_3>WARNING</state_label_3>
+    <state_label_4>S05</state_label_4>
     <state_label_fallback>OFF</state_label_fallback>
     <state_value_0>-1.0</state_value_0>
     <state_value_1>0.0</state_value_1>
-    <state_value_2>1.0</state_value_2>
-    <state_value_3>2.0</state_value_3>
+    <state_value_2>2.0</state_value_2>
+    <state_value_3>1.0</state_value_3>
+    <state_value_4>3.0</state_value_4>
     <tooltip>$(pv_name)
 $(pv_value)</tooltip>
     <visible>true</visible>
@@ -384,7 +389,7 @@ $(pv_value)</tooltip>
     <background_color>
       <color red="255" green="255" blue="255" />
     </background_color>
-    <border_alarm_sensitive>true</border_alarm_sensitive>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
     <border_color>
       <color red="0" green="128" blue="255" />
     </border_color>
@@ -550,24 +555,24 @@ $(pv_value)</tooltip>
       <color red="192" green="192" blue="192" />
     </foreground_color>
     <height>10</height>
-    <name>led-alarm-low</name>
+    <name>led-hard-limit-low</name>
+    <off_color>
+      <color red="255" green="255" blue="255" />
+    </off_color>
+    <off_label>OFF</off_label>
+    <on_color>
+      <color name="Major" red="255" green="0" blue="0" />
+    </on_color>
+    <on_label>ON</on_label>
     <pv_name></pv_name>
     <pv_value />
     <rules>
       <rule name="value" prop_id="pv_value" out_exp="true">
-        <exp bool_exp="pv0 != 0">
-          <value>1.0</value>
-        </exp>
-        <exp bool_exp="pv2 != 0 &amp;&amp; pv3 != 0 &amp;&amp; pv1 &lt; pv2">
-          <value>2.0</value>
-        </exp>
         <exp bool_exp="true">
-          <value>0.0</value>
+          <value>pv0 != 0 &amp;&amp; pv1 == 1</value>
         </exp>
         <pv trig="true">$(MPV).LLS</pv>
-        <pv trig="true">$(MPV).RBV</pv>
-        <pv trig="true">$(MPV).LLM</pv>
-        <pv trig="true">$(MPV).HLM</pv>
+        <pv trig="true">sim://ramp(0,1,1,0.2)</pv>
       </rule>
     </rules>
     <scale_options>
@@ -578,32 +583,12 @@ $(pv_value)</tooltip>
     <scripts />
     <show_boolean_label>false</show_boolean_label>
     <square_led>true</square_led>
-    <state_color_0>
-      <color red="255" green="255" blue="255" />
-    </state_color_0>
-    <state_color_1>
-      <color name="Major" red="255" green="0" blue="0" />
-    </state_color_1>
-    <state_color_2>
-      <color name="Minor" red="255" green="128" blue="0" />
-    </state_color_2>
-    <state_color_fallback>
-      <color red="230" green="230" blue="230" />
-    </state_color_fallback>
-    <state_count>3</state_count>
-    <state_label_0>OFF</state_label_0>
-    <state_label_1>ERROR</state_label_1>
-    <state_label_2>WARNING</state_label_2>
-    <state_label_fallback>UNKNOWN</state_label_fallback>
-    <state_value_0>0.0</state_value_0>
-    <state_value_1>1.0</state_value_1>
-    <state_value_2>2.0</state_value_2>
     <tooltip>$(pv_name)
 $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>LED</widget_type>
-    <width>18</width>
-    <wuid>-17cc82e7:158a9e325d8:-7ba1</wuid>
+    <width>10</width>
+    <wuid>2b3bb8fd:158ce6b8a6d:-7f5d</wuid>
     <x>10</x>
     <y>85</y>
   </widget>
@@ -636,24 +621,26 @@ $(pv_value)</tooltip>
       <color red="192" green="192" blue="192" />
     </foreground_color>
     <height>10</height>
-    <name>led-alarm-hi</name>
+    <name>led-soft-limit-low</name>
+    <off_color>
+      <color red="255" green="255" blue="255" />
+    </off_color>
+    <off_label>OFF</off_label>
+    <on_color>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </on_color>
+    <on_label>ON</on_label>
     <pv_name></pv_name>
     <pv_value />
     <rules>
       <rule name="value" prop_id="pv_value" out_exp="true">
-        <exp bool_exp="pv0 != 0">
-          <value>1.0</value>
-        </exp>
-        <exp bool_exp="pv2 != 0 &amp;&amp; pv3 != 0 &amp;&amp; pv1 &gt; pv3">
-          <value>2.0</value>
-        </exp>
         <exp bool_exp="true">
-          <value>0.0</value>
+          <value>( pv1 != 0 &amp;&amp; pv2 != 0 &amp;&amp; pv0 &lt; pv1 ) &amp;&amp; pv3 == 1</value>
         </exp>
-        <pv trig="true">$(MPV).HLS</pv>
         <pv trig="true">$(MPV).RBV</pv>
         <pv trig="true">$(MPV).LLM</pv>
         <pv trig="true">$(MPV).HLM</pv>
+        <pv trig="true">sim://ramp(0,1,1,0.333)</pv>
       </rule>
     </rules>
     <scale_options>
@@ -664,33 +651,147 @@ $(pv_value)</tooltip>
     <scripts />
     <show_boolean_label>false</show_boolean_label>
     <square_led>true</square_led>
-    <state_color_0>
-      <color red="255" green="255" blue="255" />
-    </state_color_0>
-    <state_color_1>
-      <color name="Major" red="255" green="0" blue="0" />
-    </state_color_1>
-    <state_color_2>
-      <color name="Minor" red="255" green="128" blue="0" />
-    </state_color_2>
-    <state_color_fallback>
-      <color red="230" green="230" blue="230" />
-    </state_color_fallback>
-    <state_count>3</state_count>
-    <state_label_0>OFF</state_label_0>
-    <state_label_1>ERROR</state_label_1>
-    <state_label_2>WARNING</state_label_2>
-    <state_label_fallback>UNKNOWN</state_label_fallback>
-    <state_value_0>0.0</state_value_0>
-    <state_value_1>1.0</state_value_1>
-    <state_value_2>2.0</state_value_2>
     <tooltip>$(pv_name)
 $(pv_value)</tooltip>
     <visible>true</visible>
     <widget_type>LED</widget_type>
-    <width>18</width>
+    <width>10</width>
+    <wuid>-17cc82e7:158a9e325d8:-7ba1</wuid>
+    <x>20</x>
+    <y>85</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <bit>-1</bit>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="255" green="255" blue="255" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <bulb_border>1</bulb_border>
+    <bulb_border_color>
+      <color red="150" green="150" blue="150" />
+    </bulb_border_color>
+    <data_type>0</data_type>
+    <effect_3d>false</effect_3d>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>10</height>
+    <name>led-soft-limit-hi</name>
+    <off_color>
+      <color red="255" green="255" blue="255" />
+    </off_color>
+    <off_label>OFF</off_label>
+    <on_color>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </on_color>
+    <on_label>ON</on_label>
+    <pv_name></pv_name>
+    <pv_value />
+    <rules>
+      <rule name="value" prop_id="pv_value" out_exp="true">
+        <exp bool_exp="true">
+          <value>( pv1 != 0 &amp;&amp; pv2 != 0 &amp;&amp; pv0 &gt; pv2 ) &amp;&amp; pv3 == 1</value>
+        </exp>
+        <pv trig="true">$(MPV).RBV</pv>
+        <pv trig="true">$(MPV).LLM</pv>
+        <pv trig="true">$(MPV).HLM</pv>
+        <pv trig="true">sim://ramp(0,1,1,0.333)</pv>
+      </rule>
+    </rules>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>true</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_boolean_label>false</show_boolean_label>
+    <square_led>true</square_led>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <visible>true</visible>
+    <widget_type>LED</widget_type>
+    <width>10</width>
     <wuid>-17cc82e7:158a9e325d8:-7b9d</wuid>
-    <x>112</x>
+    <x>110</x>
+    <y>85</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <bit>-1</bit>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="255" green="255" blue="255" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <bulb_border>1</bulb_border>
+    <bulb_border_color>
+      <color red="150" green="150" blue="150" />
+    </bulb_border_color>
+    <data_type>0</data_type>
+    <effect_3d>false</effect_3d>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>10</height>
+    <name>led-hard-limit-hi</name>
+    <off_color>
+      <color red="255" green="255" blue="255" />
+    </off_color>
+    <off_label>OFF</off_label>
+    <on_color>
+      <color name="Major" red="255" green="0" blue="0" />
+    </on_color>
+    <on_label>ON</on_label>
+    <pv_name></pv_name>
+    <pv_value />
+    <rules>
+      <rule name="value" prop_id="pv_value" out_exp="true">
+        <exp bool_exp="true">
+          <value>pv0 != 0 &amp;&amp; pv1 == 1</value>
+        </exp>
+        <pv trig="true">$(MPV).HLS</pv>
+        <pv trig="true">sim://ramp(0,1,1,0.2)</pv>
+      </rule>
+    </rules>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>true</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_boolean_label>false</show_boolean_label>
+    <square_led>true</square_led>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <visible>true</visible>
+    <widget_type>LED</widget_type>
+    <width>10</width>
+    <wuid>-382ef957:158cf25a63b:-7f64</wuid>
+    <x>120</x>
     <y>85</y>
   </widget>
   <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
@@ -728,7 +829,7 @@ $(pv_value)</tooltip>
     </off_color>
     <off_label>OFF</off_label>
     <on_color>
-      <color red="0" green="255" blue="255" />
+      <color red="0" green="255" blue="0" />
     </on_color>
     <on_label>ON</on_label>
     <pv_name></pv_name>
@@ -736,12 +837,13 @@ $(pv_value)</tooltip>
     <rules>
       <rule name="on-off-idle-led" prop_id="pv_value" out_exp="true">
         <exp bool_exp="true">
-          <value>pv0 != 0 &amp;&amp; pv1 == 0 &amp;&amp; ( pv2 == 0 &amp;&amp; pv3 == 0 )</value>
+          <value>pv0 != 0 &amp;&amp; pv1 == 0 &amp;&amp; ( pv2 == 0 &amp;&amp; pv3 == 0 &amp;&amp; pv4 == 0 )</value>
         </exp>
         <pv trig="true">$(MPV).DMOV</pv>
         <pv trig="true">$(MPV).MOVN</pv>
         <pv trig="true">$(MPV).STAT</pv>
         <pv trig="true">$(MPV).MISS</pv>
+        <pv trig="true">$(MPV).LVIO</pv>
       </rule>
     </rules>
     <scale_options>
@@ -804,10 +906,11 @@ $(pv_value)</tooltip>
     <rules>
       <rule name="on-off-moving-led" prop_id="pv_value" out_exp="true">
         <exp bool_exp="true">
-          <value>( pv0 == 0 || pv1 != 0 ) &amp;&amp; pv2 == 1</value>
+          <value>( pv0 == 0 || pv1 != 0 || pv2 != 0 ) &amp;&amp; pv3 == 1</value>
         </exp>
         <pv trig="true">$(MPV).DMOV</pv>
         <pv trig="true">$(MPV).MOVN</pv>
+        <pv trig="true">$(MPV).LVIO</pv>
         <pv trig="true">sim://ramp(0,1,1,0.333)</pv>
       </rule>
     </rules>
@@ -877,7 +980,7 @@ $(pv_value)</tooltip>
         <pv trig="true">$(MPV).MOVN</pv>
         <pv trig="true">$(MPV).STAT</pv>
         <pv trig="true">$(MPV).MISS</pv>
-        <pv trig="true">sim://ramp(0,1,1,0.25)</pv>
+        <pv trig="true">sim://ramp(0,1,1,0.2)</pv>
       </rule>
     </rules>
     <scale_options>
@@ -920,7 +1023,7 @@ $(pv_value)</tooltip>
     <name>feedback-message</name>
     <rules>
       <rule name="message-color" prop_id="foreground_color" out_exp="false">
-        <exp bool_exp="pv0 == 0 || pv1 != 0">
+        <exp bool_exp="pv0 == 0 || pv1 != 0 || pv4 != 0">
           <value>
             <color red="192" green="96" blue="0" />
           </value>
@@ -939,6 +1042,7 @@ $(pv_value)</tooltip>
         <pv trig="true">$(MPV).MOVN</pv>
         <pv trig="true">$(MPV).STAT</pv>
         <pv trig="true">$(MPV).MISS</pv>
+        <pv trig="true">$(MPV).LVIO</pv>
       </rule>
       <rule name="message-text" prop_id="text" out_exp="false">
         <exp bool_exp="pv5 != 0 || pv6 != 0">
@@ -950,14 +1054,14 @@ $(pv_value)</tooltip>
         <exp bool_exp="pv3 != 0">
           <value>MISSED</value>
         </exp>
-        <exp bool_exp="pv4 &amp; 512">
-          <value>PROBLEM</value>
+        <exp bool_exp="( pv4 &amp; 16384 ) == 0">
+          <value>NOT HOMED</value>
         </exp>
-        <exp bool_exp="pv4 &amp; 64">
+        <exp bool_exp="( pv4 &amp; 64 ) != 0">
           <value>SLIP/STALL</value>
         </exp>
-        <exp bool_exp="pv4 &amp; 16384">
-          <value>NOT HOMED</value>
+        <exp bool_exp="( pv4 &amp; 512 ) != 0">
+          <value>PROBLEM</value>
         </exp>
         <exp bool_exp="pv7 != 0">
           <value>LIMIT VIOLATION</value>
