@@ -27,7 +27,7 @@ cd test
 ./run-EthercatMC-ioc.sh SolAxis
 ```
 
-Pressing RETURN then executing `dbl` will show the list of PVs available.
+Pressing RETURN then executing `dbl` will show the list of available PVs.
 
 ### Running the Tests
 
