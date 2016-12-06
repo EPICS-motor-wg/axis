@@ -885,13 +885,14 @@ $(pv_value)</tooltip>
     <rules>
       <rule name="on-off-idle-led" prop_id="pv_value" out_exp="true">
         <exp bool_exp="true">
-          <value>pv0 != 0 &amp;&amp; pv1 == 0 &amp;&amp; ( pv2 == 0 &amp;&amp; pv3 == 0 &amp;&amp; pv4 == 0 )</value>
+          <value>pv0 != 0 &amp;&amp; pv1 == 0 &amp;&amp; pv2 == 0 &amp;&amp; pv3 == 0 &amp;&amp; pv4 == 0 &amp;&amp; ( pv5 &amp; 16384 ) != 0</value>
         </exp>
         <pv trig="true">$(MPV).DMOV</pv>
         <pv trig="true">$(MPV).MOVN</pv>
         <pv trig="true">$(MPV).STAT</pv>
         <pv trig="true">$(MPV).MISS</pv>
         <pv trig="true">$(MPV).LVIO</pv>
+        <pv trig="true">$(MPV).MSTA</pv>
       </rule>
     </rules>
     <scale_options>
@@ -954,12 +955,12 @@ $(pv_value)</tooltip>
     <rules>
       <rule name="on-off-moving-led" prop_id="pv_value" out_exp="true">
         <exp bool_exp="true">
-          <value>( pv0 == 0 || pv1 != 0 || pv2 != 0 ) &amp;&amp; pv3 == 1</value>
+          <value>pv0 == 0 || pv1 != 0 || pv2 != 0 || ( pv3 &amp; 16384 ) == 0</value>
         </exp>
         <pv trig="true">$(MPV).DMOV</pv>
         <pv trig="true">$(MPV).MOVN</pv>
         <pv trig="true">$(MPV).LVIO</pv>
-        <pv trig="true">sim://ramp(0,1,1,0.333)</pv>
+        <pv trig="true">$(MPV).MSTA</pv>
       </rule>
     </rules>
     <scale_options>
@@ -1071,7 +1072,7 @@ $(pv_value)</tooltip>
     <name>feedback-message</name>
     <rules>
       <rule name="message-color" prop_id="foreground_color" out_exp="false">
-        <exp bool_exp="pv0 == 0 || pv1 != 0 || pv4 != 0">
+        <exp bool_exp="pv0 == 0 || pv1 != 0 || pv4 != 0 || ( pv5 &amp; 16384 ) == 0">
           <value>
             <color name="Minor" red="255" green="128" blue="0" />
           </value>
@@ -1091,6 +1092,7 @@ $(pv_value)</tooltip>
         <pv trig="true">$(MPV).STAT</pv>
         <pv trig="true">$(MPV).MISS</pv>
         <pv trig="true">$(MPV).LVIO</pv>
+        <pv trig="true">$(MPV).MSTA</pv>
       </rule>
       <rule name="message-text" prop_id="text" out_exp="false">
         <exp bool_exp="pv5 != 0 || pv6 != 0">
