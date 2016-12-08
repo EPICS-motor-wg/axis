@@ -1,0 +1,1575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<display typeId="org.csstudio.opibuilder.Display" version="1.0.0">
+  <actions hook="false" hook_all="false" />
+  <auto_scale_widgets>
+    <auto_scale_widgets>false</auto_scale_widgets>
+    <min_width>-1</min_width>
+    <min_height>-1</min_height>
+  </auto_scale_widgets>
+  <auto_zoom_to_fit_all>false</auto_zoom_to_fit_all>
+  <background_color>
+    <color red="240" green="240" blue="240" />
+  </background_color>
+  <boy_version>5.1.0.201611230835</boy_version>
+  <foreground_color>
+    <color red="217" green="217" blue="217" />
+  </foreground_color>
+  <grid_space>10</grid_space>
+  <height>175</height>
+  <macros>
+    <include_parent_macros>true</include_parent_macros>
+    <MPV>$(P)$(M)</MPV>
+    <MORE>0</MORE>
+  </macros>
+  <name>Motor Controller</name>
+  <rules />
+  <scripts />
+  <show_close_button>true</show_close_button>
+  <show_edit_range>true</show_edit_range>
+  <show_grid>true</show_grid>
+  <show_ruler>true</show_ruler>
+  <snap_to_geometry>true</snap_to_geometry>
+  <widget_type>Display</widget_type>
+  <width>140</width>
+  <wuid>-17cc82e7:158a9e325d8:-7f06</wuid>
+  <x>-1</x>
+  <y>-1</y>
+  <widget typeId="org.csstudio.opibuilder.widgets.Rectangle" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <alpha>255</alpha>
+    <anti_alias>true</anti_alias>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="16" green="127" blue="168" />
+    </background_color>
+    <bg_gradient_color>
+      <color red="255" green="255" blue="255" />
+    </bg_gradient_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="30" green="82" blue="102" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>2</border_width>
+    <enabled>true</enabled>
+    <fg_gradient_color>
+      <color red="255" green="255" blue="255" />
+    </fg_gradient_color>
+    <fill_level>0.0</fill_level>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="255" green="0" blue="0" />
+    </foreground_color>
+    <gradient>false</gradient>
+    <height>165</height>
+    <horizontal_fill>true</horizontal_fill>
+    <line_color>
+      <color red="128" green="0" blue="255" />
+    </line_color>
+    <line_style>0</line_style>
+    <line_width>0</line_width>
+    <name>outer-dark-rectangle</name>
+    <pv_name></pv_name>
+    <pv_value />
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <transparent>false</transparent>
+    <visible>true</visible>
+    <widget_type>Rectangle</widget_type>
+    <width>140</width>
+    <wuid>-17cc82e7:158a9e325d8:-7e04</wuid>
+    <x>0</x>
+    <y>10</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.RoundedRectangle" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <alpha>255</alpha>
+    <anti_alias>true</anti_alias>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="16" green="127" blue="168" />
+    </background_color>
+    <bg_gradient_color>
+      <color red="255" green="255" blue="255" />
+    </bg_gradient_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="27" green="106" blue="135" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>2</border_width>
+    <corner_height>16</corner_height>
+    <corner_width>16</corner_width>
+    <enabled>true</enabled>
+    <fg_gradient_color>
+      <color red="255" green="255" blue="255" />
+    </fg_gradient_color>
+    <fill_level>0.0</fill_level>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="255" green="0" blue="0" />
+    </foreground_color>
+    <gradient>false</gradient>
+    <height>20</height>
+    <horizontal_fill>true</horizontal_fill>
+    <line_color>
+      <color red="128" green="0" blue="255" />
+    </line_color>
+    <line_style>0</line_style>
+    <line_width>0</line_width>
+    <name>dark-rounded-header</name>
+    <pv_name></pv_name>
+    <pv_value />
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <transparent>false</transparent>
+    <visible>true</visible>
+    <widget_type>Rounded Rectangle</widget_type>
+    <width>140</width>
+    <wuid>-17cc82e7:158a9e325d8:-7f01</wuid>
+    <x>0</x>
+    <y>0</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.Rectangle" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <alpha>255</alpha>
+    <anti_alias>true</anti_alias>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="83" green="87" blue="91" />
+    </background_color>
+    <bg_gradient_color>
+      <color red="255" green="255" blue="255" />
+    </bg_gradient_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="30" green="82" blue="102" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>2</border_width>
+    <enabled>true</enabled>
+    <fg_gradient_color>
+      <color red="255" green="255" blue="255" />
+    </fg_gradient_color>
+    <fill_level>0.0</fill_level>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="255" green="0" blue="0" />
+    </foreground_color>
+    <gradient>false</gradient>
+    <height>151</height>
+    <horizontal_fill>true</horizontal_fill>
+    <line_color>
+      <color red="128" green="0" blue="255" />
+    </line_color>
+    <line_style>0</line_style>
+    <line_width>0</line_width>
+    <name>inner-white-rectangle</name>
+    <pv_name></pv_name>
+    <pv_value />
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <transparent>false</transparent>
+    <visible>true</visible>
+    <widget_type>Rectangle</widget_type>
+    <width>136</width>
+    <wuid>-17cc82e7:158a9e325d8:-7e07</wuid>
+    <x>2</x>
+    <y>22</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <auto_size>false</auto_size>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="255" green="255" blue="255" />
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <fontdata fontName="Liberation Sans" height="8" style="0" />
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="128" green="128" blue="128" />
+    </foreground_color>
+    <format_type>0</format_type>
+    <height>40</height>
+    <horizontal_alignment>2</horizontal_alignment>
+    <name>version</name>
+    <precision>0</precision>
+    <precision_from_pv>true</precision_from_pv>
+    <pv_name></pv_name>
+    <pv_value />
+    <rotation_angle>270.0</rotation_angle>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_units>true</show_units>
+    <text>ver. 1.0.0</text>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <transparent>true</transparent>
+    <vertical_alignment>2</vertical_alignment>
+    <visible>true</visible>
+    <widget_type>Text Update</widget_type>
+    <width>20</width>
+    <wrap_words>false</wrap_words>
+    <wuid>-2e78be70:158d37a1559:-7fb1</wuid>
+    <x>117</x>
+    <y>97</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <auto_size>false</auto_size>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="255" green="255" blue="255" />
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="15" style="1">Header 2</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="255" green="255" blue="255" />
+    </foreground_color>
+    <format_type>0</format_type>
+    <height>20</height>
+    <horizontal_alignment>0</horizontal_alignment>
+    <name>title</name>
+    <precision>0</precision>
+    <precision_from_pv>true</precision_from_pv>
+    <pv_name>$(MPV).DESC</pv_name>
+    <pv_value />
+    <rotation_angle>0.0</rotation_angle>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_units>false</show_units>
+    <text>######</text>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <transparent>true</transparent>
+    <vertical_alignment>0</vertical_alignment>
+    <visible>true</visible>
+    <widget_type>Text Update</widget_type>
+    <width>115</width>
+    <wrap_words>false</wrap_words>
+    <wuid>68421233:158ab88d770:-7f6e</wuid>
+    <x>20</x>
+    <y>1</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <bit>-1</bit>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="0" green="0" blue="0" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <bulb_border>0</bulb_border>
+    <bulb_border_color>
+      <color red="150" green="150" blue="150" />
+    </bulb_border_color>
+    <data_type>0</data_type>
+    <effect_3d>false</effect_3d>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>10</height>
+    <name>led-pv-status</name>
+    <pv_name>$(MPV).SEVR</pv_name>
+    <pv_value />
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>true</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_boolean_label>false</show_boolean_label>
+    <square_led>true</square_led>
+    <state_color_0>
+      <color name="Invalid" red="255" green="0" blue="255" />
+    </state_color_0>
+    <state_color_1>
+      <color red="0" green="255" blue="0" />
+    </state_color_1>
+    <state_color_2>
+      <color red="255" green="0" blue="0" />
+    </state_color_2>
+    <state_color_3>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </state_color_3>
+    <state_color_4>
+      <color name="Disconnected" red="255" green="0" blue="255" />
+    </state_color_4>
+    <state_color_fallback>
+      <color red="230" green="230" blue="230" />
+    </state_color_fallback>
+    <state_count>5</state_count>
+    <state_label_0>INVALID</state_label_0>
+    <state_label_1>OK</state_label_1>
+    <state_label_2>ERROR</state_label_2>
+    <state_label_3>WARNING</state_label_3>
+    <state_label_4>S05</state_label_4>
+    <state_label_fallback>OFF</state_label_fallback>
+    <state_value_0>-1.0</state_value_0>
+    <state_value_1>0.0</state_value_1>
+    <state_value_2>2.0</state_value_2>
+    <state_value_3>1.0</state_value_3>
+    <state_value_4>3.0</state_value_4>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <visible>true</visible>
+    <widget_type>LED</widget_type>
+    <width>10</width>
+    <wuid>-17cc82e7:158a9e325d8:-7b8d</wuid>
+    <x>5</x>
+    <y>7</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <auto_size>false</auto_size>
+    <background_color>
+      <color red="0" green="0" blue="0" />
+    </background_color>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="9" style="0">Fine Print</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="50" green="160" blue="201" />
+    </foreground_color>
+    <height>15</height>
+    <horizontal_alignment>2</horizontal_alignment>
+    <name>pv-name</name>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <text>$(MPV)</text>
+    <tooltip></tooltip>
+    <transparent>true</transparent>
+    <vertical_alignment>1</vertical_alignment>
+    <visible>true</visible>
+    <widget_type>Label</widget_type>
+    <width>134</width>
+    <wrap_words>false</wrap_words>
+    <wuid>-17cc82e7:158a9e325d8:-7d10</wuid>
+    <x>3</x>
+    <y>22</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.meter" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="83" green="87" blue="91" />
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <color_hi>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </color_hi>
+    <color_hihi>
+      <color red="255" green="0" blue="0" />
+    </color_hihi>
+    <color_lo>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </color_lo>
+    <color_lolo>
+      <color red="255" green="0" blue="0" />
+    </color_lolo>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="0" green="0" blue="0" />
+    </foreground_color>
+    <height>57</height>
+    <level_hi>90.0</level_hi>
+    <level_hihi>100.0</level_hihi>
+    <level_lo>-90.0</level_lo>
+    <level_lolo>-100.0</level_lolo>
+    <limits_from_pv>true</limits_from_pv>
+    <log_scale>false</log_scale>
+    <major_tick_step_hint>50</major_tick_step_hint>
+    <maximum>120.0</maximum>
+    <minimum>-120.0</minimum>
+    <name>pv-value-meter</name>
+    <needle_color>
+      <color red="153" green="153" blue="153" />
+    </needle_color>
+    <pv_name>$(MPV).RBV</pv_name>
+    <pv_value />
+    <ramp_gradient>false</ramp_gradient>
+    <rules>
+      <rule name="set-lo-limit" prop_id="level_lo" out_exp="false">
+        <exp bool_exp="true">
+          <value>-90.0</value>
+        </exp>
+        <pv trig="true">$(MPV).LLM</pv>
+      </rule>
+      <rule name="set-hi-limit" prop_id="level_hi" out_exp="false">
+        <exp bool_exp="true">
+          <value>90.0</value>
+        </exp>
+        <pv trig="true">$(MPV).HLM</pv>
+      </rule>
+    </rules>
+    <scale_font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </scale_font>
+    <scale_format></scale_format>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_hi>false</show_hi>
+    <show_hihi>false</show_hihi>
+    <show_lo>false</show_lo>
+    <show_lolo>false</show_lolo>
+    <show_markers>true</show_markers>
+    <show_minor_ticks>false</show_minor_ticks>
+    <show_scale>false</show_scale>
+    <show_value_label>false</show_value_label>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <value_label_format></value_label_format>
+    <visible>true</visible>
+    <widget_type>Meter</widget_type>
+    <width>136</width>
+    <wuid>-17cc82e7:158a9e325d8:-7c61</wuid>
+    <x>2</x>
+    <y>41</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <auto_size>false</auto_size>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="255" green="255" blue="255" />
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="151" green="188" blue="202" />
+    </foreground_color>
+    <format_type>0</format_type>
+    <height>51</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <name>engineer-unit</name>
+    <precision>0</precision>
+    <precision_from_pv>true</precision_from_pv>
+    <pv_name>$(MPV).EGU</pv_name>
+    <pv_value />
+    <rotation_angle>0.0</rotation_angle>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_units>false</show_units>
+    <text>######</text>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <transparent>true</transparent>
+    <vertical_alignment>1</vertical_alignment>
+    <visible>true</visible>
+    <widget_type>Text Update</widget_type>
+    <width>120</width>
+    <wrap_words>false</wrap_words>
+    <wuid>68421233:158ab88d770:-7f6a</wuid>
+    <x>10</x>
+    <y>89</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <bit>-1</bit>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="83" green="87" blue="91" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <bulb_border>1</bulb_border>
+    <bulb_border_color>
+      <color red="0" green="0" blue="0" />
+    </bulb_border_color>
+    <data_type>0</data_type>
+    <effect_3d>false</effect_3d>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>10</height>
+    <name>led-hard-limit-low</name>
+    <off_color>
+      <color red="83" green="87" blue="91" />
+    </off_color>
+    <off_label>OFF</off_label>
+    <on_color>
+      <color name="Major" red="255" green="0" blue="0" />
+    </on_color>
+    <on_label>ON</on_label>
+    <pv_name></pv_name>
+    <pv_value />
+    <rules>
+      <rule name="value" prop_id="pv_value" out_exp="true">
+        <exp bool_exp="true">
+          <value>pv0 != 0</value>
+        </exp>
+        <pv trig="true">$(MPV).LLS</pv>
+      </rule>
+    </rules>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>true</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_boolean_label>false</show_boolean_label>
+    <square_led>true</square_led>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <visible>true</visible>
+    <widget_type>LED</widget_type>
+    <width>10</width>
+    <wuid>2b3bb8fd:158ce6b8a6d:-7f5d</wuid>
+    <x>10</x>
+    <y>85</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <bit>-1</bit>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="83" green="87" blue="91" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <bulb_border>1</bulb_border>
+    <bulb_border_color>
+      <color red="0" green="0" blue="0" />
+    </bulb_border_color>
+    <data_type>0</data_type>
+    <effect_3d>false</effect_3d>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>10</height>
+    <name>led-soft-limit-low</name>
+    <off_color>
+      <color red="83" green="87" blue="91" />
+    </off_color>
+    <off_label>OFF</off_label>
+    <on_color>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </on_color>
+    <on_label>ON</on_label>
+    <pv_name></pv_name>
+    <pv_value />
+    <rules>
+      <rule name="value" prop_id="pv_value" out_exp="true">
+        <exp bool_exp="true">
+          <value>pv1 != 0 &amp;&amp; pv2 != 0 &amp;&amp; pv0 &lt; pv1</value>
+        </exp>
+        <pv trig="true">$(MPV).RBV</pv>
+        <pv trig="true">$(MPV).LLM</pv>
+        <pv trig="true">$(MPV).HLM</pv>
+      </rule>
+    </rules>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>true</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_boolean_label>false</show_boolean_label>
+    <square_led>true</square_led>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <visible>true</visible>
+    <widget_type>LED</widget_type>
+    <width>10</width>
+    <wuid>-17cc82e7:158a9e325d8:-7ba1</wuid>
+    <x>20</x>
+    <y>85</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <bit>-1</bit>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="83" green="87" blue="91" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <bulb_border>1</bulb_border>
+    <bulb_border_color>
+      <color red="0" green="0" blue="0" />
+    </bulb_border_color>
+    <data_type>0</data_type>
+    <effect_3d>false</effect_3d>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>10</height>
+    <name>led-soft-limit-hi</name>
+    <off_color>
+      <color red="83" green="87" blue="91" />
+    </off_color>
+    <off_label>OFF</off_label>
+    <on_color>
+      <color name="Minor" red="255" green="128" blue="0" />
+    </on_color>
+    <on_label>ON</on_label>
+    <pv_name></pv_name>
+    <pv_value />
+    <rules>
+      <rule name="value" prop_id="pv_value" out_exp="true">
+        <exp bool_exp="true">
+          <value>pv1 != 0 &amp;&amp; pv2 != 0 &amp;&amp; pv0 &gt; pv2</value>
+        </exp>
+        <pv trig="true">$(MPV).RBV</pv>
+        <pv trig="true">$(MPV).LLM</pv>
+        <pv trig="true">$(MPV).HLM</pv>
+      </rule>
+    </rules>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>true</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_boolean_label>false</show_boolean_label>
+    <square_led>true</square_led>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <visible>true</visible>
+    <widget_type>LED</widget_type>
+    <width>10</width>
+    <wuid>-17cc82e7:158a9e325d8:-7b9d</wuid>
+    <x>110</x>
+    <y>85</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <bit>-1</bit>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="83" green="87" blue="91" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <bulb_border>1</bulb_border>
+    <bulb_border_color>
+      <color red="0" green="0" blue="0" />
+    </bulb_border_color>
+    <data_type>0</data_type>
+    <effect_3d>false</effect_3d>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>10</height>
+    <name>led-hard-limit-hi</name>
+    <off_color>
+      <color red="83" green="87" blue="91" />
+    </off_color>
+    <off_label>OFF</off_label>
+    <on_color>
+      <color name="Major" red="255" green="0" blue="0" />
+    </on_color>
+    <on_label>ON</on_label>
+    <pv_name></pv_name>
+    <pv_value />
+    <rules>
+      <rule name="value" prop_id="pv_value" out_exp="true">
+        <exp bool_exp="true">
+          <value>pv0 != 0</value>
+        </exp>
+        <pv trig="true">$(MPV).HLS</pv>
+      </rule>
+    </rules>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>true</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_boolean_label>false</show_boolean_label>
+    <square_led>true</square_led>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <visible>true</visible>
+    <widget_type>LED</widget_type>
+    <width>10</width>
+    <wuid>-382ef957:158cf25a63b:-7f56</wuid>
+    <x>120</x>
+    <y>85</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <bit>-1</bit>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="83" green="87" blue="91" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <bulb_border>1</bulb_border>
+    <bulb_border_color>
+      <color red="0" green="0" blue="0" />
+    </bulb_border_color>
+    <data_type>0</data_type>
+    <effect_3d>false</effect_3d>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>10</height>
+    <name>led-idle</name>
+    <off_color>
+      <color red="83" green="87" blue="91" />
+    </off_color>
+    <off_label>OFF</off_label>
+    <on_color>
+      <color red="0" green="255" blue="0" />
+    </on_color>
+    <on_label>ON</on_label>
+    <pv_name></pv_name>
+    <pv_value />
+    <rules>
+      <rule name="on-off-idle-led" prop_id="pv_value" out_exp="true">
+        <exp bool_exp="true">
+          <value>pv0 != 0 &amp;&amp; pv1 == 0 &amp;&amp; pv2 == 0 &amp;&amp; pv3 == 0 &amp;&amp; pv4 == 0 &amp;&amp; ( pv5 &amp; 16384 ) != 0</value>
+        </exp>
+        <pv trig="true">$(MPV).DMOV</pv>
+        <pv trig="true">$(MPV).MOVN</pv>
+        <pv trig="true">$(MPV).STAT</pv>
+        <pv trig="true">$(MPV).MISS</pv>
+        <pv trig="true">$(MPV).LVIO</pv>
+        <pv trig="true">$(MPV).MSTA</pv>
+      </rule>
+    </rules>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_boolean_label>false</show_boolean_label>
+    <square_led>false</square_led>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <visible>true</visible>
+    <widget_type>LED</widget_type>
+    <width>10</width>
+    <wuid>-17cc82e7:158a9e325d8:-7ae4</wuid>
+    <x>55</x>
+    <y>89</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <bit>-1</bit>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="83" green="87" blue="91" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <bulb_border>1</bulb_border>
+    <bulb_border_color>
+      <color red="0" green="0" blue="0" />
+    </bulb_border_color>
+    <data_type>0</data_type>
+    <effect_3d>false</effect_3d>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>10</height>
+    <name>led-moving</name>
+    <off_color>
+      <color red="83" green="87" blue="91" />
+    </off_color>
+    <off_label>OFF</off_label>
+    <on_color>
+      <color red="255" green="128" blue="0" />
+    </on_color>
+    <on_label>ON</on_label>
+    <pv_name></pv_name>
+    <pv_value />
+    <rules>
+      <rule name="on-off-moving-led" prop_id="pv_value" out_exp="true">
+        <exp bool_exp="true">
+          <value>pv0 == 0 || pv1 != 0 || pv2 != 0 || ( pv3 &amp; 16384 ) == 0</value>
+        </exp>
+        <pv trig="true">$(MPV).DMOV</pv>
+        <pv trig="true">$(MPV).MOVN</pv>
+        <pv trig="true">$(MPV).LVIO</pv>
+        <pv trig="true">$(MPV).MSTA</pv>
+      </rule>
+    </rules>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_boolean_label>false</show_boolean_label>
+    <square_led>false</square_led>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <visible>true</visible>
+    <widget_type>LED</widget_type>
+    <width>10</width>
+    <wuid>-17cc82e7:158a9e325d8:-7aec</wuid>
+    <x>65</x>
+    <y>89</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.LED" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <bit>-1</bit>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="83" green="87" blue="91" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <bulb_border>1</bulb_border>
+    <bulb_border_color>
+      <color red="0" green="0" blue="0" />
+    </bulb_border_color>
+    <data_type>0</data_type>
+    <effect_3d>false</effect_3d>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>10</height>
+    <name>led-error</name>
+    <off_color>
+      <color red="83" green="87" blue="91" />
+    </off_color>
+    <off_label>OFF</off_label>
+    <on_color>
+      <color red="255" green="0" blue="0" />
+    </on_color>
+    <on_label>ON</on_label>
+    <pv_name></pv_name>
+    <pv_value />
+    <rules>
+      <rule name="on-off-error-led" prop_id="pv_value" out_exp="true">
+        <exp bool_exp="true">
+          <value>pv0 != 0 &amp;&amp; pv1 == 0 &amp;&amp; ( pv2 != 0 || pv3 != 0 ) &amp;&amp; pv4 == 1</value>
+        </exp>
+        <pv trig="true">$(MPV).DMOV</pv>
+        <pv trig="true">$(MPV).MOVN</pv>
+        <pv trig="true">$(MPV).STAT</pv>
+        <pv trig="true">$(MPV).MISS</pv>
+        <pv trig="true">sim://ramp(0,1,1,0.2)</pv>
+      </rule>
+    </rules>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_boolean_label>false</show_boolean_label>
+    <square_led>false</square_led>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <visible>true</visible>
+    <widget_type>LED</widget_type>
+    <width>10</width>
+    <wuid>-17cc82e7:158a9e325d8:-7ae0</wuid>
+    <x>75</x>
+    <y>89</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <auto_size>false</auto_size>
+    <background_color>
+      <color red="0" green="0" blue="0" />
+    </background_color>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="9" style="0">Fine Print</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="230" green="230" blue="230" />
+    </foreground_color>
+    <height>21</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <name>feedback-message</name>
+    <rules>
+      <rule name="message-color" prop_id="foreground_color" out_exp="false">
+        <exp bool_exp="pv0 == 0 || pv1 != 0 || pv4 != 0 || ( pv5 &amp; 16384 ) == 0">
+          <value>
+            <color name="Minor" red="255" green="128" blue="0" />
+          </value>
+        </exp>
+        <exp bool_exp="pv2 != 0 || pv3 != 0">
+          <value>
+            <color name="Major" red="255" green="0" blue="0" />
+          </value>
+        </exp>
+        <exp bool_exp="true">
+          <value>
+            <color red="0" green="255" blue="0" />
+          </value>
+        </exp>
+        <pv trig="true">$(MPV).DMOV</pv>
+        <pv trig="true">$(MPV).MOVN</pv>
+        <pv trig="true">$(MPV).STAT</pv>
+        <pv trig="true">$(MPV).MISS</pv>
+        <pv trig="true">$(MPV).LVIO</pv>
+        <pv trig="true">$(MPV).MSTA</pv>
+      </rule>
+      <rule name="message-text" prop_id="text" out_exp="false">
+        <exp bool_exp="pv5 != 0 || pv6 != 0">
+          <value>HOMING</value>
+        </exp>
+        <exp bool_exp="pv0 == 0 || pv1 != 0">
+          <value>MOVING</value>
+        </exp>
+        <exp bool_exp="pv3 != 0">
+          <value>MISSED</value>
+        </exp>
+        <exp bool_exp="( pv4 &amp; 16384 ) == 0">
+          <value>NOT HOMED</value>
+        </exp>
+        <exp bool_exp="( pv4 &amp; 64 ) != 0">
+          <value>SLIP/STALL</value>
+        </exp>
+        <exp bool_exp="( pv4 &amp; 512 ) != 0">
+          <value>PROBLEM</value>
+        </exp>
+        <exp bool_exp="pv7 != 0">
+          <value>LIMIT VIOLATION</value>
+        </exp>
+        <exp bool_exp="pv2 != 0">
+          <value>pvStr2</value>
+        </exp>
+        <exp bool_exp="true">
+          <value>IDLE</value>
+        </exp>
+        <pv trig="true">$(MPV).DMOV</pv>
+        <pv trig="true">$(MPV).MOVN</pv>
+        <pv trig="true">$(MPV).STAT</pv>
+        <pv trig="true">$(MPV).MISS</pv>
+        <pv trig="true">$(MPV).MSTA</pv>
+        <pv trig="true">$(MPV).HOMF</pv>
+        <pv trig="true">$(MPV).HOMR</pv>
+        <pv trig="true">$(MPV).LVIO</pv>
+      </rule>
+    </rules>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <text>MESSAGE</text>
+    <tooltip></tooltip>
+    <transparent>true</transparent>
+    <vertical_alignment>1</vertical_alignment>
+    <visible>true</visible>
+    <widget_type>Label</widget_type>
+    <width>130</width>
+    <wrap_words>false</wrap_words>
+    <wuid>-17cc82e7:158a9e325d8:-7ad6</wuid>
+    <x>5</x>
+    <y>94</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.TextInput" version="2.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <auto_size>false</auto_size>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="68" green="73" blue="74" />
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="151" green="188" blue="202" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <confirm_message></confirm_message>
+    <enabled>true</enabled>
+    <font>
+      <fontdata fontName=".SF NS Text" height="10" style="0" />
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="255" green="255" blue="255" />
+    </foreground_color>
+    <format_type>0</format_type>
+    <height>16</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <limits_from_pv>true</limits_from_pv>
+    <multiline_input>false</multiline_input>
+    <name>tweak-step-size</name>
+    <precision>3</precision>
+    <precision_from_pv>true</precision_from_pv>
+    <pv_name>$(MPV).TWV</pv_name>
+    <pv_value />
+    <rotation_angle>0.0</rotation_angle>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <selector_type>0</selector_type>
+    <show_units>false</show_units>
+    <style>0</style>
+    <text>1.0</text>
+    <tooltip>Tweak Step Size (EGU)</tooltip>
+    <transparent>false</transparent>
+    <visible>true</visible>
+    <widget_type>Text Input</widget_type>
+    <width>50</width>
+    <wuid>-17cc82e7:158a9e325d8:-7a93</wuid>
+    <x>46</x>
+    <y>151</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.Image" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <align_to_nearest_second>false</align_to_nearest_second>
+    <auto_size>true</auto_size>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <crop_bottom>0</crop_bottom>
+    <crop_left>0</crop_left>
+    <crop_right>0</crop_right>
+    <crop_top>0</crop_top>
+    <degree>0</degree>
+    <enabled>true</enabled>
+    <flip_horizontal>false</flip_horizontal>
+    <flip_vertical>false</flip_vertical>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>18</height>
+    <image_file>motor-icons/more-disabled.png</image_file>
+    <name>button-more</name>
+    <no_animation>false</no_animation>
+    <permutation_matrix>
+      <row>
+        <col>1.0</col>
+        <col>0.0</col>
+      </row>
+      <row>
+        <col>0.0</col>
+        <col>1.0</col>
+      </row>
+    </permutation_matrix>
+    <rules>
+      <rule name="enable-image" prop_id="image_file" out_exp="false">
+        <exp bool_exp="pv0 == 0">
+          <value>motor-icons/more-disabled.png</value>
+        </exp>
+        <exp bool_exp="pv0 != 0">
+          <value>motor-icons/more.png</value>
+        </exp>
+        <pv trig="true">loc://_$(M)_more_($(MORE))</pv>
+      </rule>
+    </rules>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <stretch_to_fit>false</stretch_to_fit>
+    <tooltip></tooltip>
+    <transparency>true</transparency>
+    <visible>true</visible>
+    <widget_type>Image</widget_type>
+    <width>18</width>
+    <wuid>-17cc82e7:158a9e325d8:-791e</wuid>
+    <x>5</x>
+    <y>150</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.Image" version="1.0.0">
+    <actions hook="true" hook_all="false">
+      <action type="WRITE_PV">
+        <pv_name>$(MPV).TWR</pv_name>
+        <value>1</value>
+        <timeout>10</timeout>
+        <confirm_message></confirm_message>
+        <description>Tweak motor Reverse</description>
+      </action>
+    </actions>
+    <align_to_nearest_second>false</align_to_nearest_second>
+    <auto_size>true</auto_size>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <crop_bottom>0</crop_bottom>
+    <crop_left>0</crop_left>
+    <crop_right>0</crop_right>
+    <crop_top>0</crop_top>
+    <degree>0</degree>
+    <enabled>true</enabled>
+    <flip_horizontal>false</flip_horizontal>
+    <flip_vertical>false</flip_vertical>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>18</height>
+    <image_file>motor-icons/step-backward-dark.png</image_file>
+    <name>button-reverse</name>
+    <no_animation>false</no_animation>
+    <permutation_matrix>
+      <row>
+        <col>1.0</col>
+        <col>0.0</col>
+      </row>
+      <row>
+        <col>0.0</col>
+        <col>1.0</col>
+      </row>
+    </permutation_matrix>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <stretch_to_fit>false</stretch_to_fit>
+    <tooltip>Tweak Motor Reverse</tooltip>
+    <transparency>true</transparency>
+    <visible>true</visible>
+    <widget_type>Image</widget_type>
+    <width>18</width>
+    <wuid>-17cc82e7:158a9e325d8:-791a</wuid>
+    <x>25</x>
+    <y>150</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.Image" version="1.0.0">
+    <actions hook="true" hook_all="false">
+      <action type="WRITE_PV">
+        <pv_name>$(MPV).TWF</pv_name>
+        <value>1</value>
+        <timeout>10</timeout>
+        <confirm_message></confirm_message>
+        <description>Tweak motor Forward</description>
+      </action>
+    </actions>
+    <align_to_nearest_second>false</align_to_nearest_second>
+    <auto_size>true</auto_size>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <crop_bottom>0</crop_bottom>
+    <crop_left>0</crop_left>
+    <crop_right>0</crop_right>
+    <crop_top>0</crop_top>
+    <degree>0</degree>
+    <enabled>true</enabled>
+    <flip_horizontal>false</flip_horizontal>
+    <flip_vertical>false</flip_vertical>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>18</height>
+    <image_file>motor-icons/step-forward-dark.png</image_file>
+    <name>button-forward</name>
+    <no_animation>false</no_animation>
+    <permutation_matrix>
+      <row>
+        <col>1.0</col>
+        <col>0.0</col>
+      </row>
+      <row>
+        <col>0.0</col>
+        <col>1.0</col>
+      </row>
+    </permutation_matrix>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <stretch_to_fit>false</stretch_to_fit>
+    <tooltip>Tweak Motor Forward</tooltip>
+    <transparency>true</transparency>
+    <visible>true</visible>
+    <widget_type>Image</widget_type>
+    <width>18</width>
+    <wuid>-17cc82e7:158a9e325d8:-790b</wuid>
+    <x>98</x>
+    <y>150</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.Image" version="1.0.0">
+    <actions hook="true" hook_all="false">
+      <action type="WRITE_PV">
+        <pv_name>$(MPV).STOP</pv_name>
+        <value>1</value>
+        <timeout>10</timeout>
+        <confirm_message></confirm_message>
+        <description>Stop</description>
+      </action>
+    </actions>
+    <align_to_nearest_second>false</align_to_nearest_second>
+    <auto_size>true</auto_size>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <crop_bottom>0</crop_bottom>
+    <crop_left>0</crop_left>
+    <crop_right>0</crop_right>
+    <crop_top>0</crop_top>
+    <degree>0</degree>
+    <enabled>true</enabled>
+    <flip_horizontal>false</flip_horizontal>
+    <flip_vertical>false</flip_vertical>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>18</height>
+    <image_file>motor-icons/stop-dark.png</image_file>
+    <name>button-stop</name>
+    <no_animation>false</no_animation>
+    <permutation_matrix>
+      <row>
+        <col>1.0</col>
+        <col>0.0</col>
+      </row>
+      <row>
+        <col>0.0</col>
+        <col>1.0</col>
+      </row>
+    </permutation_matrix>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <stretch_to_fit>false</stretch_to_fit>
+    <tooltip>Stop</tooltip>
+    <transparency>true</transparency>
+    <visible>true</visible>
+    <widget_type>Image</widget_type>
+    <width>18</width>
+    <wuid>-17cc82e7:158a9e325d8:-790a</wuid>
+    <x>118</x>
+    <y>150</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.TextInput" version="2.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <auto_size>false</auto_size>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="68" green="73" blue="74" />
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="151" green="188" blue="202" />
+    </border_color>
+    <border_style>1</border_style>
+    <border_width>1</border_width>
+    <confirm_message></confirm_message>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName=".SF NS Text" height="11" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="255" green="255" blue="255" />
+    </foreground_color>
+    <format_type>0</format_type>
+    <height>20</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <limits_from_pv>true</limits_from_pv>
+    <multiline_input>false</multiline_input>
+    <name>pv-value</name>
+    <precision>3</precision>
+    <precision_from_pv>true</precision_from_pv>
+    <pv_name>$(MPV).VAL</pv_name>
+    <pv_value />
+    <rotation_angle>0.0</rotation_angle>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <selector_type>0</selector_type>
+    <show_units>false</show_units>
+    <style>0</style>
+    <text>0.0</text>
+    <tooltip>User Desired Value</tooltip>
+    <transparent>false</transparent>
+    <visible>true</visible>
+    <widget_type>Text Input</widget_type>
+    <width>100</width>
+    <wuid>-17cc82e7:158a9e325d8:-7ab3</wuid>
+    <x>20</x>
+    <y>125</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.TextUpdate" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <auto_size>false</auto_size>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="255" green="255" blue="255" />
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <fontdata fontName="Liberation Sans" height="24" style="0" />
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="255" green="255" blue="255" />
+    </foreground_color>
+    <format_type>0</format_type>
+    <height>60</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <name>pv-value-readback</name>
+    <precision>0</precision>
+    <precision_from_pv>true</precision_from_pv>
+    <pv_name>$(MPV).RBV</pv_name>
+    <pv_value />
+    <rotation_angle>0.0</rotation_angle>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_units>false</show_units>
+    <text>######</text>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <transparent>true</transparent>
+    <vertical_alignment>1</vertical_alignment>
+    <visible>true</visible>
+    <widget_type>Text Update</widget_type>
+    <width>130</width>
+    <wrap_words>false</wrap_words>
+    <wuid>68421233:158ab88d770:-7c7a</wuid>
+    <x>5</x>
+    <y>24</y>
+  </widget>
+</display>

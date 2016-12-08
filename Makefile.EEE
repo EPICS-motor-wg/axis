@@ -21,7 +21,9 @@ DBDS += axisApp/EthercatSrc/EthercatMCController.dbd
 
 SUBSTITUTIONS=-none-
 
-OPIS=-none-
+# What we need at ESS
+OPIS += axisApp/op/opi/
+
 
 # What we need at ESS
 SOURCES += axisApp/AxisSrc/asynAxisAxis.cpp
