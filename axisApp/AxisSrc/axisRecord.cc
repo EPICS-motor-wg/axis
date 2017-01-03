@@ -562,6 +562,12 @@ static long init_record(dbCommon* arg, int pass)
     callbackSetPriority(pmr->prio, &pcallback->dly_callback);
     pcallback->precord = pmr;
 
+    if (pmr->eres == 0.0)
+    {
+        pmr->eres = pmr->mres;
+        MARK(M_ERES);
+    }
+
     /*
      * Reconcile two different ways of specifying speed and resolution; make
      * sure things are sane.
@@ -616,12 +622,6 @@ static long init_record(dbCommon* arg, int pass)
      * from device support.  (Reset ptrans->callback_changed to NO in devSup).
      */
     (*pdset->update_values) (pmr);
-
-    if (pmr->eres == 0.0)
-    {
-        pmr->eres = pmr->mres;
-        MARK(M_ERES);
-    }
 
     process_motor_info(pmr, true);
 
