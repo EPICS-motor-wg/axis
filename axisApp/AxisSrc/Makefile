@@ -25,7 +25,6 @@ axis_SRCS += axisRecord.cc
 axis_SRCS += axisUtilAux.cc
 axis_SRCS += axisUtil.cc
 
-axis_SRCS += drvAxisAsyn.c
 axis_SRCS += devAxisAsyn.c
 axis_SRCS += paramLib.c
 axis_SRCS += asynAxisController.cpp

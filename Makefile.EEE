@@ -32,7 +32,6 @@ SOURCES += axisApp/AxisSrc/axisRecord.cc
 SOURCES += axisApp/AxisSrc/axisUtil.cc
 SOURCES += axisApp/AxisSrc/axisUtilAux.cc
 SOURCES += axisApp/AxisSrc/devAxisAsyn.c
-SOURCES += axisApp/AxisSrc/drvAxisAsyn.c
 SOURCES += axisApp/AxisSrc/paramLib.c
 SOURCES += axisExApp/WithAsyn/WithAsynMain.c
 SOURCES += axisApp/EthercatSrc/EthercatMCAxis.cpp
