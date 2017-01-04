@@ -116,6 +116,9 @@ typedef enum motorCommand {
     motorAccel,
     motorPosition,
     motorResolution,
+    motorRecResolution,
+    motorRecDirection,
+    motorRecOffset,
     motorEncRatio,
     motorPGain,
     motorIGain,
@@ -232,6 +235,34 @@ static long findDrvInfo(axisRecord *pmotor, asynUser *pasynUser, char *drvInfoSt
     return(0);
 }
 
+static asynStatus config_controller(struct axisRecord *pmr, motorAsynPvt *pPvt)
+{
+    asynUser *pasynUser;
+    asynStatus status;
+
+    pasynUser = pasynManager->duplicateAsynUser(pPvt->pasynUser, NULL, NULL);
+    /* Encoder ratio */
+    pasynUser->reason = pPvt->driverReasons[motorEncRatio];
+    pPvt->pasynFloat64->write(pPvt->asynFloat64Pvt, pasynUser, pmr->mres / pmr->eres);
+
+    /* DIR */
+    pasynUser->reason = pPvt->driverReasons[motorRecDirection];
+    pPvt->pasynInt32->write(pPvt->asynFloat64Pvt, pasynUser, pmr->dir);
+
+    /* OFF */
+    pasynUser->reason = pPvt->driverReasons[motorRecOffset];
+    pPvt->pasynFloat64->write(pPvt->asynFloat64Pvt, pasynUser, pmr->off);
+
+    /* MRES, always last */
+    pasynUser->reason = pPvt->driverReasons[motorRecResolution];
+    status = pPvt->pasynFloat64->write(pPvt->asynFloat64Pvt, pasynUser, pmr->mres);
+
+    pasynManager->freeAsynUser(pasynUser);
+    return status;
+}
+
+
+
 static long init_record(struct axisRecord * pmr )
 {
     asynUser *pasynUser;
@@ -311,6 +342,9 @@ static long init_record(struct axisRecord * pmr )
     if (findDrvInfo(pmr, pasynUser, motorAccelString,                  motorAccel)) goto bad;
     if (findDrvInfo(pmr, pasynUser, motorPositionString,               motorPosition)) goto bad;
     if (findDrvInfo(pmr, pasynUser, motorResolutionString,             motorResolution)) goto bad;
+    if (findDrvInfo(pmr, pasynUser, motorRecResolutionString,          motorRecResolution)) goto bad;
+    if (findDrvInfo(pmr, pasynUser, motorRecDirectionString,           motorRecDirection)) goto bad;
+    if (findDrvInfo(pmr, pasynUser, motorRecOffsetString,              motorRecOffset)) goto bad;
     if (findDrvInfo(pmr, pasynUser, motorEncoderRatioString,           motorEncRatio)) goto bad;
     if (findDrvInfo(pmr, pasynUser, motorPGainString,                  motorPGain)) goto bad;
     if (findDrvInfo(pmr, pasynUser, motorIGainString,                  motorIGain)) goto bad;
@@ -344,6 +378,16 @@ static long init_record(struct axisRecord * pmr )
     }
     pPvt->pasynGenericPointer = (asynGenericPointer *)pasynInterface->pinterface;
     pPvt->asynGenericPointerPvt = pasynInterface->drvPvt;
+
+    /* Send MRES, offset, direction and encoder ratio to the driver as soon as
+       possible */
+       
+    status = config_controller(pmr, pPvt);
+    if(status!=asynSuccess) {
+        asynPrint(pasynUser, ASYN_TRACE_ERROR,
+                  "devMotorAsyn::init_record %s config_controller() failed, error=%s\n",
+                  pmr->name, pasynUser->errorMessage);
+    }
 
     /* Now connect the callback, to the Generic Pointer interface, which passes MotorStatus structure */
     pasynUser = pasynManager->duplicateAsynUser(pPvt->pasynUser, asynCallback, 0);
