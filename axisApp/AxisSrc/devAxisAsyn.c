@@ -257,6 +257,10 @@ static asynStatus config_controller(struct axisRecord *pmr, motorAsynPvt *pPvt)
     pasynUser->reason = pPvt->driverReasons[motorRecResolution];
     status = pPvt->pasynFloat64->write(pPvt->asynFloat64Pvt, pasynUser, pmr->mres);
 
+    /* force a poll() in the driver */
+    pasynUser->reason = pPvt->driverReasons[motorUpdateStatus];
+    pPvt->pasynInt32->write(pPvt->asynFloat64Pvt, pasynUser, 1);
+    
     pasynManager->freeAsynUser(pasynUser);
     return status;
 }
