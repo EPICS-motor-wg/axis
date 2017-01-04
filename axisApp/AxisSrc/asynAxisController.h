@@ -30,7 +30,6 @@
 #define motorEncoderPositionString      "MOTOR_ENCODER_POSITION"
 #define motorDeferMovesString           "MOTOR_DEFER_MOVES"
 #define motorMoveToHomeString           "MOTOR_MOVE_HOME"
-#define motorResolutionString           "MOTOR_RESOLUTION"
 #define motorEncoderRatioString         "MOTOR_ENCODER_RATIO"
 #define motorPGainString                "MOTOR_PGAIN"
 #define motorIGainString                "MOTOR_IGAIN"

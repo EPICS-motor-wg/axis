@@ -115,7 +115,6 @@ typedef enum motorCommand {
     motorVelBase,
     motorAccel,
     motorPosition,
-    motorResolution,
     motorRecResolution,
     motorRecDirection,
     motorRecOffset,
@@ -345,7 +344,6 @@ static long init_record(struct axisRecord * pmr )
     if (findDrvInfo(pmr, pasynUser, motorVelBaseString,                motorVelBase)) goto bad;
     if (findDrvInfo(pmr, pasynUser, motorAccelString,                  motorAccel)) goto bad;
     if (findDrvInfo(pmr, pasynUser, motorPositionString,               motorPosition)) goto bad;
-    if (findDrvInfo(pmr, pasynUser, motorResolutionString,             motorResolution)) goto bad;
     if (findDrvInfo(pmr, pasynUser, motorRecResolutionString,          motorRecResolution)) goto bad;
     if (findDrvInfo(pmr, pasynUser, motorRecDirectionString,           motorRecDirection)) goto bad;
     if (findDrvInfo(pmr, pasynUser, motorRecOffsetString,              motorRecOffset)) goto bad;
@@ -413,14 +411,6 @@ static long init_record(struct axisRecord * pmr )
        dbScanLock() etc will fail. */
     pasynUser = pasynManager->duplicateAsynUser(pPvt->pasynUser, asynCallback, 0);
 
-    /* Send the motor resolution to the driver.  This should be done in the record
-     * in the future ? */
-/*  DON'T DO THIS FOR NOW.  THE NUMBER CAN COME TOO LATE TO BE OF USE TO THE DRIVER
-    resolution = pmr->mres;
-    pasynUser->reason = pPvt->driverReasons[motorResolution];
-    pPvt->pasynFloat64->write(pPvt->asynFloat64Pvt, pasynUser,
-                  resolution);
-*/
     pasynUser->reason = pPvt->driverReasons[motorStatus];
     status = pPvt->pasynGenericPointer->read(pPvt->asynGenericPointerPvt, pasynUser,
                       (void *)&pPvt->status);
@@ -635,10 +625,6 @@ static RTN_STATUS build_trans( motor_cmnd command,
         case GET_INFO:
             pmsg->command = motorUpdateStatus;
             pmsg->interface = int32Type;
-            break;
-        case SET_RESOLUTION:
-            pmsg->command = motorResolution;
-            pmsg->dvalue = *param;
             break;
         default:
             asynPrint(pasynUser, ASYN_TRACE_ERROR,

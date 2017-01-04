@@ -111,8 +111,7 @@ typedef enum  {
         PRIMITIVE,      /* Primitive Controller command. */
         SET_HIGH_LIMIT, /* Set High Travel Limit. */
         SET_LOW_LIMIT,  /* Set Low Travel Limit. */
-        JOG_VELOCITY,   /* Change Jog velocity. */
-        SET_RESOLUTION  /* Set resolution */
+        JOG_VELOCITY    /* Change Jog velocity. */
 } motor_cmnd;
 
 

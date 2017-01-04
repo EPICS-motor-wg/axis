@@ -56,7 +56,6 @@ asynAxisController::asynAxisController(const char *portName, int numAxes, int nu
   createParam(motorEncoderPositionString,        asynParamFloat64,    &motorEncoderPosition_);
   createParam(motorDeferMovesString,             asynParamInt32,      &motorDeferMoves_);
   createParam(motorMoveToHomeString,             asynParamInt32,      &motorMoveToHome_);
-  createParam(motorResolutionString,             asynParamFloat64,    &motorResolution_);
   createParam(motorEncoderRatioString,           asynParamFloat64,    &motorEncoderRatio_);
   createParam(motorPGainString,                  asynParamFloat64,    &motorPGain_);
   createParam(motorIGainString,                  asynParamFloat64,    &motorIGain_);
