@@ -356,6 +356,8 @@ asynStatus XPSAxis::home(double min_velocity, double max_velocity, double accele
   }
   moving_ = true;
 
+  setIntegerParam(pC_->motorStatusProblem_, 0);
+
   return asynSuccess;
 }
 
@@ -1055,8 +1057,8 @@ asynStatus XPSAxis::getPositionCompare()
       maxPosition = minPosition;
       minPosition = temp;
     }
-    setDoubleParam(pC_->XPSPositionCompareMinPosition_,  XPSPositionToMotorRecPosition(minPosition));
-    setDoubleParam(pC_->XPSPositionCompareMaxPosition_,  XPSPositionToMotorRecPosition(maxPosition));
+//    setDoubleParam(pC_->XPSPositionCompareMinPosition_,  XPSPositionToMotorRecPosition(minPosition));
+//    setDoubleParam(pC_->XPSPositionCompareMaxPosition_,  XPSPositionToMotorRecPosition(maxPosition));
     setDoubleParam(pC_->XPSPositionCompareStepSize_,     fabs(XPSStepToMotorRecStep(stepSize)));
   } 
   status = PositionerPositionCompareAquadBWindowedGet(pollSocket_, positionerName_, &minPosition, &maxPosition, &enable);
@@ -1067,8 +1069,8 @@ asynStatus XPSAxis::getPositionCompare()
       maxPosition = minPosition;
       minPosition = temp;
     }
-    setDoubleParam(pC_->XPSPositionCompareMinPosition_,  XPSPositionToMotorRecPosition(minPosition));
-    setDoubleParam(pC_->XPSPositionCompareMaxPosition_,  XPSPositionToMotorRecPosition(maxPosition));
+//    setDoubleParam(pC_->XPSPositionCompareMinPosition_,  XPSPositionToMotorRecPosition(minPosition));
+//    setDoubleParam(pC_->XPSPositionCompareMaxPosition_,  XPSPositionToMotorRecPosition(maxPosition));
   } 
   asynPrint(pasynUser_, ASYN_TRACE_FLOW,
             "%s:%s: set XPS %s, axis %d "
