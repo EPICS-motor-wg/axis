@@ -113,7 +113,7 @@ RTN_STATUS axisUtilInit(char *vme_name)
 static int axisUtil_task(void *arg)
 {
     char temp[PVNAME_STRINGSZ+5];
-    int itera, status;
+    int itera;
     epicsEventId wait_forever;
 
     SEVCHK(ca_context_create(ca_enable_preemptive_callback),
@@ -160,7 +160,7 @@ static int axisUtil_task(void *arg)
             strcpy(temp, axislist[itera]);
             strcat(temp, ".DMOV");
             axisArray[itera].chid_dmov = getChID(temp);
-            status = pvMonitor(1, axisArray[itera].chid_dmov, itera);
+            (void)pvMonitor(1, axisArray[itera].chid_dmov, itera);
                     
             /* Setup .STOPs */
             strcpy(temp, axislist[itera]);
@@ -175,7 +175,7 @@ static int axisUtil_task(void *arg)
 	if (!chid_allstop) {
 	    errlogPrintf("Failed to connect to %sallstop\n",vme);
 	} else {
-	    status = pvMonitor(0, chid_allstop, -1);
+          (void)pvMonitor(0, chid_allstop, -1);
 	}
     }
     
@@ -246,7 +246,7 @@ static void allstop_handler(struct event_handler_args args)
 
 static void stopAll(chid callback_chid, char *callback_value)
 {
-    int itera, status = 0;
+    int itera;
     short val = 1, release_val = 0;
     
     if (callback_chid != chid_allstop)
@@ -263,12 +263,12 @@ static void stopAll(chid callback_chid, char *callback_value)
 		to stop axis records for which device and driver support have not been loaded.*/
                 if (axisArray[itera].in_motion == 1)
 		    ca_put(DBR_SHORT, axisArray[itera].chid_stop, &val);
-            status = ca_flush_io(); 
+            (void)ca_flush_io(); 
         }
 
         /* reset allstop so that it may be called again */
         ca_put(DBR_SHORT, chid_allstop, &release_val);
-        status = ca_flush_io();
+        (void)ca_flush_io();
         if (axisUtil_debug)
             errlogPrintf("reset allstop to \"release\"\n");
     }
@@ -287,7 +287,7 @@ static void moving(int callback_axis_index, chid callback_chid,
                    short callback_dmov)
 {
     short new_alldone_value, done = 1, not_done = 0;
-    int numAxissMoving, status;
+    int numAxissMoving;
     char diffChar;
     char diffStr[PVNAME_STRINGSZ+1];
 
@@ -353,7 +353,7 @@ static void moving(int callback_axis_index, chid callback_chid,
 	errlogPrintf("the number of axiss moving remains the same.\n");
     
     /* send the ca_puts */
-    status = ca_flush_io();
+    (void)ca_flush_io();
 }
 
 
