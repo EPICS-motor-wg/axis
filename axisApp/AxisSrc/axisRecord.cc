@@ -2154,7 +2154,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
             double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
             double rbdst1 = 1.0 + (fabs(pmr->bdst) / fabs(pmr->mres));
             long rdbdpos = NINT(pmr->rdbd / fabs(pmr->mres)); /* retry deadband steps */
-            long rpos, npos;
+            long absdiff = labs(NINT(rbvpos)- NINT(newpos));
 
             /*** Use if encoder or ReadbackLink is in use. ***/
             if (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip))
@@ -2177,15 +2177,13 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
 
             /* Don't move if we're within retry deadband. */
 
-            rpos = NINT(rbvpos);
-            npos = NINT(newpos);
             too_small = false;
             if ((pmr->mip & MIP_RETRY) == 0)
             {
-                if (abs(npos - rpos) < 1)
+                if (absdiff < 1)
                     too_small = true;
             }
-            else if (abs(npos - rpos) < rdbdpos)
+            else if (absdiff < rdbdpos)
                 too_small = true;
 
             if (too_small == true)
