@@ -3,7 +3,17 @@ What is this file about?
    until today, 2016-10-19.
  - Describe if they have been integrated into axis or not and why
 
-
+2017-01-05:
+  cherry pick some of the open pull requests on motor into axis:
+#46  cherry-picked        essmotor/161020_1732_remove_warnings_in_NewportSrc
+#49  cherry-picked        essmotor/161107_remove-warnings-newport
+This 2 seem to include the following:
+#47                       essmotor/161024_fix_wrong_print_of_size_t
+#48                       essmotor/161107_hash_typedef_is_not_C_syntax
+#50                       essmotor/161107-size_t-is-not-int (this is buggy!)
+#51                       essmotor/161107-XPS-Arg2-mixed-with-Arg3
+If some of the commits are not ideal, we can revert them later,
+or fix them.
 
 
 -------------------------------------------------------------------------------
