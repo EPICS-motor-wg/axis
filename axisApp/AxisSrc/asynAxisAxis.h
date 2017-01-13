@@ -62,6 +62,7 @@ class epicsShareClass asynAxisAxis {
   void setDisableFlag(int disableFlag);
   double getLastEndOfMoveTime();
   void setLastEndOfMoveTime(double time);
+  void updateMsgTxtFromDriver(const char *value);
 
   protected:
   class asynAxisController *pC_;    /**< Pointer to the asynAxisController to which this axis belongs.
@@ -76,6 +77,7 @@ class epicsShareClass asynAxisAxis {
   int statusChanged_;
   
   private:
+  void updateMsgTxtField(void);
   int referencingModeMove_;
   int wasMovingFlag_;
   int disableFlag_;

@@ -43,6 +43,9 @@
 #define motorPowerOffFractionString     "MOTOR_POWER_OFF_FRACTION"
 #define motorPostMoveDelayString        "MOTOR_POST_MOVE_DELAY"
 #define motorStatusString               "MOTOR_STATUS"
+#define motorLatestCommandString        "MOTOR_LATEST_COMMAND"
+#define motorMessageIsFromDriverString  "MOTOR_MESSAGE_DRIVER"
+#define motorMessageTextString          "MOTOR_MESSAGE_TEXT"
 #define motorUpdateStatusString         "MOTOR_UPDATE_STATUS"
 #define motorStatusDirectionString      "MOTOR_STATUS_DIRECTION" 
 #define motorStatusDoneString           "MOTOR_STATUS_DONE"
@@ -99,6 +102,23 @@
 #define profileReadbacksString          "PROFILE_READBACKS"
 #define profileFollowingErrorsString    "PROFILE_FOLLOWING_ERRORS"
 
+/* bits in status word */
+#define STATUS_BIT_DIRECTION       (1<<0) 
+#define STATUS_BIT_DONE            (1<<1)
+#define STATUS_BIT_HIGH_LIMIT      (1<<2)
+#define STATUS_BIT_AT_HOME         (1<<3)
+#define STATUS_BIT_SLIP            (1<<4)
+#define STATUS_BIT_POWERED         (1<<5)
+#define STATUS_BIT_FOLLOWING_ERROR (1<<6)
+#define STATUS_BIT_HOME            (1<<7)
+#define STATUS_BIT_HAS_ENCODER     (1<<8)
+#define STATUS_BIT_PROBLEM         (1<<9)
+#define STATUS_BIT_MOVING          (1<<10)
+#define STATUS_BIT_GAIN_SUPPORT    (1<<11)
+#define STATUS_BIT_COMMS_ERROR     (1<<12)
+#define STATUS_BIT_LOW_LIMIT       (1<<13)
+#define STATUS_BIT_HOMED           (1<<14)
+
 /** The structure that is passed back to devMotorAsyn when the status changes. */
 typedef struct MotorStatus {
   double position;           /**< Commanded motor position */
@@ -145,6 +165,19 @@ enum ProfileStatus {
   PROFILE_STATUS_ABORT,
   PROFILE_STATUS_TIMEOUT
 };
+
+/* Latest command, needed for MsgTxt */
+enum LatestCommand {
+  LATEST_COMMAND_UNDEFINED,
+  LATEST_COMMAND_STOP,
+  LATEST_COMMAND_HOMING,
+  LATEST_COMMAND_MOVE_TO_HOME,
+  LATEST_COMMAND_MOVE_ABS,
+  LATEST_COMMAND_MOVE_REL,
+  LATEST_COMMAND_MOVE_VEL
+  /* More to be added, like profile move */
+};
+
 
 #ifdef __cplusplus
 #include <asynPortDriver.h>
@@ -226,6 +259,9 @@ class epicsShareClass asynAxisController : public asynPortDriver {
   int motorPostMoveDelay_;
   int motorStatus_;
   int motorUpdateStatus_;
+  int motorLatestCommand_;
+  int motorMessageIsFromDriver_;
+  int motorMessageText_;
 
   // These are the status bits
   int motorStatusDirection_;

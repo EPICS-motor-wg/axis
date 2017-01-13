@@ -299,6 +299,105 @@ asynStatus asynAxisAxis::setStringParam(int function, const char *value)
 }
 
 
+void asynAxisAxis::updateMsgTxtFromDriver(const char *value)
+{
+  if (value && value[0]) {
+    pC_->setIntegerParam(axisNo_,pC_->motorMessageIsFromDriver_, 1);
+    setStringParam(pC_->motorMessageText_,value);
+  } else {
+    pC_->setIntegerParam(axisNo_,pC_->motorMessageIsFromDriver_, 0);
+  }
+}
+
+/** Update the MsgTxt field*/  
+void asynAxisAxis::updateMsgTxtField()
+{
+  int motorMessageIsFromDriver;
+  pC_->getIntegerParam(axisNo_,pC_->motorMessageIsFromDriver_, &motorMessageIsFromDriver);
+  /* The driver has put in a message, keep it */
+  if (motorMessageIsFromDriver) return;
+
+  int motorStatusDone;
+  pC_->getIntegerParam(axisNo_,pC_->motorStatusDone_, &motorStatusDone);
+
+  if (motorStatusDone) {
+    int motorStatusHighLimit;
+    int motorStatusLowLimit;
+    pC_->getIntegerParam(axisNo_,pC_->motorStatusHighLimit_, &motorStatusHighLimit);
+    pC_->getIntegerParam(axisNo_,pC_->motorStatusLowLimit_, &motorStatusLowLimit);
+    if (motorStatusHighLimit && motorStatusLowLimit)
+      setStringParam(pC_->motorMessageText_,"W: Both limit switches");
+    else if (motorStatusHighLimit)
+      setStringParam(pC_->motorMessageText_,"W: Raw high limit switch");
+    else if (motorStatusLowLimit)
+      setStringParam(pC_->motorMessageText_,"W: Raw low limit switch");
+    else {
+      int motorStatusProblem;
+      int motorLatestCommand;
+      pC_->getIntegerParam(axisNo_,pC_->motorLatestCommand_, &motorLatestCommand);
+      pC_->getIntegerParam(axisNo_,pC_->motorStatusProblem_, &motorStatusProblem);
+      if (motorStatusProblem)
+        setStringParam(pC_->motorMessageText_,"E: Problem");
+      else if (motorLatestCommand == LATEST_COMMAND_STOP)
+        setStringParam(pC_->motorMessageText_,"I: Stop");
+      else
+        setStringParam(pC_->motorMessageText_," ");
+    }
+    return;
+  }
+  int motorStatusMoving;
+  pC_->getIntegerParam(axisNo_,pC_->motorStatusMoving_, &motorStatusMoving);
+  int motorLatestCommand;
+  pC_->getIntegerParam(axisNo_,pC_->motorLatestCommand_, &motorLatestCommand);
+  if (motorStatusMoving) {
+    switch (motorLatestCommand) {
+    case LATEST_COMMAND_STOP:
+        setStringParam(pC_->motorMessageText_,"I: Stopped");
+        break;
+    case LATEST_COMMAND_HOMING:
+        setStringParam(pC_->motorMessageText_,"I: Homing");
+        break;
+    case LATEST_COMMAND_MOVE_TO_HOME:
+        setStringParam(pC_->motorMessageText_,"I: Moving to home");
+        break;
+    case LATEST_COMMAND_MOVE_ABS:
+        setStringParam(pC_->motorMessageText_,"I: Moving abs");
+        break;
+    case LATEST_COMMAND_MOVE_REL:
+        setStringParam(pC_->motorMessageText_,"I: Moving rel");
+        break;
+    case LATEST_COMMAND_MOVE_VEL:
+        setStringParam(pC_->motorMessageText_,"I: Moving vel");
+        break;
+    default:
+        setStringParam(pC_->motorMessageText_,"I: Moving");
+    }
+  } else {
+    /* Not done, not moving. Show the latest command */
+    switch (motorLatestCommand) {
+    case LATEST_COMMAND_STOP:
+        setStringParam(pC_->motorMessageText_,"I: Stop");
+        break;
+    case LATEST_COMMAND_HOMING:
+        setStringParam(pC_->motorMessageText_,"I: Home");
+        break;
+    case LATEST_COMMAND_MOVE_TO_HOME:
+        setStringParam(pC_->motorMessageText_,"I: Move to home");
+        break;
+    case LATEST_COMMAND_MOVE_ABS:
+        setStringParam(pC_->motorMessageText_,"I: Move abs");
+        break;
+    case LATEST_COMMAND_MOVE_REL:
+        setStringParam(pC_->motorMessageText_,"I: Move rel");
+        break;
+    case LATEST_COMMAND_MOVE_VEL:
+        setStringParam(pC_->motorMessageText_,"I: Move vel");
+        break;
+    default:
+        setStringParam(pC_->motorMessageText_,"I: Move");
+    }
+  }
+}
 
 /** Calls the callbacks for any parameters that have changed for this axis in the parameter library.
   * This function takes special action if the aggregate MotorStatus structure has changed.
@@ -307,6 +406,7 @@ asynStatus asynAxisAxis::callParamCallbacks()
 {
   if (statusChanged_) {
     statusChanged_ = 0;
+    updateMsgTxtField();
     pC_->doCallbacksGenericPointer((void *)&status_, pC_->motorStatus_, axisNo_);
   }
   return pC_->callParamCallbacks(axisNo_);

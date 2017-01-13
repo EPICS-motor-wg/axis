@@ -70,6 +70,9 @@ asynAxisController::asynAxisController(const char *portName, int numAxes, int nu
   createParam(motorPostMoveDelayString,          asynParamFloat64,    &motorPostMoveDelay_);
   createParam(motorStatusString,                 asynParamInt32,      &motorStatus_);
   createParam(motorUpdateStatusString,           asynParamInt32,      &motorUpdateStatus_);
+  createParam(motorLatestCommandString,          asynParamInt32,      &motorLatestCommand_);
+  createParam(motorMessageIsFromDriverString,    asynParamInt32,      &motorMessageIsFromDriver_);
+  createParam(motorMessageTextString,            asynParamOctet,      &motorMessageText_);
   createParam(motorStatusDirectionString,        asynParamInt32,      &motorStatusDirection_);
   createParam(motorStatusDoneString,             asynParamInt32,      &motorStatusDone_);
   createParam(motorStatusHighLimitString,        asynParamInt32,      &motorStatusHighLimit_);
@@ -194,6 +197,7 @@ asynStatus asynAxisController::writeInt32(asynUser *pasynUser, epicsInt32 value)
   if (function == motorStop_) {
     double accel;
     getDoubleParam(axis, motorAccel_, &accel);
+    pAxis->setIntegerParam(motorLatestCommand_, LATEST_COMMAND_STOP);
     status = pAxis->stop(accel);
   
   } else if (function == motorDeferMoves_) {
@@ -223,6 +227,7 @@ asynStatus asynAxisController::writeInt32(asynUser *pasynUser, epicsInt32 value)
 
   } else if (function == motorMoveToHome_) {
     if (value == 1) {
+      pAxis->setIntegerParam(motorLatestCommand_, LATEST_COMMAND_MOVE_TO_HOME);
       asynPrint(pasynUser, ASYN_TRACE_FLOW, 
         "%s:%s:: Starting a move to home for axis %d\n",  driverName, functionName, axis);
       moveToHomeAxis_ = axis;
@@ -284,6 +289,7 @@ asynStatus asynAxisController::writeFloat64(asynUser *pasynUser, epicsFloat64 va
     getDoubleParam(axis, motorVelBase_, &baseVelocity);
     getDoubleParam(axis, motorVelocity_, &velocity);
     getDoubleParam(axis, motorAccel_, &acceleration);
+    pAxis->setIntegerParam(motorLatestCommand_, LATEST_COMMAND_MOVE_REL);
     status = pAxis->move(value, 1, baseVelocity, velocity, acceleration);
     pAxis->setIntegerParam(motorStatusDone_, 0);
     pAxis->callParamCallbacks();
@@ -300,6 +306,7 @@ asynStatus asynAxisController::writeFloat64(asynUser *pasynUser, epicsFloat64 va
     getDoubleParam(axis, motorVelBase_, &baseVelocity);
     getDoubleParam(axis, motorVelocity_, &velocity);
     getDoubleParam(axis, motorAccel_, &acceleration);
+    pAxis->setIntegerParam(motorLatestCommand_, LATEST_COMMAND_MOVE_ABS);
     status = pAxis->move(value, 0, baseVelocity, velocity, acceleration);
     pAxis->setIntegerParam(motorStatusDone_, 0);
     pAxis->callParamCallbacks();
@@ -315,6 +322,7 @@ asynStatus asynAxisController::writeFloat64(asynUser *pasynUser, epicsFloat64 va
     }
     getDoubleParam(axis, motorVelBase_, &baseVelocity);
     getDoubleParam(axis, motorAccel_, &acceleration);
+    pAxis->setIntegerParam(motorLatestCommand_, LATEST_COMMAND_MOVE_VEL);
     status = pAxis->moveVelocity(baseVelocity, value, acceleration);
     pAxis->setIntegerParam(motorStatusDone_, 0);
     pAxis->callParamCallbacks();
@@ -333,6 +341,7 @@ asynStatus asynAxisController::writeFloat64(asynUser *pasynUser, epicsFloat64 va
     getDoubleParam(axis, motorVelocity_, &velocity);
     getDoubleParam(axis, motorAccel_, &acceleration);
     forwards = (value == 0) ? 0 : 1;
+    pAxis->setIntegerParam(motorLatestCommand_, LATEST_COMMAND_HOMING);
     status = pAxis->home(baseVelocity, velocity, acceleration, forwards);
     pAxis->setIntegerParam(motorStatusDone_, 0);
     pAxis->callParamCallbacks();

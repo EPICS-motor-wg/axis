@@ -86,6 +86,16 @@ record(ao,"$(P)$(M)Resolution") {
     field(PREC, "$(PREC)")
 }
 
+# The message text
+record(waveform, "$(PREFIX)$(R)MsgTxt") {
+    field(DTYP, "asynOctetRead")
+    field(INP, "@asyn($(MOTOR_PORT),$(AXIS_NO))MOTOR_MESSAGE_TEXT")
+    field(FTVL, "CHAR")
+    field(NELM, "80")
+    field(SCAN, "I/O Intr")
+}
+
+
 #! Further lines contain data used by VisualDCT
 #! View(405,484,0.9)
 #! Record("$(P)$(M)",840,675,0,0,"$(P)$(M)")
