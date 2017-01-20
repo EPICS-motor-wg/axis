@@ -1672,16 +1672,26 @@ LOGIC:
 ******************************************************************************/
 static int homing_wanted_and_allowed(axisRecord *pmr)
 {
+    msta_field msta;
+    msta.All = pmr->msta;
     int ret = 0;
     if (pmr->homf && !(pmr->mip & MIP_HOMF)) {
         ret = 1;
-        if ((pmr->dir == motorDIR_Pos) ? pmr->hls : pmr->lls)
-          ret = 0; /* sitting on the directed limit switch */
+        if (msta.Bits.RA_HOME_ON_LS)
+           ; /* controller reported handle this fine */
+        else if ((pmr->dir == motorDIR_Pos) ? pmr->hls : pmr->lls)
+            ret = 0; /* sitting on the directed limit switch */
+        printf("%s/%s:%d ret=%d\n",
+               __FILE__, __FUNCTION__,__LINE__, ret);
     }
     if (pmr->homr && !(pmr->mip & MIP_HOMR)) {
         ret = 1;
-        if ((pmr->dir == motorDIR_Pos) ? pmr->lls : pmr->hls)
-          ret = 0; /* sitting on the directed limit switch */
+        if (msta.Bits.RA_HOME_ON_LS)
+           ; /* controller reported handle this fine */
+        else if ((pmr->dir == motorDIR_Pos) ? pmr->lls : pmr->hls)
+            ret = 0; /* sitting on the directed limit switch */
+        printf("%s/%s:%d ret=%d\n",
+               __FILE__, __FUNCTION__,__LINE__, ret);
     }
     return ret;
 }
