@@ -227,6 +227,8 @@ static inline void Debug(int level, const char *format, ...) {
 
 /*** Forward references ***/
 
+static int homing_wanted_and_allowed(axisRecord *pmr);
+static void do_home(axisRecord *pmr);
 static RTN_STATUS do_work(axisRecord *, CALLBACK_VALUE);
 static void alarm_sub(axisRecord *);
 static void monitor(axisRecord *);
@@ -783,34 +785,12 @@ static long postProcess(axisRecord * pmr)
         if (pmr->mip & MIP_STOP)
         {
             /* Stopped and Hom* button still down.  Now do Hom*. */
-            double vbase = pmr->vbas / fabs(pmr->mres);
-            double hpos = 0;
-            double hvel =  pmr->hvel / fabs(pmr->mres);
-            double acc = (hvel - vbase) / pmr->accl;
-
-            motor_cmnd command;
-
             pmr->mip &= ~MIP_STOP;
             pmr->dmov = FALSE;
             MARK(M_DMOV);
             pmr->rcnt = 0;
             MARK(M_RCNT);
-            INIT_MSG();
-            WRITE_MSG(SET_VELOCITY, &hvel);
-            WRITE_MSG(SET_VEL_BASE, &vbase);
-            if (acc > 0.0)  /* Don't SET_ACCEL to zero. */
-                WRITE_MSG(SET_ACCEL, &acc);
-            
-            if (((pmr->mip & MIP_HOMF) && (pmr->mres > 0.0)) ||
-                ((pmr->mip & MIP_HOMR) && (pmr->mres < 0.0)))
-                command = HOME_FOR;
-            else
-                command = HOME_REV;
-            
-            WRITE_MSG(command, &hpos);
-            WRITE_MSG(GO, NULL);
-            SEND_MSG();
-
+            do_home(pmr);
             pmr->pp = TRUE;
             pmr->cdir = (pmr->mip & MIP_HOMF) ? 1 : 0;
             if (pmr->mres < 0.0)
@@ -1689,7 +1669,62 @@ LOGIC:
     NORMAL RETURN.
     
     
-*******************************************************************************/
+******************************************************************************/
+static int homing_wanted_and_allowed(axisRecord *pmr)
+{
+    msta_field msta;
+    msta.All = pmr->msta;
+    int ret = 0;
+    if (pmr->homf && !(pmr->mip & MIP_HOMF)) {
+        ret = 1;
+        if (msta.Bits.RA_HOME_ON_LS)
+           ; /* controller reported handle this fine */
+        else if ((pmr->dir == motorDIR_Pos) ? pmr->hls : pmr->lls)
+            ret = 0; /* sitting on the directed limit switch */
+        printf("%s/%s:%d ret=%d\n",
+               __FILE__, __FUNCTION__,__LINE__, ret);
+    }
+    if (pmr->homr && !(pmr->mip & MIP_HOMR)) {
+        ret = 1;
+        if (msta.Bits.RA_HOME_ON_LS)
+           ; /* controller reported handle this fine */
+        else if ((pmr->dir == motorDIR_Pos) ? pmr->lls : pmr->hls)
+            ret = 0; /* sitting on the directed limit switch */
+        printf("%s/%s:%d ret=%d\n",
+               __FILE__, __FUNCTION__,__LINE__, ret);
+    }
+    return ret;
+}
+
+/*****************************************************************************/
+static void do_home(axisRecord *pmr)
+{
+    struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
+    double vbase = pmr->vbas / fabs(pmr->mres);
+    double hpos = 0;
+    double hvel =  pmr->hvel / fabs(pmr->mres);
+    double acc = (hvel - vbase) / pmr->accl;
+    motor_cmnd command;
+
+    INIT_MSG();
+    WRITE_MSG(SET_VELOCITY, &hvel);
+    WRITE_MSG(SET_VEL_BASE, &vbase);
+    if (acc > 0.0)  /* Don't SET_ACCEL to zero. */
+        WRITE_MSG(SET_ACCEL, &acc);
+
+    if (((pmr->mip & MIP_HOMF) && (pmr->mres > 0.0)) ||
+        ((pmr->mip & MIP_HOMR) && (pmr->mres < 0.0)))
+        command = HOME_FOR;
+    else
+        command = HOME_REV;
+
+    WRITE_MSG(command, &hpos);
+    WRITE_MSG(GO, NULL);
+    SEND_MSG();
+    pmr->cdir = (command == HOME_FOR) ? 1 : 0;
+
+}
+
 static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
 {
     struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
@@ -1894,9 +1929,8 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
     {
         /** Check out all the buttons and other sources of motion **/
 
-        /* Send motor to home switch in forward direction. */
-        if (((pmr->homf && !(pmr->mip & MIP_HOMF) && !((pmr->dir == motorDIR_Pos) ? pmr->hls : pmr->lls)) ||
-             (pmr->homr && !(pmr->mip & MIP_HOMR) && !((pmr->dir == motorDIR_Pos) ? pmr->lls : pmr->hls))))
+        /* Send motor to home switch in wanted direction. */
+        if (homing_wanted_and_allowed(pmr)) 
         {
             if (stop_or_pause == true)
             {
@@ -1918,37 +1952,13 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
             }
             else
             {
-                double vbase, hvel, hpos, acc;
-                motor_cmnd command;
-
                 /* defend against divide by zero */
                 if (pmr->eres == 0.0)
                 {
                     pmr->eres = pmr->mres;
                     MARK(M_ERES);
                 }
-
-                vbase = pmr->vbas / fabs(pmr->mres);
-                hvel  = pmr->hvel / fabs(pmr->mres);
-                acc   = (hvel - vbase) / pmr->accl;
-                hpos = 0;
-
-                INIT_MSG();
-                WRITE_MSG(SET_VELOCITY, &hvel);
-                WRITE_MSG(SET_VEL_BASE, &vbase);
-                if (acc > 0.0)  /* Don't SET_ACCEL to zero. */
-                    WRITE_MSG(SET_ACCEL, &acc);
-
-                if (((pmr->mip & MIP_HOMF) && (pmr->mres > 0.0)) ||
-                    ((pmr->mip & MIP_HOMR) && (pmr->mres < 0.0)))
-                    command = HOME_FOR;
-                else
-                    command = HOME_REV;
-
-                WRITE_MSG(command, &hpos);
-                WRITE_MSG(GO, NULL);
-                SEND_MSG();
-
+                do_home(pmr);
                 pmr->dmov = FALSE;
                 MARK(M_DMOV);
                 pmr->rcnt = 0;
