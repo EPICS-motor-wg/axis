@@ -185,7 +185,7 @@ USAGE...        Motor Record Support.
  *                    Changed error checks from dial to user limits.
  */                                                          
 
-#define VERSION 10.000003
+#define VERSION 10.000004
 
 #include    <stdlib.h>
 #include    <string.h>
@@ -1363,6 +1363,8 @@ enter_do_work:
             pmr->stop = 1;
             MARK(M_STOP);
             clear_buttons(pmr);
+            printf("%s/%s:%d STOP lvio\n",
+                   __FILE__, __FUNCTION__,__LINE__);
         }
     }
 
@@ -1687,8 +1689,6 @@ static int homing_wanted_and_allowed(axisRecord *pmr)
            ; /* controller reported handle this fine */
         else if ((pmr->dir == motorDIR_Pos) ? pmr->hls : pmr->lls)
             ret = 0; /* sitting on the directed limit switch */
-        printf("%s/%s:%d ret=%d\n",
-               __FILE__, __FUNCTION__,__LINE__, ret);
     }
     if (pmr->homr && !(pmr->mip & MIP_HOMR)) {
         ret = 1;
@@ -1696,8 +1696,6 @@ static int homing_wanted_and_allowed(axisRecord *pmr)
            ; /* controller reported handle this fine */
         else if ((pmr->dir == motorDIR_Pos) ? pmr->lls : pmr->hls)
             ret = 0; /* sitting on the directed limit switch */
-        printf("%s/%s:%d ret=%d\n",
-               __FILE__, __FUNCTION__,__LINE__, ret);
     }
     return ret;
 }
@@ -3636,10 +3634,19 @@ static void process_motor_info(axisRecord * pmr, bool initcall)
     {
         pmr->stop = 1;
         MARK(M_STOP);
+        printf("%s/%s:%d STOP ls_active=%d PROBLEM=%d\n",
+               __FILE__, __FUNCTION__,__LINE__,
+               ls_active ? 1 : 0,
+               msta.Bits.RA_PROBLEM ? 1 : 0);
+    }
+
+    if (ls_active == true || msta.Bits.RA_PROBLEM)
+    {
+        clear_buttons(pmr);
     }
 
     /* Get motor-now-moving indicator. */
-    if (ls_active == true || msta.Bits.RA_DONE || msta.Bits.RA_PROBLEM)
+    if (msta.Bits.RA_DONE)
     {
         pmr->movn = 0;
         if (ls_active == true || msta.Bits.RA_PROBLEM)
