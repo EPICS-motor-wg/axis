@@ -3622,15 +3622,14 @@ static void process_motor_info(axisRecord * pmr, bool initcall)
     pmr->rhls = (msta.Bits.RA_PLUS_LS);
     pmr->rlls = (msta.Bits.RA_MINUS_LS);
 
+    /* Treat limit switch active only when it is pressed and in direction of movement. */
+    ls_active = ((pmr->rhls && pmr->cdir) || (pmr->rlls && !pmr->cdir)) ? true : false;
+
     if ((pmr->mip & MIP_HOMF) || (pmr->mip & MIP_HOMR))
     {
-        ls_active = false;
+        if (msta.Bits.RA_HOME_ON_LS)
+            ls_active = false;    /*Suppress stop on LS if homing on LS is allowed */
         msta.Bits.RA_PROBLEM = 0; /* Suppress problem while homing */
-    }
-    else
-    {
-        /* Treat limit switch active only when it is pressed and in direction of movement. */
-        ls_active = ((pmr->rhls && pmr->cdir) || (pmr->rlls && !pmr->cdir)) ? true : false;
     }
     
     pmr->hls = ((pmr->dir == motorDIR_Pos) == (pmr->mres >= 0)) ? pmr->rhls : pmr->rlls;
