@@ -1233,7 +1233,10 @@ static long process(dbCommon *arg)
             {
 
                 /* We're going in the wrong direction. Readback problem? */
-                printf("%s:tdir = %d\n", pmr->name, pmr->tdir);
+                printf("%s:%d STOP %s diff=%g ntm_deadband=%g\n",
+                       __FILE__, __LINE__,
+                       pmr->name, fabs(pmr->diff), ntm_deadband);
+
                 INIT_MSG();
                 WRITE_MSG(STOP_AXIS, NULL);
                 SEND_MSG();
@@ -1374,8 +1377,8 @@ enter_do_work:
             pmr->stop = 1;
             MARK(M_STOP);
             clear_buttons(pmr);
-            printf("%s/%s:%d STOP lvio\n",
-                   __FILE__, __FUNCTION__,__LINE__);
+            printf("%s:%d STOP %s lvio\n",
+                   __FILE__, __LINE__, pmr->name);
         }
     }
 
@@ -3644,9 +3647,9 @@ static void process_motor_info(axisRecord * pmr, bool initcall)
     {
         pmr->stop = 1;
         MARK(M_STOP);
-        printf("%s/%s:%d STOP ls_active=%d PROBLEM=%d\n",
-               __FILE__, __FUNCTION__,__LINE__,
-               ls_active ? 1 : 0,
+        printf("%s:%d STOP %s ls_active=%d PROBLEM=%d\n",
+               __FILE__, __LINE__,
+               pmr->name, ls_active ? 1 : 0,
                msta.Bits.RA_PROBLEM ? 1 : 0);
     }
 
