@@ -157,7 +157,8 @@ typedef union
     struct
     {
 #ifdef MSB_First
-        unsigned int na             :16;/* N/A bits  */
+        unsigned int na             :15;/* N/A bits  */
+        unsigned int RA_STOP_PROB   :1; /* Stop the axis when RA_PROBLEM is set */
         unsigned int RA_HOME_ON_LS  :1; /* Homing on LS towards LS allowed */ 
         unsigned int RA_HOMED       :1; /* Axis has been homed.*/
         unsigned int RA_MINUS_LS    :1; /* minus limit switch has been hit */
@@ -191,7 +192,8 @@ typedef union
         unsigned int RA_MINUS_LS    :1; /* minus limit switch has been hit */
         unsigned int RA_HOMED       :1; /* Axis has been homed.*/
         unsigned int RA_HOME_ON_LS  :1; /* Homing on LS towards LS allowed */ 
-        unsigned int na             :16;/* N/A bits  */
+        unsigned int RA_STOP_PROB   :1; /* Stop the axis when RA_PROBLEM is set */
+        unsigned int na             :15;/* N/A bits  */
 #endif
     } Bits;                                
 } msta_field;

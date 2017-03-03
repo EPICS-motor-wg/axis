@@ -248,7 +248,7 @@ asynStatus asynAxisAxis::setIntegerParam(int function, int value)
   epicsUInt32 status=0;
   // This assumes the parameters defined above are in the same order as the bits the motor record expects!
   if (function >= pC_->motorStatusDirection_ && 
-      function <= pC_->motorStatusHomeOnLs_) {
+      function <= pC_->motorStopOnProblem_) {
     status = status_.status;
     mask = 1 << (function - pC_->motorStatusDirection_);
     if (value) status |= mask;

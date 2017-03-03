@@ -3632,7 +3632,6 @@ static void process_motor_info(axisRecord * pmr, bool initcall)
     {
         if (msta.Bits.RA_HOME_ON_LS)
             ls_active = false;    /*Suppress stop on LS if homing on LS is allowed */
-        msta.Bits.RA_PROBLEM = 0; /* Suppress problem while homing */
     }
     
     pmr->hls = ((pmr->dir == motorDIR_Pos) == (pmr->mres >= 0)) ? pmr->rhls : pmr->rlls;
@@ -3643,14 +3642,15 @@ static void process_motor_info(axisRecord * pmr, bool initcall)
         MARK(M_LLS);
 
     /* If the motor has a problem, stop it if needed */
-    if ((ls_active == true || msta.Bits.RA_PROBLEM) && !msta.Bits.RA_DONE)
+    if ((ls_active == true || (msta.Bits.RA_PROBLEM && msta.Bits.RA_STOP_PROB)) && !msta.Bits.RA_DONE)
     {
         pmr->stop = 1;
         MARK(M_STOP);
-        printf("%s:%d STOP %s ls_active=%d PROBLEM=%d\n",
+        printf("%s:%d STOP %s ls_active=%d PROBLEM=%d RA_STOP_PROB=%d\n",
                __FILE__, __LINE__,
                pmr->name, ls_active ? 1 : 0,
-               msta.Bits.RA_PROBLEM ? 1 : 0);
+               msta.Bits.RA_PROBLEM ? 1 : 0,
+               msta.Bits.RA_STOP_PROB ? 1 : 0);
     }
 
     if (ls_active == true || msta.Bits.RA_PROBLEM)
