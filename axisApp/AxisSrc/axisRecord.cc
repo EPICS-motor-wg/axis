@@ -185,7 +185,7 @@ USAGE...        Motor Record Support.
  *                    Changed error checks from dial to user limits.
  */                                                          
 
-#define VERSION 10.000006
+#define VERSION 10.000007
 
 #include    <stdlib.h>
 #include    <string.h>
