@@ -202,6 +202,7 @@ class epicsShareClass asynAxisController : public asynPortDriver {
   virtual asynStatus writeFloat64Array(asynUser *pasynUser, epicsFloat64 *value, size_t nElements);
   virtual asynStatus readFloat64Array(asynUser *pasynUser, epicsFloat64 *value, size_t nElements, size_t *nRead);
   virtual asynStatus readGenericPointer(asynUser *pasynUser, void *pointer);
+  virtual asynStatus writeOctet(asynUser *pasynUser, const char *value, size_t nChars, size_t *nActual);
   virtual void report(FILE *fp, int details);
 
   /* These are the methods that are new to this class */

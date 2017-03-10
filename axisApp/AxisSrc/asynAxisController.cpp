@@ -519,6 +519,29 @@ asynStatus asynAxisController::readGenericPointer(asynUser *pasynUser, void *poi
   return asynSuccess;
 }  
 
+/** Called when asyn clients call pasynOctetSyncIO->write().
+  * Extracts the function and axis number from pasynUser.
+  * Sets the value in the parameter library.
+  * \param[in] pasynUser asynUser structure that encodes the reason and address.
+  * \param[in] value Value to write.
+  * \param[in] nChars len (but we only support strings ?!).
+  * \param[out] nActual. number of octets that had been written */
+asynStatus asynAxisController::writeOctet(asynUser *pasynUser, const char *value, 
+                                          size_t nChars, size_t *nActual)
+{
+  asynStatus status = asynSuccess;
+  asynAxisAxis *pAxis;
+  int function = pasynUser->reason;
+
+  pAxis = getAxis(pasynUser);
+  if (!pAxis) return asynError;
+
+  status = pAxis->setStringParam(function, value);
+  if (status == asynSuccess) *nActual = strlen(value);
+  return status;
+}
+
+
 /** Returns a pointer to an asynAxisAxis object.
   * Returns NULL if the axis number encoded in pasynUser is invalid.
   * Derived classes will reimplement this function to return a pointer to the derived
