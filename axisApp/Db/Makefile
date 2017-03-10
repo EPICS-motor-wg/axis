@@ -19,6 +19,7 @@ DB += axis.db
 DB += basic_axis.db
 DB += basic_asyn_axis.db
 DB += EthercatMC.template
+DB += EthercatMCdebug.template
 DB += EthercatMChome.template
 DB += IMS_extra.db
 DB += XPSAuxAi.db
