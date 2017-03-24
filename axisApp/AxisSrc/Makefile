@@ -13,6 +13,7 @@ DBD += axisSupport.dbd
 INC += axis.h
 
 INC += axis_interface.h
+INC += axis_priv.h
 INC += paramLib.h
 INC += asynAxisController.h
 INC += asynAxisAxis.h

@@ -200,6 +200,7 @@ USAGE...        Motor Record Support.
 #include    <dbEvent.h>
 #include    <devSup.h>
 #include    <math.h>
+#include    <axis_priv.h>
 
 #define GEN_SIZE_OFFSET
 #include    "axisRecord.h"
@@ -563,6 +564,7 @@ static long init_record(dbCommon* arg, int pass)
                         &pcallback->dly_callback);
     callbackSetPriority(pmr->prio, &pcallback->dly_callback);
     pcallback->precord = pmr;
+    pmr->priv = (struct axis_priv*)calloc(1, sizeof(struct axis_priv));
 
     if (pmr->eres == 0.0)
     {
