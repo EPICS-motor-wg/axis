@@ -3590,7 +3590,11 @@ static void process_motor_info(axisRecord * pmr, bool initcall)
     {
         /* An encoder is present and the user wants us to use it. */
         pmr->rrbv = pmr->rep;
-        pmr->drbv = pmr->rrbv * pmr->eres;
+        /* device support gave us a double, use it */
+        if (pmr->priv->readBack.encoderPosition)
+            pmr->drbv = pmr->priv->readBack.encoderPosition * pmr->eres;
+        else
+            pmr->drbv = pmr->rrbv * pmr->eres;
     }
     else if (pmr->urip == motorUEIP_Yes && initcall == false)
     {
@@ -3603,13 +3607,21 @@ static void process_motor_info(axisRecord * pmr, bool initcall)
         else
         {
             pmr->rrbv = NINT((rdblvalue * pmr->rres) / pmr->mres);
+#if AXIS_CRIPPLE_RDBL_TO_32BIT_INT
             pmr->drbv = pmr->rrbv * pmr->mres;
+#else
+            pmr->drbv = rdblvalue * pmr->rres / pmr->mres;
+#endif
         }
     }
     else /* UEIP = URIP = No */
     {
         pmr->rrbv = pmr->rmp;
-        pmr->drbv = pmr->rrbv * pmr->mres;
+        /* if device support gave us a double, use it */
+        if (pmr->priv->readBack.position)
+            pmr->drbv = pmr->priv->readBack.position * pmr->mres;
+        else
+            pmr->drbv = pmr->rrbv * pmr->mres;
     }
 
     if (pmr->rrbv != old_rrbv)
@@ -4095,7 +4107,11 @@ static void syncTargetPosition(axisRecord *pmr)
     {
         /* An encoder is present and the user wants us to use it. */
         pmr->rrbv = pmr->rep;
-        pmr->drbv = pmr->rrbv * pmr->eres;
+        /* device support gave us a double, use it */
+        if (pmr->priv->readBack.encoderPosition)
+            pmr->drbv = pmr->priv->readBack.encoderPosition * pmr->eres;
+        else
+            pmr->drbv = pmr->rrbv * pmr->eres;
     }
     else if (pmr->urip)
     {
@@ -4106,13 +4122,21 @@ static void syncTargetPosition(axisRecord *pmr)
         else
         {
             pmr->rrbv = NINT((rdblvalue * pmr->rres) / pmr->mres);
+#if AXIS_CRIPPLE_RDBL_TO_32BIT_INT
             pmr->drbv = pmr->rrbv * pmr->mres;
+#else
+            pmr->drbv = rdblvalue * pmr->rres / pmr->mres;
+#endif
         }
     }
     else
     {
         pmr->rrbv = pmr->rmp;
-        pmr->drbv = pmr->rrbv * pmr->mres;
+        /* if device support gave us a double, use it */
+        if (pmr->priv->readBack.position)
+            pmr->drbv = pmr->priv->readBack.position * pmr->mres;
+        else
+            pmr->drbv = pmr->rrbv * pmr->mres;
     }
     MARK(M_RRBV);
     MARK(M_DRBV);

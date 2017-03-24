@@ -71,6 +71,7 @@
 
 #include "axisRecord.h"
 #include "axis.h"
+#include "axis_priv.h"
 #include "epicsExport.h"
 #include "asynAxisController.h"
 #include "axis_interface.h"
@@ -455,6 +456,8 @@ CALLBACK_VALUE update_values(struct axisRecord * pmr)
     {
         epicsInt32 rawvalue;
 
+        pmr->priv->readBack.position = pPvt->status.position;
+        pmr->priv->readBack.encoderPosition = pPvt->status.encoderPosition;
         rawvalue = (epicsInt32)floor(pPvt->status.position + 0.5);
         if (pmr->rmp != rawvalue)
         {
