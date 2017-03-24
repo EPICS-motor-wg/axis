@@ -1,6 +1,3 @@
-# FILENAME...   axisRecord.dbd
-
-
 # Experimental Physics and Industrial Control System (EPICS)
 
 # Copyright 1991, the Regents of the University of California,
@@ -22,8 +19,10 @@
 #       Advanced Photon Source
 #       Argonne National Laboratory
 
-#Modification Log:
-#-----------------
+
+
+
+
 
 include "menuYesNo.dbd"
 
@@ -452,6 +451,109 @@ recordtype(axis) {
                 pp(TRUE)
                 interest(1)
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
         field(HOMF,DBF_SHORT) {
                 prompt("Home Forward")
                 special(SPC_MOD)

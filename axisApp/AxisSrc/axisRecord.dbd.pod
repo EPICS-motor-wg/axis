@@ -1,0 +1,1437 @@
+# Experimental Physics and Industrial Control System (EPICS)
+
+# Copyright 1991, the Regents of the University of California,
+# and the University of Chicago Board of Governors.
+
+# This software was produced under  U.S. Government contracts:
+# (W-7405-ENG-36) at the Los Alamos National Laboratory,
+# and (W-31-109-ENG-38) at Argonne National Laboratory.
+
+# Initial development by:
+#       The Controls and Automation Group (AT-8)
+#       Ground Test Accelerator
+#       Accelerator Technology Division
+#       Los Alamos National Laboratory
+
+# Co-developed with
+#       The Controls and Computing Group
+#       Accelerator Systems Division
+#       Advanced Photon Source
+#       Argonne National Laboratory
+
+
+
+=title Axis Record (axis)
+
+...
+
+=head3 Menu motorDIR
+
+User Direction
+
+=menu motorDIR
+
+=head2 Parameter Fields
+
+The record-specific fields are described below.
+
+=recordtype axis
+
+...
+
+=cut
+
+
+
+include "menuYesNo.dbd"
+
+menu(motorDIR) {
+        choice(motorDIR_Pos,"Pos")
+        choice(motorDIR_Neg,"Neg")
+}
+menu(motorSET) {
+        choice(motorSET_Use,"Use")
+        choice(motorSET_Set,"Set")
+}
+menu(motorMODE) {
+        choice(motorMODE_Position,"Position")
+        choice(motorMODE_Velocity,"Velocity")
+}
+menu(motorUEIP) {
+        choice(motorUEIP_No,"No")
+        choice(motorUEIP_Yes,"Yes")
+}
+menu(motorSPMG) {
+        choice(motorSPMG_Stop,"Stop")
+        choice(motorSPMG_Pause,"Pause")
+        choice(motorSPMG_Move,"Move")
+        choice(motorSPMG_Go,"Go")
+}
+menu(motorFOFF) {
+        choice(motorFOFF_Variable,"Variable")
+        choice(motorFOFF_Frozen,"Frozen")
+}
+menu(motorTORQ) {
+        choice(motorTORQ_Disable,"Disable")
+        choice(motorTORQ_Enable,"Enable")
+}
+menu(motorSTUP) {
+        choice(motorSTUP_OFF, "OFF")
+        choice(motorSTUP_ON,  "ON")
+        choice(motorSTUP_BUSY,"BUSY")
+}
+menu(motorRMOD) {
+        choice(motorRMOD_D,"Default")
+        choice(motorRMOD_A,"Arithmetic")
+        choice(motorRMOD_G,"Geometric")
+        choice(motorRMOD_I,"In-Position")
+}
+
+include "menuOmsl.dbd"
+
+recordtype(axis) {
+        include "dbCommon.dbd" 
+        field(VERS,DBF_FLOAT) {
+                prompt("Code Version")
+                special(SPC_NOMOD)
+                initial("1")
+        }
+        field(OFF,DBF_DOUBLE) {
+                asl(ASL0)
+                prompt("User Offset (EGU)")
+                special(SPC_MOD)
+                pp(TRUE)
+        }
+        field(FOFF,DBF_MENU) {
+                asl(ASL0)
+                prompt("Offset-Freeze Switch")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+                menu(motorFOFF)
+        }
+        field(FOF,DBF_SHORT) {
+                prompt("Freeze Offset")
+                asl(ASL0)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(VOF,DBF_SHORT) {
+                prompt("Variable Offset")
+                asl(ASL0)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(DIR,DBF_MENU) {
+                prompt("User Direction")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                pp(TRUE)
+                interest(1)
+                menu(motorDIR)
+        }
+        field(SET,DBF_MENU) {
+                asl(ASL0)
+                prompt("Set/Use Switch")
+                interest(1)
+                menu(motorSET)
+        }
+        field(SSET,DBF_SHORT) {
+                prompt("Set SET Mode")
+                asl(ASL0)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(SUSE,DBF_SHORT) {
+                prompt("Set USE Mode")
+                asl(ASL0)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(VELO,DBF_DOUBLE) {
+                prompt("Velocity (EGU/s)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(VBAS,DBF_DOUBLE) {
+                prompt("Base Velocity (EGU/s)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(VMAX,DBF_DOUBLE) {
+                prompt("Max. Velocity (EGU/s)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(S,DBF_DOUBLE) {
+                prompt("Speed (revolutions/sec)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(SBAS,DBF_DOUBLE) {
+                prompt("Base Speed (RPS)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(SMAX,DBF_DOUBLE) {
+                prompt("Max. Speed (RPS)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(ACCL,DBF_DOUBLE) {
+                prompt("Seconds to Velocity")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+                initial("0.2")
+        }
+        field(BDST,DBF_DOUBLE) {
+                prompt("BL Distance (EGU)")
+                asl(ASL0)
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(BVEL,DBF_DOUBLE) {
+                prompt("BL Velocity (EGU/s)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(SBAK,DBF_DOUBLE) {
+                prompt("BL Speed (RPS)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(BACC,DBF_DOUBLE) {
+                prompt("BL Seconds to Velocity")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+                initial("0.5")
+        }
+        field(FRAC,DBF_FLOAT) {
+                prompt("Move Fraction")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+                initial("1")
+        }
+        field(OUT,DBF_OUTLINK) {
+                prompt("Output Specification")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(CARD,DBF_SHORT) {
+                prompt("Card Number")
+                special(SPC_NOMOD)
+                interest(3)
+        }
+        field(RDBL,DBF_INLINK) {
+                prompt("Readback Location")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(DOL,DBF_INLINK) {
+                prompt("Desired Output Loc")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(OMSL,DBF_MENU) {
+                prompt("Output Mode Select")
+                promptgroup(GUI_COMMON)
+                interest(1)
+                menu(menuOmsl)
+        }
+        field(RLNK,DBF_OUTLINK) {
+                prompt("Readback OutLink")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(SREV,DBF_LONG) {
+                prompt("Steps per Revolution")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                pp(TRUE)
+                interest(1)
+                initial("200")
+        }
+        field(UREV,DBF_DOUBLE) {
+                prompt("EGU's per Revolution")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                pp(TRUE)
+                interest(1)
+        }
+        field(MRES,DBF_DOUBLE) {
+                prompt("Motor Step Size (EGU)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                pp(TRUE)
+                interest(1)
+        }
+        field(ERES,DBF_DOUBLE) {
+                prompt("Encoder Step Size (EGU)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                pp(TRUE)
+                interest(1)
+        }
+        field(RRES,DBF_DOUBLE) {
+                prompt("Readback Step Size (EGU")
+                promptgroup(GUI_COMMON)
+                interest(1)
+        }
+        field(UEIP,DBF_MENU) {
+                prompt("Use Encoder If Present")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                pp(TRUE)
+                interest(1)
+                menu(motorUEIP)
+        }
+        field(URIP,DBF_MENU) {
+                prompt("Use RDBL Link If Presen")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                pp(TRUE)
+                interest(1)
+                menu(motorUEIP)
+        }
+        field(PREC,DBF_SHORT) {
+                prompt("Display Precision")
+                promptgroup(GUI_COMMON)
+                interest(1)
+        }
+        field(EGU,DBF_STRING) {
+                prompt("Engineering Units")
+                promptgroup(GUI_COMMON)
+                interest(1)
+                size(16)
+        }
+        field(HLM,DBF_DOUBLE) {
+                prompt("User High Limit")
+                special(SPC_MOD)
+                pp(TRUE)
+        }
+        field(LLM,DBF_DOUBLE) {
+                prompt("User Low Limit")
+                special(SPC_MOD)
+                pp(TRUE)
+        }
+        field(DHLM,DBF_DOUBLE) {
+                prompt("Dial High Limit")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                pp(TRUE)
+        }
+        field(DLLM,DBF_DOUBLE) {
+                prompt("Dial Low Limit")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                pp(TRUE)
+        }
+        field(HOPR,DBF_DOUBLE) {
+                prompt("High Operating Range")
+                promptgroup(GUI_COMMON)
+                interest(1)
+        }
+        field(LOPR,DBF_DOUBLE) {
+                prompt("Low Operating Range")
+                promptgroup(GUI_COMMON)
+                interest(1)
+        }
+        field(HLS,DBF_SHORT) {
+                prompt("User High Limit Switch")
+                special(SPC_NOMOD)
+        }
+        field(LLS,DBF_SHORT) {
+                prompt("User Low Limit Switch")
+                special(SPC_NOMOD)
+        }
+        field(RHLS,DBF_SHORT) {
+                prompt("Raw High Limit Switch")
+                special(SPC_NOMOD)
+        }
+        field(RLLS,DBF_SHORT) {
+                prompt("Raw Low Limit Switch")
+                special(SPC_NOMOD)
+        }
+        field(HIHI,DBF_DOUBLE) {
+                prompt("Hihi Alarm Limit (EGU)")
+                promptgroup(GUI_COMMON)
+                pp(TRUE)
+                interest(2)
+        }
+        field(LOLO,DBF_DOUBLE) {
+                prompt("Lolo Alarm Limit (EGU)")
+                promptgroup(GUI_COMMON)
+                pp(TRUE)
+                interest(2)
+        }
+        field(HIGH,DBF_DOUBLE) {
+                prompt("High Alarm Limit (EGU)")
+                promptgroup(GUI_COMMON)
+                pp(TRUE)
+                interest(2)
+        }
+        field(LOW,DBF_DOUBLE) {
+                prompt("Low Alarm Limit (EGU)")
+                promptgroup(GUI_COMMON)
+                pp(TRUE)
+                interest(2)
+        }
+        field(HHSV,DBF_MENU) {
+                prompt("Hihi Severity")
+                promptgroup(GUI_COMMON)
+                pp(TRUE)
+                interest(2)
+                menu(menuAlarmSevr)
+        }
+        field(LLSV,DBF_MENU) {
+                prompt("Lolo Severity")
+                promptgroup(GUI_COMMON)
+                pp(TRUE)
+                interest(2)
+                menu(menuAlarmSevr)
+        }
+        field(HSV,DBF_MENU) {
+                prompt("High Severity")
+                promptgroup(GUI_COMMON)
+                pp(TRUE)
+                interest(2)
+                menu(menuAlarmSevr)
+        }
+        field(LSV,DBF_MENU) {
+                prompt("Low Severity")
+                promptgroup(GUI_COMMON)
+                pp(TRUE)
+                interest(2)
+                menu(menuAlarmSevr)
+        }
+        field(HLSV,DBF_MENU) {
+                prompt("HW Limit Violation Svr")
+                promptgroup(GUI_COMMON)
+                pp(TRUE)
+                interest(2)
+                menu(menuAlarmSevr)
+        }
+        field(RDBD,DBF_DOUBLE) {
+                prompt("Retry Deadband (EGU)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(RCNT,DBF_SHORT) {
+                prompt("Retry count")
+                special(SPC_NOMOD)
+                interest(2)
+        }
+        field(RTRY,DBF_SHORT) {
+                prompt("Max retry count")
+                promptgroup(GUI_COMMON)
+                interest(1)
+                initial("10")
+        }
+        field(MISS,DBF_SHORT) {
+                prompt("Ran out of retries")
+                special(SPC_NOMOD)
+                interest(2)
+        }
+        field(SPMG,DBF_MENU) {
+                asl(ASL0)
+                prompt("Stop/Pause/Move/Go")
+                pp(TRUE)
+                interest(1)
+                menu(motorSPMG)
+                initial("3")
+        }
+        field(LSPG,DBF_MENU) {
+                prompt("Last SPMG")
+                special(SPC_NOMOD)
+                interest(1)
+                menu(motorSPMG)
+                initial("3")
+        }
+        field(STOP,DBF_SHORT) {
+                asl(ASL0)
+                prompt("Stop")
+                pp(TRUE)
+                interest(1)
+        }
+
+=head3 Calibration-related fields
+
+User and dial coordinates can differ by a sign (the DIR field) and an offset (OFF),
+according to the following equation: 
+
+userVAL = DialVAL * DIR + OFFset
+This field is "OFFset" in the below equation.
+It is not normally written to directly by the user. 
+
+=fields DIR, OFF, FOFF, VOF, FOF, SET, SSET, SUSE
+
+=cut
+
+=head3 Homing fields
+
+=head3 Motor-resolution fields
+
+=fields MRES, SREV, UREV
+
+MRES, and (SREV,UREV) represent two ways of specifying the motor resolution--the distance or angle,
+in engineering units (EGU's), associated with a single motor step.
+The equation relating these quantities is "MRES = UREV/SREV ". 
+Initially, SREV has the value 200, the number of full steps per revolution for most stepper motors,
+and the record never changes this field. Only the user can change it. 
+
+When MRES is changed, the record sets UREV = MRES*SREV. 
+
+When UREV or SREV is changed, the motor sets MRES = UREV/SREV. 
+
+In all cases, the effect of a motor resolution change on the 
+reported motor position depends in a simple way on the value of the SET field:
+If (SET = 1), new user and dial values (VAL, DVAL) are calculated from the existing raw value (RVAL).
+If (SET = 0), a new raw value is calculated from the existing dial value.
+The motor doesn't move in either case; neither does the actual motor speed (in revolutions per second) change. 
+
+If either MRES or UREV is changed,
+motor speeds that are expressed in engineering units per second 
+(i.e., those whose names contain the letter 'V': 
+
+VELO, BVEL, VMAX and VBAS) are automatically adjusted by the record according to the following equations: 
+
+VELO = UREV * S; 
+
+BVEL = UREV * SBAK; 
+
+VMAX = UREV * SMAX; 
+
+VBAS = UREV * SBAS.  
+
+Motor speeds that are expressed in revolutions per second (S, SBAK, and SBAS) are independent of changes
+to MRES or UREV.
+In contrast, when SREV is changed, only MRES is adjusted by the record, 
+thus allowing all other fields to remain unaffected.
+
+Currently, changes to motor-resolution fields have no effect on the values of limit fields
+(although they should). 
+
+MRES or UREV allow negative values so that the user/dial coordinate systems can be configured 
+to the opposite polarity of the motor controller's. 
+
+=cut
+
+=head3 Motion-related fields
+
+VMAX 	Valid range; 0 <= VMAX.  VMAX=0 disables maximum velocity range checking.
+
+SMAX 	Valid range; 0 <= SMAX
+
+VBAS 	Valid range; 0 <= VBAS
+
+SBAS 	Valid range; 0 <= SBAS
+
+=fields VMAX, SMAX, VBAS, SBAS
+
+
+Range checking is done in such a way that any minimum (i.e., VBAS/SBAS) or maximum  (i.e., VMAX/SMAX) value entered is valid.
+
+For example, if the minimum is entered and it exceeds the maximum, then the maximum is set to the new minimum value.  
+
+A VMAX value of zero disables maximum velocity range checking.
+
+At boot-up, if one field of a field pair (i.e., VMAX/SMAX, VBAS/SBAS, VELO/S, BVEL/SBAK) is zero and the other field is nonzero, the nonzero field takes precedence.  If both fields of a given field pair are nonzero, the RPS member of the field pair (i.e., SMAX, SBAS, S, SBAK) takes precedence.
+
+Slew (VELO/S) and backup (BVEL/SBAK) velocity fields are silently forced by the record 
+to be within the range set by VMAX/SMAX and VBAS/SBAS, inclusively.
+
+Those who use both BURT and VMAX (i.e., nonzero VMAX) should insure that VMAX and VBAS
+
+are placed before VELO and BVEL in their BURT request files.
+
+The intent of VBAS/SBAS is to prevent the motor from moving at speeds slow enough to excite its resonance,
+which can cause the motor to miss steps. 
+The motor is expected to accelerate from a stand-still to VBAS in one motor pulse.  
+VELO is the speed, in engineering units per second, at which the motor is moved after the acceleration phase of a motion is finished. S is the same speed expressed in revolutions per second. The record makes sure that VELO and S are consistent, using the equation S = VELO/UREV.
+
+
+VELO 	Valid range; VBAS <= VELO <= VMAX
+
+S 	Valid range;  SBAS <=      S      <= SMAX
+
+=fields VELO, S, VBAS, ACCL
+
+The record expects the hardware to produce a trapezoidal speed profile. That is, the motor speed is expected to increase linearly with time from the base speed, VBAS, to the full speed, VELO, in ACCL seconds. At the end of a motion, the speed is expected to decrease similarly to VBAS. 
+
+=cut
+
+=fields JVEL, JAR
+
+The velocity and acceleration can be different from what is used during positioning. The velocity is specified in JVEL. Accelaration is measured in EGU/sec^2 and is found in JAR. Note that JAR is specifying the acceleration using EQU/sec^2 while ACCL is specifying the time to reach the maximum velocity. When JAR is 0, VELO / ACCL is used as a fallback.
+
+With the OMS and IMS device drivers, jog velocity can be changed on-the-fly.  The velocity will accelerate to the new velocity based on the JAR field.
+
+=cut
+
+=fields BDST
+
+The algorithm used in moves to a (dial-coordinate) position called "TARGET" follows: 
+
+1) If the motor is to move a distance greater than the magnitude of BDST, or if the motor is to move in a direction opposite to the sign of BDST, then the motor will move first to position (TARGET-BDST), at an acceleration specified by ACCL and speed VELO, and then to position TARGET, at an acceleration specified by BACC and speed BVEL. 
+
+2) If the motor is to move a distance smaller than the magnitude of BDST, and if the motor is to move in the same direction as the sign of BDST, then backlash is assumed already to have been taken out, and the motor will move to position TARGET at an acceleration specified by BACC and speed BVEL.  
+
+=cut
+
+=fields BVEL, SBAK, BACC
+
+The algorithm used in moves to a (dial-coordinate) position called "TARGET" follows: 
+
+1) If the motor is to move a distance greater than the magnitude of BDST, or if the motor is to move in a direction opposite to the sign of BDST, then the motor will move first to position (TARGET-BDST), at an acceleration specified by ACCL and speed VELO, and then to position TARGET, at an acceleration specified by BACC and speed BVEL. 
+
+2) If the motor is to move a distance smaller than the magnitude of BDST, and if the motor is to move in the same direction as the sign of BDST, then backlash is assumed already to have been taken out, and the motor will move to position TARGET at an acceleration specified by BACC and speed BVEL.  
+
+
+BVEL is the speed, in engineering units per second, at which the motor is move after the acceleration phase of a backlash-takeout motion is finished. SBAK is the same speed expressed in revolutions per second. Neither BVEL nor SBAK may be negative or zero. 
+
+=cut
+
+=fields FRAC
+
+This field supports closed-loop control of pathological devices for which drive values are not expected to compare reproducibly with readback values. (Inchworms and other friction-driven devices are good examples: the number of steps taken by an inchworm motor is a very poor indicator of the distance it has traveled.) 
+
+In a move from position CURRENT to position TARGET, the record will ask hardware to move a distance FRAC*(TARGET-CURRENT). When that motion is complete, the record will request a motion of FRAC*(remaining distance), and so on until the target position has been reached.
+
+=cut
+
+
+=fields RDBD
+
+When the motor has finished a complete motion, possibly including backlash takeout, the record will compare its current position with the desired position. If the magnitude of the difference is greater than RDBD, the motor will try again, as if the user had requested a move from the now current position to the desired position. Only a limited number of retries will be performed (see RTRY).
+
+=cut
+
+=fields RTRY
+
+The maximum number of times the record will try again to move to the desired position. When the retry limit is reached, the record will declare the motion finished. If the desired position was not reached, the field MISS will be set to 1.
+
+=cut
+
+
+=fields RMOD
+
+ (0:"Unity", 1:"Arthmetic", 2:"Geometric", 3:"In-Position")
+
+RMOD allows the user to select different ways of calculating the retry distance move. The default mode (Unity) moves the motor a relative distance based on the dial error (DIFF field). Badly behaved devices (piezo motors) can oscillate around their target position in this mode. Hence, two other modes were added to allow a decreasing response from the record after each retry.
+
+The Arithmetic mode generates an arithmetic sequence of corrections. For example, if the max. retry count (RTRY) is 10, then the retries will proceed as follows; DIFF * (1.0), DIFF * (9/10), DIFF * (8/10), etc.
+
+The Geometric mode generates a geometric sequence with a 1/2 common factor of corrections. For example, if the max. retry count is 10, then the retries will proceed as follows; DIFF * (1.0), DIFF * (1/2) DIFF * (1/4), DIFF * (1/8), etc.
+
+The In-Position mode is used only with servos. This mode does not send any motion commands to the controller during a retry. It simply waits for the DIFF field to less than the RDBD field. This mode is intended to be used with nonzero DLY and RTRY fields. 
+
+=cut
+
+
+=head3 Link-related fields
+
+=fields OUT
+
+If Soft Channel device support is specified, this field is an EPICS link; each time DVAL is changed, device support puts DVAL to this link.  Otherwise, this field specifies the hardware to be controlled.
+
+=cut
+
+=fields RDBL
+
+This field specifies the field (of this or any other EPICS record) from which the motor's current position is to be read when the field URIP (Use Readback If Present) has the value "Yes" (1). If this field does not contain a valid EPICS link, the URIP may as well have the value "No" (0).  If Soft Channel device support is specified, this field is monitored for value changes by a CA event task. 
+
+=cut
+
+=fields DOL
+
+If this field contains a valid EPICS link, and the OMSL field has the value "closed_loop" (1), then every time the record is processed, it will get a value for the VAL field from the link and move to that location, ignoring all other drive fields. Closed-loop mode has not been tested extensively. 
+
+=cut
+
+=fields OMSL
+
+(0:"supervisory", 1:"closed_loop") 
+If this field has the value "closed_loop" (1), and the field DOL contains a valid EPICS link, then every time the record is processed, it will get a value for the VAL field from the link and move to that location, ignoring all other drive fields. Closed-loop mode has not been tested extensively. 
+
+=cut
+
+=fields RLNK
+
+If this field contains a valid EPICS link, then every time the record is processed, it will put the (engineering-unit) readback value RBV to that link. 
+
+=cut
+
+=fields DINP
+
+If Soft Channel device support is specified, the value specified by this link is used to set the DONE bit in the MSTA field; which in turn sets the DMOV field.
+
+=cut
+
+=fields RINP
+
+If Soft Channel device support is specified, the value specified by this link is used to set the RMP field.
+
+=cut
+
+=fields STOO
+
+If Soft Channel device support is specified, a one is written to the  specified link each time the STOP_AXIS motor command is issued.
+
+
+=head4 Soft Channel Device Driver
+
+
+The Soft Channel database links (i.e., DINP, RINP and STOO) are only processed when the Soft Channel device driver is selected.  These links are ignored when using any other Record device driver.
+
+The input links (i.e., DINP, RDBL and RINP) are monitored for value changes by a CA event task.  Users must choose either a dial input link (RDBL) or a raw input link (RINP), but not both. At this time, the above links are not dynamically retargetable. 
+
+Note that Soft Channel device support resets the target position (VAL/DVAL/RVAL) to the actual position (RBV/DRBV/RRBV) the first time, and only the first time, that the PV pointed to by RDBL is posted. Hence, Soft Channel device support requires that the RDBL PV have a valid value the first time it is posted. 
+
+Note that JOG[F/R] does not work with the Soft Channel device driver. 
+
+=cut
+
+
+=head2 Limit-related  Fields
+    
+=fields HLM
+
+The maximum allowed value of the VAL field. If HLM changes so that VAL is no longer less than HLM, then the record will set the field LVIO to 1. If the DIR field has the value "Pos", then HLM will always be consistent with DHLM, otherwise HLM will always be consistent with DLLM.
+
+=cut
+
+=fields LLM
+
+The minimum allowed value of the VAL field. If LLM changes so that VAL is no longer greater than LLM, then the record will set the field LVIO to 1. If the DIR field has the value "Pos", then LLM will always be consistent with DLLM, otherwise LLM will always be consistent with DHLM. 
+
+=cut
+
+=fields DHLM
+
+The maximum allowed value of the DVAL field. If DHLM changes so that DVAL is no longer less than DHLM, then the record will set the field LVIO to 1.. If the DIR field has the value "Pos", then DHLM will always be consistent with HLM, otherwise DHLM will always be consistent with LLM. 
+
+=cut
+
+
+=fields DLLM
+
+The minimum allowed value of the DVAL field. If DLLM changes so that DVAL is no longer greater than DLLM, then the record will set the field LVIO to 1. If the DIR field has the value "Pos", then DLLM will always be consistent with LLM, otherwise DLLM will always be consistent with HLM. 
+
+=cut
+
+
+=fields LVIO
+
+A value of 1 indicates that the dial-value drive field, DVAL, or the dial-value readback field, DRBV, is outside of the limits (DHLM, DLLM), and this prevents the motor from moving. If the backlash distance, BDST, is non-zero, it further restricts the allowable range of DVAL. When a JOG button is hit, LVIO goes to 1 and stops the motor if/when DVAL gets to within one second's travel time of either limit. 
+
+=cut
+
+
+=fields HLS, RHLS
+
+If either of these fields is nonzero, then the motor is at the positive-limit switch, where the positive sense is that of the user-coordinate system for HLS, and that of the raw (step-number) coordinate system for RHLS. 
+
+=cut
+
+
+=fields LLS, RLLS
+
+If either of these fields is nonzero, then the motor is at the negative-limit switch, where the positive sense is that of the user-coordinate system for LLS, and that of the raw (step-number) coordinate system for RLLS.
+
+=cut
+
+=head2 Command-button fields
+
+=fields SPMG
+
+This field is intended primarily for interactive use, and normally has the value "Go." 
+
+If the user sets this field to "Stop," the motor will decelerate to a stop, the VAL field will be set equal to the RBV field, and the DVAL field will be set equal to the DRBV field. (These actions ensure that the motor will not start moving again until a drive field is changed.) In any case, the motor will not move while SPMG has the value "Stop" or "Pause." 
+
+If "SPMG" has the value "Move," the record will reset SPMG to "Pause" when a motion completes. This behavior supports users who want a motor to sit still until they say "Move", no matter what changes occur in the drive fields.  
+
+=cut
+
+
+=fields STOP
+
+When this field is set to 1, the record will immediately reset it to 0, and the motor will decelerate to a stop. When the motor has stopped, VAL will be set equal to RBV, and DVAL will be set equal to DRBV. (This ensures that the motor will not start moving the next time the record is processed, unless a drive field is explicitly changed. If you want the motor to pause, use the SPMG field.)
+
+=cut
+
+
+=fields HOMF, HOMR
+
+When one of these fields is set to 1, the motor will decelerate to a stop if already moving, move in the indicated direction (in dial coordinates) at the acceleration specified by ACCL and a speed specified by HVEL, until the hardware detects the "home" switch has become active. Then the hardware will do something hardware dependent in response to its "home" command, if any. (The OMS hardware causes the motor to decelerate to a stop.) When the motor stops, the VAL field will be set equal to the RBV field, and the DVAL field will be set equal to the DRBV field.  These fields can be set to 1, but setting either field to 0 results in an error.  The record sets HOM[F/R] to zero when the homing procedure is either completed or aborted.
+
+=cut
+
+
+=fields JOGF, JOGR
+
+When one of these fields is set to 1, the motor will decelerate to a stop if already moving, and move in the indicated direction (in user coordinates) at an acceleration specified by ACCL and speed VELO, until the field goes to 0. Then the motor will set VAL to RBV and DVAL to DRBV, decelerate to a stop, and execute a (backlash-corrected, if BDST is nonzero) move to the position at which the field went to 0. 
+
+These fields are dangerous when used over channel access, because the motor does not stop moving until a second message is received. If a very busy network should cause that second message to be lost, the motor will travel to its limit switch or hard stop.  
+
+=cut
+
+=fields TWF, TWR
+
+When one of these fields is set to 1, the record will immediately reset it to 0, and the motor will move (with backlash takeout if BDST is nonzero) by a distance TWV (in user coordinates) at the acceleration specified by ACCL and at speed VELO.
+
+=cut
+
+=fields TWV
+
+This field contains the distance the motor is to move in response to the TWF and TWR buttons.
+
+=cut
+
+
+=head2 Drive fields
+
+=fields VAL
+
+This is the desired position in user coordinates. When this field is written to, DVAL and RVAL will be changed correspondingly, and the motor will move (with backlash takeout if BDST is nonzero) to the newly written position. 
+
+=cut
+
+
+=fields DVAL
+
+This is the desired position in dial coordinates. When this field is written to, VAL and RVAL will be changed correspondingly, and the motor will move (with backlash takeout if BDST is nonzero) to the newly written position. 
+
+=cut
+
+
+=fields RVAL
+
+This is the desired position in raw coordinates. When this field is written to, VAL and DVAL will be changed correspondingly, and the motor will move (with backlash takeout if BDST is nonzero) to the newly written position. 
+
+=cut
+
+
+=fields RLV
+
+When this field is changed, its value will be added to VAL, the field itself will immediately be reset to 0, and the record will behave as though the VAL field had been changed directly. 
+
+=cut
+
+
+=fields SYNC
+
+When this field is set to Yes(1) the record sets the Drive fields (VAL/DVAL/RVAL) to their readback values (RBV/DRBV/RRBV) and sets the SYNC field back to No(0). 
+
+=cut
+
+
+
+=head2 Status/Readback fields
+
+=fields RBV
+
+The current motor position, in user coordinates, from the motor hardware (default), or from the encoder supported by the motor-controller hardware (if UEIP is nonzero), or from the readback link RDBL (if URIP is nonzero). 
+
+=cut
+
+
+=fields DRBV
+
+The current motor position, in dial coordinates, from the motor hardware (default), or from the encoder supported by the motor-controller hardware (if UEIP is nonzero), or from the readback link RDBL (if URIP is nonzero). 
+
+=cut
+
+
+=fields DMOV
+
+This field is set to 0 when the record begins a motion, and remains 0 through any retries and backlash corrections that may be required until the record has completely finished that motion, whereupon the field is set to 1. DMOV is guaranteed to execute and post a 1/0/1 pulse when the motor is commanded to move--even if no motion actually occurs because the motor was commanded to move to its current position. 
+
+=cut
+
+
+=fields MOVN
+
+This field is set to 1 while the record believes that the motor actually is moving. This field is not the inverse of DMOV, since it may go to zero during a complex motion, if that motion includes a momentary stop.
+
+=cut
+
+
+=fields DLY
+
+Delay (in seconds) the time between motor controller done and record done (i.e., DMOV).
+
+=cut
+
+
+=fields DIFF
+
+DIFF is the difference, in engineering units, between the desired motor position, and the readback device's report of the current position.
+
+=cut
+
+
+=fields RDIF
+
+RDIF is the same difference in "raw" units (normally, steps). 
+
+=cut
+
+
+=fields RRBV
+
+The current position of the motor, encoder, or readback link, as received from whatever source has been selected to provide position information. The units associated with this field depend on the source. 
+
+=cut
+
+
+=fields RMP
+
+The contents of the hardware's step-count register. This field contains the same information as the dial value, but in steps, rather than in engineering units. 
+
+=cut
+
+    
+=fields REP
+
+The contents of the hardware's encoder-count register. Ideally, this field contains the same information as the dial value, but in encoder counts, rather than in engineering units. 
+
+=cut
+
+
+=fields MSTA
+
+The motor status as received from the hardware.  The MSTA bits are defined as follows:
+
+        DIRECTION: last raw direction; (0:Negative, 1:Positive)
+        DONE: motion is complete.
+        PLUS_LS: plus limit switch has been hit.
+        HOMELS: state of the home limit switch.
+        Unused
+        POSITION: closed-loop position control is enabled.
+        SLIP_STALL: Slip/Stall detected (eg. fatal following error)
+        HOME: if at home position.
+        PRESENT: encoder is present.
+        PROBLEM: driver stopped polling, or hardware problem
+        MOVING: non-zero velocity present.
+        GAIN_SUPPORT: motor supports closed-loop position control.
+        COMM_ERR: Controller communication error.
+        MINUS_LS: minus limit switch has been hit.
+        HOMED: the motor has been homed.
+
+The record is put into MAJOR STATE alarm if either SLIP_STALL or PROBLEM bits are detected. If HLSV is set, then the record is put into HIGH alarm if either a high soft limit or hard limit (PLUS_LS) has been reached. Similary for the low limits. 
+
+=cut
+
+
+=fields TDIR
+
+The direction in which the motor is currently traveling (or was most recently traveling), as received from the hardware. If 0, the raw readback value should be decreasing. 
+
+=cut
+
+
+=fields ATHM
+
+The state of the hardware's "home" switch. If 1, the motor has hit the switch.
+
+=cut
+
+
+=fields RCNT
+
+The number of times the record has detected failure of the motor to land within the retry-deadband distance of the desired position. 
+
+=cut
+
+
+=fields MISS
+
+If 1, the motor has failed to land on the desired position more than the allowed number of times. This field will be reset the next time the motor succeeds in reaching the desired position. 
+
+=cut
+
+
+=fields RVEL
+
+Speed in steps per second that the motor actually is moving.
+
+=cut
+
+
+=fields STUP
+
+The STUP field functions as follows;
+
+Valid values for STUP are OFF(0), ON(1) and BUSY(2).
+A Channel Access (CA) client writes ON(1) to the STUP field which causes the record to set STUP to BUSY(2) and request a single controller status update. After the status is updated the record sets STUP to OFF(0).
+CA clients are restricted to writing ON(1) to STUP only when STUP is OFF(0).
+It is the responsibility of the user to restrict the frequency (and thus the incurred overhead) at which the CA client writes ON(1) to STUP.
+
+With the STUP field it is possible to have another EPICS record periodically write ON(1) to the record's STUP field. This would result in continuous, periodic status updates. 
+
+=cut
+
+=fields ADEL
+
+An archive value is only posted if RBV moves out of the ADEL deadband when compared to the previous value archived. ie. if ((RBV-ALST)>ADEL). ADEL defaults to zero, which would mean that all changes to RBV are archived.
+
+=cut
+
+=fields MDEL
+
+An monitor value is only posted if RBV moves out of the MDEL deadband when compared to the previous value posted. ie. if ((RBV-MLST)>MDEL). MDEL defaults to zero, which would mean that all value changes to RBV are posted.
+
+=cut
+
+=head2 Servo fields
+
+=fields PCOF, ICOF, DCOF
+
+These fields may be removed at any time.
+
+=cut
+
+=fields CNEN
+
+0:"Disable", 1:"Enable")
+Implementation dependent, typically one of these:
+
+        Enable/Disable Torque control
+        Enable/Disable Closed loop in the motion controller
+        Enable/Disable Amplifier on/off
+
+
+=cut
+
+=fields NTM
+
+The requirements on how the record processes a new target position while the motor is in motion are as follows;
+Case #1: The record is given a new position, which is in the opposite direction from the current motor motion. If NTM is "YES", the motor is immediately stopped and given a motion command to the new position. If NTM is "NO ", the motor completes the previous move before it is given a motion command to the new position.
+Case #2: The record is given a new position, which is in the same direction as the current motor motion, but the new position is closer to the motor's current position than the original target position. If NTM is "YES", the motor is stopped after it has gone past the new position; then a command is given to return to the new position. If NTM is "NO", the motor completes the previous move before it is given a motion command to the new position.
+Case #3: The record is given a new position, which is in the same direction as the current motor motion, but the new position is further from the motor's current position than the original position. After the motor reaches the original target position and stops, a command is given to the new target position. This case is independent of NTM.
+NTM defaults to "YES". It should be set to "NO" only for soft motors. Soft motors should be configured with NTM set to "NO" to prevent Case #1 above from interfering with "hard" motors using backlash correction. 
+
+=cut
+
+=fields NTMF
+
+Determines NTM deadband = NTMF * (|BDST| + RDBD). NTMF must be >= 2. The NTM deadband prevents NTM logic from issuing a STOP command at the end of a DC motor move that overshoots its' target position.
+
+=cut
+
+=head2 Alarm
+
+=fields HLSV
+
+If HLSW is not 0, the record is put into major alarm if the soft limits are violated or a limit switch is hit.
+
+If you miss a field to put the record into minor alarm when MISS is 1, send us a pull request.
+
+=cut
+
+
+=head2 Miscellaneous fields
+
+=fields EGU, PREC
+
+=cut
+
+=fields VERS
+
+Version number as defined in axisRecord.cc. <MAJOR>.<MINORas3digits><PatchLevelas3digits>
+
+=cut
+
+=fields CARD
+
+For VME based devices (i.e., OMS VME8/44, OMS VME58 and V544) this is the VME card number, derived from the output link. Cards are numbered from zero according to their VME addresses.  Oregon Micro Systems series VME8 and VME44 cards occur in the same series, since they are handled by the same driver.  Oregon Micro Systems VME58 cards are numbered separately, as are Highland Technology V540 cards.  This field is set to -1 for non-VME based device/drivers.
+
+=cut
+
+=head2 Command Primitives
+
+=fields INIT, PREM, POST
+
+None of INIT, PREM or POST is currently supported.
+
+=cut
+
+=fields LOCK
+
+After a "hard" motor initiated move, Soft Channel device support automatically synchronizes a "soft" motor's target position with a "hard" motor's readback position. Soft Channel device support detects that the "hard" motor has initiated the move when it sees the PV pointed to by DINP go false, while the "soft" record's DMOV is true. Automatic synchronization is undesirable in a multi-axis application. Hence, setting the LOCK field to "YES" disables this automatic synchronization.
+
+=cut
+
+=fields NTM, NTMF
+
+See under Servo fields
+
+=cut
+
+    
+        field(HOMF,DBF_SHORT) {
+                prompt("Home Forward")
+                special(SPC_MOD)
+                pp(TRUE)
+                interest(1)
+        }
+        field(HOMR,DBF_SHORT) {
+                prompt("Home Reverse")
+                special(SPC_MOD)
+                pp(TRUE)
+                interest(1)
+        }
+        field(JOGF,DBF_SHORT) {
+                asl(ASL0)
+                prompt("Jog motor Forward")
+                special(SPC_MOD)
+                pp(TRUE)
+                interest(1)
+        }
+        field(JOGR,DBF_SHORT) {
+                asl(ASL0)
+                prompt("Jog motor Reverse")
+                special(SPC_MOD)
+                pp(TRUE)
+                interest(1)
+        }
+        field(TWF,DBF_SHORT) {
+                asl(ASL0)
+                prompt("Tweak motor Forward")
+                special(SPC_MOD)
+                pp(TRUE)
+                interest(1)
+        }
+        field(TWR,DBF_SHORT) {
+                asl(ASL0)
+                prompt("Tweak motor Reverse")
+                special(SPC_MOD)
+                pp(TRUE)
+                interest(1)
+        }
+        field(TWV,DBF_DOUBLE) {
+                asl(ASL0)
+                prompt("Tweak Step Size (EGU)")
+                promptgroup(GUI_COMMON)
+                interest(1)
+        }
+        field(VAL,DBF_DOUBLE) {
+                asl(ASL0)
+                prompt("User Desired Value (EGU")
+                special(SPC_MOD)
+                pp(TRUE)
+        }
+        field(LVAL,DBF_DOUBLE) {
+                prompt("Last User Des Val (EGU)")
+                special(SPC_NOMOD)
+                interest(1)
+        }
+        field(DVAL,DBF_DOUBLE) {
+                asl(ASL0)
+                prompt("Dial Desired Value (EGU")
+                special(SPC_MOD)
+                pp(TRUE)
+        }
+        field(LDVL,DBF_DOUBLE) {
+                prompt("Last Dial Des Val (EGU)")
+                special(SPC_NOMOD)
+                interest(1)
+        }
+        field(RVAL,DBF_LONG) {
+                asl(ASL0)
+                prompt("Raw Desired Value (step")
+                special(SPC_MOD)
+                pp(TRUE)
+        }
+        field(LRVL,DBF_LONG) {
+                prompt("Last Raw Des Val (steps")
+                special(SPC_NOMOD)
+                interest(1)
+        }
+        field(RLV,DBF_DOUBLE) {
+                asl(ASL0)
+                prompt("Relative Value (EGU)")
+                special(SPC_MOD)
+                pp(TRUE)
+        }
+        field(LRLV,DBF_DOUBLE) {
+                prompt("Last Rel Value (EGU)")
+                special(SPC_NOMOD)
+                interest(1)
+        }
+        field(RBV,DBF_DOUBLE) {
+                prompt("User Readback Value")
+                special(SPC_NOMOD)
+        }
+        field(DRBV,DBF_DOUBLE) {
+                prompt("Dial Readback Value")
+                special(SPC_NOMOD)
+        }
+        field(DIFF,DBF_DOUBLE) {
+                prompt("Difference dval-drbv")
+                special(SPC_NOMOD)
+        }
+        field(RDIF,DBF_LONG) {
+                prompt("Difference rval-rrbv")
+                special(SPC_NOMOD)
+        }
+        field(CDIR,DBF_SHORT) {
+                prompt("Raw cmnd direction")
+                special(SPC_NOMOD)
+        }
+        field(RRBV,DBF_LONG) {
+                prompt("Raw Readback Value")
+                special(SPC_NOMOD)
+        }
+        field(RMP,DBF_LONG) {
+                prompt("Raw Motor Position")
+                special(SPC_NOMOD)
+        }
+        field(REP,DBF_LONG) {
+                prompt("Raw Encoder Position")
+                special(SPC_NOMOD)
+        }
+        field(RVEL,DBF_LONG) {
+                prompt("Raw Velocity")
+                promptgroup(GUI_COMMON)
+                special(SPC_NOMOD)
+                interest(1)
+        }
+        field(DMOV,DBF_SHORT) {
+                prompt("Done moving to value")
+                promptgroup(GUI_COMMON)
+                special(SPC_NOMOD)
+                initial("1")
+        }
+        field(LDMV,DBF_SHORT) {
+                prompt("Last Done moving value")
+                special(SPC_NOMOD)
+                initial("1")
+        }
+        field(MOVN,DBF_SHORT) {
+                prompt("Motor is moving")
+                special(SPC_NOMOD)
+        }
+        field(MSTA,DBF_ULONG) {
+                prompt("Motor Status")
+                special(SPC_NOMOD)
+                interest(3)
+        }
+        field(LVIO,DBF_SHORT) {
+                prompt("Limit violation")
+                special(SPC_NOMOD)
+                initial("1")
+        }
+        field(TDIR,DBF_SHORT) {
+                prompt("Direction of Travel")
+                special(SPC_NOMOD)
+        }
+        field(ATHM,DBF_SHORT) {
+                prompt("At HOME")
+                special(SPC_NOMOD)
+        }
+        field(PP,DBF_SHORT) {
+                prompt("Post process command")
+                special(SPC_NOMOD)
+                interest(2)
+                initial("0")
+        }
+        field(MIP,DBF_USHORT) {
+                prompt("Motion In Progress")
+                special(SPC_NOMOD)
+                interest(3)
+        }
+        field(MMAP,DBF_ULONG) {
+                prompt("Monitor Mask")
+                special(SPC_NOMOD)
+                interest(3)
+        }
+        field(NMAP,DBF_ULONG) {
+                prompt("Monitor Mask (more)")
+                special(SPC_NOMOD)
+                interest(3)
+        }
+        field(DLY,DBF_DOUBLE) {
+                prompt("Readback settle time (s)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(CBAK,DBF_NOACCESS) {
+                prompt("Callback structure")
+                special(SPC_NOMOD)
+                interest(4)
+                size(4)
+                extra("void             *cbak")
+        }
+        field(priv,DBF_NOACCESS) {
+                prompt("Private data")
+                special(SPC_NOMOD)
+                interest(4)
+                size(4)
+                extra("struct axis_priv *priv")
+        }
+        field(PCOF,DBF_DOUBLE) {
+                promptgroup(GUI_COMMON)
+                prompt("Proportional Gain")
+                special(SPC_MOD)
+                interest(1)
+                initial("0")
+        }
+        field(ICOF,DBF_DOUBLE) {
+                promptgroup(GUI_COMMON)
+                prompt("Integral Gain")
+                special(SPC_MOD)
+                interest(1)
+                initial("0")
+        }
+        field(DCOF,DBF_DOUBLE) {
+                promptgroup(GUI_COMMON)
+                prompt("Derivative Gain")
+                special(SPC_MOD)
+                interest(1)
+                initial("0")
+        }
+        field(CNEN,DBF_MENU) {
+                asl(ASL0)
+                prompt("Enable control")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                pp(TRUE)
+                menu(motorTORQ)
+        }
+        field(INIT,DBF_STRING) {
+                promptgroup(GUI_COMMON)
+                prompt("Startup commands")
+                size(40)
+                interest(1)
+        }
+        field(PREM,DBF_STRING) {
+                promptgroup(GUI_COMMON)
+                prompt("Pre-move commands")
+                size(40)
+                interest(1)
+        }
+        field(POST,DBF_STRING) {
+                promptgroup(GUI_COMMON)
+                prompt("Post-move commands")
+                size(40)
+                interest(1)
+        }
+        field(STOO,DBF_OUTLINK) {
+                prompt("STOP OutLink")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(DINP,DBF_INLINK) {
+                prompt("DMOV Input Link")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(RINP,DBF_INLINK) {
+                prompt("RMP Input Link")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(JVEL,DBF_DOUBLE) {
+                prompt("Jog Velocity (EGU/s)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(JAR,DBF_DOUBLE) {
+                prompt("Jog Accel. (EGU/s^2)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(LOCK,DBF_MENU) {
+                prompt("Soft Channel Position Lock")
+                promptgroup(GUI_COMMON)
+                interest(1)
+                menu(menuYesNo)
+                initial("NO")
+        }
+        field(NTM,DBF_MENU) {
+                prompt("New Target Monitor")
+                promptgroup(GUI_COMMON)
+                interest(1)
+                menu(menuYesNo)
+                initial("YES")
+        }
+        field(NTMF,DBF_USHORT) {
+                initial("2")
+                promptgroup(GUI_COMMON)
+                prompt("NTM Deadband Factor")
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(HVEL,DBF_DOUBLE) {
+                prompt("Home Velocity (EGU/s)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
+        field(STUP,DBF_MENU) {
+                asl(ASL0)
+                prompt("Status Update")
+                promptgroup(GUI_COMMON)
+                menu(motorSTUP)
+                pp(TRUE)
+                special(SPC_MOD)
+                interest(3)
+                initial("OFF")
+        }
+        field(RMOD,DBF_MENU) {
+                initial("Default")
+                promptgroup(GUI_COMMON)
+                prompt("Retry Mode")
+                interest(1)
+                menu(motorRMOD)
+        }
+	field(ADEL,DBF_DOUBLE) {
+                prompt("Archive Deadband")
+                promptgroup(GUI_COMMON)
+                interest(1)
+        }
+        field(MDEL,DBF_DOUBLE) {
+                prompt("Monitor Deadband")
+                promptgroup(GUI_COMMON)
+                interest(1)
+        }
+	field(ALST,DBF_DOUBLE) {
+                prompt("Last Value Archived")
+                special(SPC_NOMOD)
+                interest(3)
+        }
+        field(MLST,DBF_DOUBLE) {
+                prompt("Last Val Monitored")
+                special(SPC_NOMOD)
+                interest(3)
+        }
+	field(SYNC,DBF_SHORT) {
+		prompt("Sync position")
+		pp(TRUE)
+		interest(1)
+	}
+}

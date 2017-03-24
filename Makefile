@@ -1,6 +1,14 @@
-# Makefile when running gnu make
-# If ESS EPICS ENVIRONMENT is set up, Makefile.EEE is used
 # Otherwise use Makefile
+
+# Must check if some updated axisRecord.dbd.pod
+build: documentation/axisRecord.html
+
+
+documentation/axisRecord.html: axisApp/AxisSrc/axisRecord.dbd.pod ./axisApp/tools/gen_axisRecord_html.sh
+	./axisApp/tools/gen_axisRecord_html.sh
+
+#Use either the Makefile for EPICS, or the one for
+# ESS EPICS ENVIRONMENT
 
 ifdef EPICS_ENV_PATH
 ifeq ($(EPICS_MODULES_PATH),/opt/epics/modules)
@@ -15,4 +23,3 @@ endif
 else
 include Makefile.epics
 endif
- 
