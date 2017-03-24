@@ -2411,7 +2411,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
             }
         }
     }
-    else if (pmr->sync != 0 && pmr->mip == MIP_DONE)
+    else if (pmr->sync && pmr->stup == motorSTUP_OFF && pmr->mip == MIP_DONE)
     {
         syncTargetPosition(pmr); /* Sync target positions with readbacks. */
         pmr->sync = 0;
