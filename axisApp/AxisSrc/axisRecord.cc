@@ -229,15 +229,14 @@ static inline void Debug(int level, const char *format, ...) {
 /*** Forward references ***/
 
 static int homing_wanted_and_allowed(axisRecord *pmr);
-static void do_home(axisRecord *pmr);
 static RTN_STATUS do_work(axisRecord *, CALLBACK_VALUE);
 static void alarm_sub(axisRecord *);
 static void monitor(axisRecord *);
 static void process_motor_info(axisRecord *, bool);
 static void load_pos(axisRecord *);
 static void check_speed_and_resolution(axisRecord *);
-static void set_dial_highlimit(axisRecord *, struct motor_dset *);
-static void set_dial_lowlimit(axisRecord *, struct motor_dset *);
+static void set_dial_highlimit(axisRecord *);
+static void set_dial_lowlimit(axisRecord *);
 static void set_userlimits(axisRecord *);
 static void range_check(axisRecord *, double *, double, double);
 static void clear_buttons(axisRecord *);
@@ -646,8 +645,8 @@ static long init_record(dbCommon* arg, int pass)
     }
 
     /* Reset limits in case database values are invalid. */
-    set_dial_highlimit(pmr, pdset);
-    set_dial_lowlimit(pmr, pdset);
+    set_dial_highlimit(pmr);
+    set_dial_lowlimit(pmr);
 
     /* Initialize miscellaneous control fields. */
     pmr->dmov = TRUE;
@@ -743,9 +742,268 @@ LOGIC:
     
     
 ******************************************************************************/
-static long postProcess(axisRecord * pmr)
+
+/*****************************************************************************
+  Calls to device support
+  Wrappers that call device support.
+*****************************************************************************/
+static void devSupStop(axisRecord *pmr)
 {
     struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
+    INIT_MSG();
+    WRITE_MSG(STOP_AXIS, NULL);
+    SEND_MSG();
+}
+
+/* No WRITE_MSG(STOP_AXIS, NULL); after this point */
+#define STOP_AXIS #ErrorSTOP_AXIS
+/******************************************************************************/
+
+static void devSupLoadPos(axisRecord *pmr, double newpos)
+{
+    struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
+    double tmp = newpos;
+    INIT_MSG();
+    WRITE_MSG(LOAD_POS, &tmp);
+    SEND_MSG();
+}
+/* No WRITE_MSG(LOAD_POS, newpos); after this point */
+#define LOAD_POS #ErrorLOAD_POS
+
+/******************************************************************************/
+static RTN_STATUS devSupGetInfo(axisRecord *pmr)
+{
+    struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
+    RTN_STATUS status;
+    INIT_MSG();
+    status = WRITE_MSG(GET_INFO, NULL);
+    if (status != ERROR)
+    {
+        SEND_MSG();
+    }
+    return status;
+}
+/* No WRITE_MSG(GET_INFO, NULL); after this point */
+#define GET_INFO #ErrorGET_INFO
+
+/*****************************************************************************/
+static RTN_STATUS devSupUpdateLimitFromDial(axisRecord *pmr, motor_cmnd command,
+                                        double dialValue)
+{
+    struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
+    double tmp_raw = dialValue / pmr->mres;
+
+    RTN_STATUS status;
+
+    INIT_MSG();
+    status = WRITE_MSG(command, &tmp_raw);
+    if (status == OK)
+    {
+        SEND_MSG();
+    }
+    return status;
+}
+
+/*****************************************************************************/
+static void devSupMoveAbsRaw(axisRecord *pmr, double vel, double vbase,
+                             double acc, double pos)
+{
+    struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
+    INIT_MSG();
+    if (vel <= vbase)
+        vel = vbase + 1;
+    WRITE_MSG(SET_VELOCITY, &vel);
+    WRITE_MSG(SET_VEL_BASE, &vbase);
+    if (acc > 0.0)  /* Don't SET_ACCEL if vel = vbase. */
+        WRITE_MSG(SET_ACCEL, &acc);
+    WRITE_MSG(MOVE_ABS, &pos);
+    WRITE_MSG(GO, NULL);
+    SEND_MSG();
+}
+/* No WRITE_MSG(MOVE_ABS, ); after this point */
+#define MOVE_ABS #ErrorMOVE_ABS
+
+
+/*****************************************************************************/
+static void devSupMoveRelRaw(axisRecord *pmr, double vel, double vbase,
+                             double acc, double relpos)
+{
+    struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
+    INIT_MSG();
+    if (vel <= vbase)
+        vel = vbase + 1;
+    WRITE_MSG(SET_VELOCITY, &vel);
+    WRITE_MSG(SET_VEL_BASE, &vbase);
+    if (acc > 0.0)  /* Don't SET_ACCEL if vel = vbase. */
+        WRITE_MSG(SET_ACCEL, &acc);
+    WRITE_MSG(MOVE_REL, &relpos);
+    WRITE_MSG(GO, NULL);
+    SEND_MSG();
+}
+/* No WRITE_MSG(MOVE_REL, ); after this point */
+#define MOVE_REL #ErrorMOVE_REL
+
+/*****************************************************************************/
+static void devSupJogRaw(axisRecord *pmr, double jogv, double vbase, double jacc)
+{
+    struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
+    INIT_MSG();
+    WRITE_MSG(SET_VEL_BASE, &vbase);
+    WRITE_MSG(SET_ACCEL, &jacc);
+    WRITE_MSG(JOG, &jogv);
+    SEND_MSG();
+}
+/* No WRITE_MSG(JOG, ); after this point */
+#define JOG #ErrorJOG
+
+/*****************************************************************************/
+static void devSupUpdateJogRaw(axisRecord *pmr, double jogv, double jacc)
+{
+    struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
+    INIT_MSG();
+    WRITE_MSG(SET_ACCEL, &jacc);
+    WRITE_MSG(JOG_VELOCITY, &jogv);
+    SEND_MSG();
+}
+/* No WRITE_MSG(JOG_VELOCITY, ); after this point */
+#define JOG_VELOCITY #ErrorJOG
+
+
+/*****************************************************************************/
+static void devSupCNEN(axisRecord *pmr, double cnen)
+{
+    struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
+    double temp_dbl;
+    INIT_MSG();
+    if (cnen)
+        WRITE_MSG(ENABLE_TORQUE, &temp_dbl);
+    else
+        WRITE_MSG(DISABL_TORQUE, &temp_dbl);
+    SEND_MSG();
+}
+
+/*****************************************************************************/
+static void devSupSetEncRatio(axisRecord *pmr, double ep_mp[2])
+{
+    struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
+    INIT_MSG();
+    WRITE_MSG(SET_ENC_RATIO, ep_mp);
+    SEND_MSG();
+}
+
+/*****************************************************************************
+  High level functions which are used by the state machine
+*****************************************************************************/
+static void doBackLashAfterMove(axisRecord *pmr)
+{
+    double vbase = pmr->vbas / fabs(pmr->mres);
+    double vel = pmr->velo / fabs(pmr->mres);
+    double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
+
+    /* Use if encoder or ReadbackLink is in use. */
+    bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
+    double relpos = pmr->diff / pmr->mres;
+    double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
+
+    if (pmr->mip & MIP_JOG_STOP)
+    {
+        double acc = (vel - vbase) / pmr->accl;
+        if (use_rel == true)
+            devSupMoveRelRaw(pmr, vel, vbase, acc, relbpos);
+        else
+            devSupMoveAbsRaw(pmr, vel, vbase, acc, bpos);
+        pmr->mip = MIP_JOG_BL1;
+    }
+    else
+    {
+        double bvel = pmr->bvel / fabs(pmr->mres);
+        double bacc = (bvel - vbase) / pmr->bacc;
+
+        if (use_rel == true)
+        {
+            relpos = relpos * pmr->frac;
+            devSupMoveRelRaw(pmr, vel, vbase, bacc, relpos);
+        }
+        else
+        {
+            double currpos = pmr->dval / pmr->mres;
+            double newpos = bpos + pmr->frac * (currpos - bpos);
+            pmr->rval = NINT(newpos);
+            devSupMoveAbsRaw(pmr, bvel, vbase, bacc, newpos);
+        }
+        pmr->mip = MIP_MOVE_BL;
+    }
+    pmr->cdir = (relpos < 0.0) ? 0 : 1;
+}
+/*****************************************************************************/
+static void doBackLashAfterJog(axisRecord *pmr)
+{
+    /* First part of jog done. Do backlash correction. */
+
+    double bvel = pmr->bvel / fabs(pmr->mres);
+    double vbase = pmr->vbas / fabs(pmr->mres);
+    double bacc = (bvel - vbase) / pmr->bacc;
+    double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
+
+    /* Use if encoder or ReadbackLink is in use. */
+    bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
+    double relpos = pmr->diff / pmr->mres;
+    double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
+
+    /* Restore DMOV to false and UNMARK it so it is not posted. */
+    pmr->dmov = FALSE;
+    UNMARK(M_DMOV);
+
+    if (use_rel == true)
+    {
+        relpos = (relpos - relbpos) * pmr->frac;
+        devSupMoveRelRaw(pmr, bvel, vbase, bacc, relpos);
+    }
+    else
+    {
+        double currpos = pmr->dval / pmr->mres;
+        double newpos = bpos + pmr->frac * (currpos - bpos);
+        pmr->rval = NINT(newpos);
+        devSupMoveAbsRaw(pmr, bvel, vbase, bacc, newpos);
+    }
+    pmr->cdir = (relpos < 0.0) ? 0 : 1;
+}
+
+/*****************************************************************************/
+static void doHome(axisRecord *pmr)
+{
+    struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
+    double vbase = pmr->vbas / fabs(pmr->mres);
+    double hpos = 0;
+    double hvel =  pmr->hvel / fabs(pmr->mres);
+    double acc = (hvel - vbase) / pmr->accl;
+    motor_cmnd command;
+
+    INIT_MSG();
+    WRITE_MSG(SET_VELOCITY, &hvel);
+    WRITE_MSG(SET_VEL_BASE, &vbase);
+    if (acc > 0.0)  /* Don't SET_ACCEL to zero. */
+        WRITE_MSG(SET_ACCEL, &acc);
+
+    if (((pmr->mip & MIP_HOMF) && (pmr->mres > 0.0)) ||
+        ((pmr->mip & MIP_HOMR) && (pmr->mres < 0.0)))
+        command = HOME_FOR;
+    else
+        command = HOME_REV;
+
+    WRITE_MSG(command, &hpos);
+    WRITE_MSG(GO, NULL);
+    SEND_MSG();
+    pmr->cdir = (command == HOME_FOR) ? 1 : 0;
+}
+/* No WRITE_MSG(HOME_FOR) or HOME_REV */
+#define HOME_FOR #ErrorHOME_FOR
+#define HOME_REV #ErrorHOME_REV
+
+/*****************************************************************************/
+
+static long postProcess(axisRecord * pmr)
+{
 #ifdef DMR_SOFTMOTOR_MODS
     int dir_positive = (pmr->dir == motorDIR_Pos);
     int dir = dir_positive ? 1 : -1;
@@ -792,7 +1050,7 @@ static long postProcess(axisRecord * pmr)
             MARK(M_DMOV);
             pmr->rcnt = 0;
             MARK(M_RCNT);
-            do_home(pmr);
+            doHome(pmr);
             pmr->pp = TRUE;
             pmr->cdir = (pmr->mip & MIP_HOMF) ? 1 : 0;
             if (pmr->mres < 0.0)
@@ -819,65 +1077,11 @@ static long postProcess(axisRecord * pmr)
     {
         if (fabs(pmr->bdst) >=  fabs(pmr->mres))
         {
-            /* First part of jog done. Do backlash correction. */
-            double vbase = pmr->vbas / fabs(pmr->mres);
-            double vel = pmr->velo / fabs(pmr->mres);
-            double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
-
-            /* Use if encoder or ReadbackLink is in use. */
-            bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
-            double relpos = pmr->diff / pmr->mres;
-            double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
-
             /* Restore DMOV to false and UNMARK it so it is not posted. */
             pmr->dmov = FALSE;
             UNMARK(M_DMOV);
-
-            INIT_MSG();
-
-            if (pmr->mip & MIP_JOG_STOP)
-            {
-                double acc = (vel - vbase) / pmr->accl;
-
-                if (vel <= vbase)
-                    vel = vbase + 1;
-                WRITE_MSG(SET_VELOCITY, &vel);
-                WRITE_MSG(SET_VEL_BASE, &vbase);
-                if (acc > 0.0)  /* Don't SET_ACCEL if vel = vbase. */
-                    WRITE_MSG(SET_ACCEL, &acc);
-                if (use_rel == true)
-                    WRITE_MSG(MOVE_REL, &relbpos);
-                else
-                    WRITE_MSG(MOVE_ABS, &bpos);
-                pmr->mip = MIP_JOG_BL1;
-            }
-            else
-            {
-                double bvel = pmr->bvel / fabs(pmr->mres);
-                double bacc = (bvel - vbase) / pmr->bacc;
-
-                if (bvel <= vbase)
-                    bvel = vbase + 1;
-                WRITE_MSG(SET_VELOCITY, &bvel);
-                if (bacc > 0.0) /* Don't SET_ACCEL if bvel = vbase. */
-                    WRITE_MSG(SET_ACCEL, &bacc);
-                if (use_rel == true)
-                {
-                    relpos = relpos * pmr->frac;
-                    WRITE_MSG(MOVE_REL, &relpos);
-                }
-                else
-                {
-                    double currpos = pmr->dval / pmr->mres;
-                    double newpos = bpos + pmr->frac * (currpos - bpos);
-                    pmr->rval = NINT(newpos);
-                    WRITE_MSG(MOVE_ABS, &newpos);
-                }
-                pmr->mip = MIP_MOVE_BL;
-            }
-            WRITE_MSG(GO, NULL);
-            pmr->cdir = (relpos < 0.0) ? 0 : 1;
-            SEND_MSG();
+            /* First part of move done. Do backlash correction. */
+            doBackLashAfterMove(pmr);
             pmr->pp = TRUE;
         }
         pmr->mip &= ~MIP_JOG_STOP;
@@ -885,44 +1089,7 @@ static long postProcess(axisRecord * pmr)
     }
     else if (pmr->mip & MIP_JOG_BL1)
     {
-        /* First part of jog done. Do backlash correction. */
-        double bvel = pmr->bvel / fabs(pmr->mres);
-        double vbase = pmr->vbas / fabs(pmr->mres);
-        double bacc = (bvel - vbase) / pmr->bacc;
-        double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
-
-        /* Use if encoder or ReadbackLink is in use. */
-        bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
-        double relpos = pmr->diff / pmr->mres;
-        double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
-
-        /* Restore DMOV to false and UNMARK it so it is not posted. */
-        pmr->dmov = FALSE;
-        UNMARK(M_DMOV);
-
-        INIT_MSG();
-
-        if (bvel <= vbase)
-            bvel = vbase + 1;
-        WRITE_MSG(SET_VELOCITY, &bvel);
-        if (bacc > 0.0) /* Don't SET_ACCEL if bvel = vbase. */
-            WRITE_MSG(SET_ACCEL, &bacc);
-        if (use_rel == true)
-        {
-            relpos = (relpos - relbpos) * pmr->frac;
-            WRITE_MSG(MOVE_REL, &relpos);
-        }
-        else
-        {
-            double currpos = pmr->dval / pmr->mres;
-            double newpos = bpos + pmr->frac * (currpos - bpos);
-            pmr->rval = NINT(newpos);
-            WRITE_MSG(MOVE_ABS, &newpos);
-        }
-        WRITE_MSG(GO, NULL);
-        pmr->cdir = (relpos < 0.0) ? 0 : 1;
-        SEND_MSG();
-
+        doBackLashAfterJog(pmr);
         pmr->mip = MIP_JOG_BL2;
         pmr->pp = TRUE;
     }
@@ -1238,10 +1405,7 @@ static long process(dbCommon *arg)
                 printf("%s:%d STOP %s diff=%g ntm_deadband=%g\n",
                        __FILE__, __LINE__,
                        pmr->name, fabs(pmr->diff), ntm_deadband);
-
-                INIT_MSG();
-                WRITE_MSG(STOP_AXIS, NULL);
-                SEND_MSG();
+                devSupStop(pmr);
                 pmr->mip |= MIP_STOP;
                 MARK(M_MIP);
                 pmr->pp = FALSE; /* Don't post process the previous move. */
@@ -1277,9 +1441,7 @@ static long process(dbCommon *arg)
                 /* Restore DMOV to false and UNMARK it so it is not posted. */
                 pmr->dmov = FALSE;
                 UNMARK(M_DMOV);
-                INIT_MSG();
-                WRITE_MSG(GET_INFO, NULL);
-                SEND_MSG();
+                devSupGetInfo(pmr);
                 pmr->pp = TRUE;
                 pmr->mip = MIP_DONE;
                 MARK(M_MIP);
@@ -1316,9 +1478,7 @@ static long process(dbCommon *arg)
                     if (pmr->mip & MIP_DELAY_ACK && !(pmr->mip & MIP_DELAY_REQ))
                     {
                         pmr->mip |= MIP_DELAY;
-                        INIT_MSG();
-                        WRITE_MSG(GET_INFO, NULL);
-                        SEND_MSG();
+                        devSupGetInfo(pmr);
                         /* Restore DMOV to false and UNMARK it so it is not posted. */
                         pmr->dmov = FALSE;
                         UNMARK(M_DMOV);
@@ -1716,38 +1876,9 @@ static int homing_wanted_and_allowed(axisRecord *pmr)
     return ret;
 }
 
-/*****************************************************************************/
-static void do_home(axisRecord *pmr)
-{
-    struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
-    double vbase = pmr->vbas / fabs(pmr->mres);
-    double hpos = 0;
-    double hvel =  pmr->hvel / fabs(pmr->mres);
-    double acc = (hvel - vbase) / pmr->accl;
-    motor_cmnd command;
-
-    INIT_MSG();
-    WRITE_MSG(SET_VELOCITY, &hvel);
-    WRITE_MSG(SET_VEL_BASE, &vbase);
-    if (acc > 0.0)  /* Don't SET_ACCEL to zero. */
-        WRITE_MSG(SET_ACCEL, &acc);
-
-    if (((pmr->mip & MIP_HOMF) && (pmr->mres > 0.0)) ||
-        ((pmr->mip & MIP_HOMR) && (pmr->mres < 0.0)))
-        command = HOME_FOR;
-    else
-        command = HOME_REV;
-
-    WRITE_MSG(command, &hpos);
-    WRITE_MSG(GO, NULL);
-    SEND_MSG();
-    pmr->cdir = (command == HOME_FOR) ? 1 : 0;
-
-}
 
 static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
 {
-    struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
     int dir_positive = (pmr->dir == motorDIR_Pos);
     int dir = dir_positive ? 1 : -1;
     int set = pmr->set;
@@ -1764,14 +1895,11 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
 
         pmr->stup = motorSTUP_BUSY;
         MARK_AUX(M_STUP);
-        INIT_MSG();
-        status = WRITE_MSG(GET_INFO, NULL);
+        status = devSupGetInfo(pmr);
         /* Avoid errors from devices that do not have "GET_INFO" (e.g. Soft
            Channel). */
         if (status == ERROR)
             pmr->stup = motorSTUP_OFF;
-        else
-            SEND_MSG();
     }
 
     /*** Process Stop/Pause/Go_Pause/Go switch. ***
@@ -1826,9 +1954,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
                         MARK(M_DMOV);
                     }
                     /* Send message (just in case), but don't put MIP in STOP state. */
-                    INIT_MSG();
-                    WRITE_MSG(STOP_AXIS, NULL);
-                    SEND_MSG();
+                    devSupStop(pmr);
                     return(OK);
                 }
                 else if (pmr->movn)
@@ -1849,9 +1975,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
                 pmr->mip = MIP_STOP;     
                 MARK(M_MIP);
             }
-            INIT_MSG();
-            WRITE_MSG(STOP_AXIS, NULL);
-            SEND_MSG();
+            devSupStop(pmr);
             return(OK);
         }
         else if (pmr->spmg == motorSPMG_Go)
@@ -1918,16 +2042,12 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
 
         if (msta.Bits.EA_PRESENT)
         {
-            INIT_MSG();
-            WRITE_MSG(SET_ENC_RATIO, ep_mp);
-            SEND_MSG();
+            devSupSetEncRatio(pmr,ep_mp);
         }
         if (pmr->set)
         {
             pmr->pp = TRUE;
-            INIT_MSG();
-            WRITE_MSG(GET_INFO, NULL);
-            SEND_MSG();
+            devSupGetInfo(pmr);
         }
         else if ((pmr->mip & MIP_LOAD_P) == 0) /* Test for LOAD_POS completion. */
             load_pos(pmr);
@@ -1970,9 +2090,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
             {
                 pmr->mip |= MIP_STOP;
                 MARK(M_MIP);
-                INIT_MSG();
-                WRITE_MSG(STOP_AXIS, NULL);
-                SEND_MSG();
+                devSupStop(pmr);
             }
             else
             {
@@ -1982,7 +2100,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
                     pmr->eres = pmr->mres;
                     MARK(M_ERES);
                 }
-                do_home(pmr);
+                doHome(pmr);
                 pmr->dmov = FALSE;
                 MARK(M_DMOV);
                 pmr->rcnt = 0;
@@ -2017,9 +2135,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
                 pmr->pp = TRUE;
                 pmr->mip |= MIP_STOP;
                 MARK(M_MIP);
-                INIT_MSG();
-                WRITE_MSG(STOP_AXIS, NULL);
-                SEND_MSG();
+                devSupStop(pmr);
             }
             else
             {
@@ -2042,12 +2158,8 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
                     pmr->cdir = !pmr->cdir;
                 if (dir == -1)
                     pmr->cdir = !pmr->cdir;
-
-                INIT_MSG();
-                WRITE_MSG(SET_VEL_BASE, &vbase);
-                WRITE_MSG(SET_ACCEL, &jacc);
-                WRITE_MSG(JOG, &jogv);
-                SEND_MSG();
+                devSupJogRaw(pmr, jogv, vbase, jacc);
+  
             }
             return(OK);
         }
@@ -2059,9 +2171,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
             pmr->pp = TRUE;
             pmr->mip |= MIP_JOG_STOP;
             pmr->mip &= ~(MIP_JOGF | MIP_JOGR);
-            INIT_MSG();
-            WRITE_MSG(STOP_AXIS, NULL);
-            SEND_MSG();
+            devSupStop(pmr);
             return(OK);
         }
         else if (pmr->mip & (MIP_JOG_STOP | MIP_JOG_BL1 | MIP_JOG_BL2))
@@ -2344,8 +2454,6 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
                 pmr->lval = pmr->val;
                 pmr->lrvl = pmr->rval;
 
-                INIT_MSG();
-
                 /* Backlash disabled, OR, no need for seperate backlash move
                  * since move is in preferred direction (preferred_dir==ON),
                  * AND, backlash acceleration and velocity are the same as slew values
@@ -2398,16 +2506,10 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
                 }
 
                 pmr->cdir = (pmr->rdif < 0.0) ? 0 : 1;
-                WRITE_MSG(SET_VELOCITY, &velocity);
-                WRITE_MSG(SET_VEL_BASE, &vbase);
-                if (accel > 0.0)        /* Don't SET_ACCEL = 0.0 */
-                    WRITE_MSG(SET_ACCEL, &accel);
                 if (use_rel == true)
-                    WRITE_MSG(MOVE_REL, &position);
+                    devSupMoveRelRaw(pmr, velocity, vbase, accel, position);
                 else
-                    WRITE_MSG(MOVE_ABS, &position);
-                WRITE_MSG(GO, NULL);
-                SEND_MSG();
+                    devSupMoveAbsRaw(pmr, velocity, vbase, accel, position);
             }
         }
     }
@@ -2423,14 +2525,9 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
         
         pmr->stup = motorSTUP_BUSY;
         MARK_AUX(M_STUP);
-        INIT_MSG();
-        status = WRITE_MSG(GET_INFO, NULL);
-        /* Avoid errors from devices that do not have "GET_INFO" (e.g. Soft
-           Channel). */
+        status = devSupGetInfo(pmr);
         if (status == ERROR)
             pmr->stup = motorSTUP_OFF;
-        else
-            SEND_MSG();
     }
 
     return(OK);
@@ -2448,7 +2545,7 @@ static long special(DBADDR *paddr, int after)
     int dir = dir_positive ? 1 : -1;
     bool changed = false;
     int fieldIndex = dbGetFieldIndex(paddr);
-    double offset, tmp_raw, tmp_limit, fabs_urev;
+    double offset, tmp_limit, fabs_urev;
     RTN_STATUS rtnval;
     motor_cmnd command;
     double temp_dbl;
@@ -2681,10 +2778,7 @@ static long special(DBADDR *paddr, int after)
             command = SET_LOW_LIMIT;
         }
 
-        tmp_raw = tmp_limit / pmr->mres;
-
-        INIT_MSG();
-        rtnval = (*pdset->build_trans)(command, &tmp_raw, pmr);
+        rtnval = devSupUpdateLimitFromDial(pmr, command, tmp_limit);
         if (rtnval != OK)
         {
             /* If an error occured, build_trans() has reset
@@ -2697,7 +2791,6 @@ static long special(DBADDR *paddr, int after)
         }
         else
         {
-            SEND_MSG();
             if (dir_positive)
                 pmr->dhlm = tmp_limit;
             else
@@ -2735,10 +2828,7 @@ static long special(DBADDR *paddr, int after)
             command = SET_HIGH_LIMIT;
         }
 
-        tmp_raw = tmp_limit / pmr->mres;
-
-        INIT_MSG();
-        rtnval = (*pdset->build_trans)(command, &tmp_raw, pmr);
+        rtnval = devSupUpdateLimitFromDial(pmr, command, tmp_limit);
         if (rtnval != OK)
         {
             /* If an error occured, build_trans() has reset
@@ -2751,7 +2841,6 @@ static long special(DBADDR *paddr, int after)
         }
         else
         {
-            SEND_MSG();
             if (dir_positive)
                 pmr->dllm = tmp_limit;
             else
@@ -2762,12 +2851,12 @@ static long special(DBADDR *paddr, int after)
 
         /* new dial high limit */
     case axisRecordDHLM:
-        set_dial_highlimit(pmr, pdset);
+        set_dial_highlimit(pmr);
         break;
 
         /* new dial low limit */
     case axisRecordDLLM:
-        set_dial_lowlimit(pmr, pdset);
+        set_dial_lowlimit(pmr);
         break;
 
         /* new frac (move fraction) */
@@ -2953,13 +3042,7 @@ pidcof:
     case axisRecordCNEN:
         if (msta.Bits.GAIN_SUPPORT != 0)
         {
-            INIT_MSG();
-            temp_dbl = pmr->cnen;
-            if (pmr->cnen != 0)
-                WRITE_MSG(ENABLE_TORQUE, &temp_dbl);
-            else
-                WRITE_MSG(DISABL_TORQUE, &temp_dbl);
-            SEND_MSG();
+            devSupCNEN(pmr, pmr->cnen); 
         }
         break;
 
@@ -2984,14 +3067,9 @@ pidcof:
         {
             double jogv = (pmr->jvel * dir) / pmr->mres;
             double jacc = pmr->jar / fabs(pmr->mres);
-
             if (pmr->jogr)
                 jogv = -jogv;
-
-            INIT_MSG();
-            WRITE_MSG(SET_ACCEL, &jacc);
-            WRITE_MSG(JOG_VELOCITY, &jogv);
-            SEND_MSG();
+            devSupUpdateJogRaw(pmr, jogv, jacc);
         }
         break;
 
@@ -3709,7 +3787,6 @@ static void process_motor_info(axisRecord * pmr, bool initcall)
 /* Calc and load new raw position into motor w/out moving it. */
 static void load_pos(axisRecord * pmr)
 {
-    struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
     double newpos = pmr->dval / pmr->mres;
 
     pmr->ldvl = pmr->dval;
@@ -3747,12 +3824,8 @@ static void load_pos(axisRecord * pmr)
     }
 
     /* Load pos. into motor controller.  Get new readback vals. */
-    INIT_MSG();
-    WRITE_MSG(LOAD_POS, &newpos);
-    SEND_MSG();
-    INIT_MSG();
-    WRITE_MSG(GET_INFO, NULL);
-    SEND_MSG();
+    devSupLoadPos(pmr, newpos);
+    devSupGetInfo(pmr);
 }
 
 /*
@@ -3939,33 +4012,25 @@ limit.  This is done so that a device level function may do an error check on
 the validity of the limit.  This is to support those devices (e.g., MM4000)
 that have their own, read-only, travel limits.
 */
-static void set_dial_highlimit(axisRecord *pmr, struct motor_dset *pdset)
+static void set_dial_highlimit(axisRecord *pmr)
 {
     int dir_positive = (pmr->dir == motorDIR_Pos);
-    double offset, tmp_raw;
     motor_cmnd command;
-    RTN_STATUS rtnval;
 
-    tmp_raw = pmr->dhlm / pmr->mres;
-    INIT_MSG();
     if (pmr->mres < 0) {
         command = SET_LOW_LIMIT;
     } else {
         command = SET_HIGH_LIMIT;
     }
-    rtnval = (*pdset->build_trans)(command, &tmp_raw, pmr);
-    offset = pmr->off;
-    if (rtnval == OK)
-        SEND_MSG();
-
+    devSupUpdateLimitFromDial(pmr, command, pmr->dhlm);
     if (dir_positive)
     {
-        pmr->hlm = pmr->dhlm + offset;
+        pmr->hlm = pmr->dhlm + pmr->off;
         MARK(M_HLM);
     }
     else
     {
-        pmr->llm = -(pmr->dhlm) + offset;
+        pmr->llm = -(pmr->dhlm) + pmr->off;
         MARK(M_LLM);
     }
     MARK(M_DHLM);
@@ -3979,34 +4044,26 @@ limit.  This is done so that a device level function may do an error check on
 the validity of the limit.  This is to support those devices (e.g., MM4000)
 that have their own, read-only, travel limits.
 */
-static void set_dial_lowlimit(axisRecord *pmr, struct motor_dset *pdset)
+static void set_dial_lowlimit(axisRecord *pmr)
 {
     int dir_positive = (pmr->dir == motorDIR_Pos);
-    double offset, tmp_raw;
     motor_cmnd command;
-    RTN_STATUS rtnval;
 
-    tmp_raw = pmr->dllm / pmr->mres;
-
-    INIT_MSG();
     if (pmr->mres < 0) {
         command = SET_HIGH_LIMIT;
     } else {
         command = SET_LOW_LIMIT;
     }
-    rtnval = (*pdset->build_trans)(command, &tmp_raw, pmr);
-    offset = pmr->off;
-    if (rtnval == OK)
-        SEND_MSG();
+    devSupUpdateLimitFromDial(pmr, command, pmr->dllm);
 
     if (dir_positive)
     {
-        pmr->llm = pmr->dllm + offset;
+        pmr->llm = pmr->dllm + pmr->off;
         MARK(M_LLM);
     }
     else
     {
-        pmr->hlm = -(pmr->dllm) + offset;
+        pmr->hlm = -(pmr->dllm) + pmr->off;
         MARK(M_HLM);
     }
     MARK(M_DLLM);
