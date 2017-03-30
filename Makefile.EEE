@@ -20,6 +20,7 @@ TEMPLATES += axisApp/Db/EthercatMChome.template
 
 
 DBDS += axisApp/AxisSrc/axisSupport.dbd
+DBDS += axisApp/AxisSrc/axisRecord.dbd
 DBDS += axisApp/EthercatSrc/EthercatMCController.dbd
 
 SUBSTITUTIONS=-none-
