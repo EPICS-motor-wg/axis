@@ -27,11 +27,10 @@ if test -x "$DBDTOHTMLPL"; then
   if test -e "$AXISDBD"; then
     chmod u+w $AXISDBD
   fi &&
-  cd $EPICS_BASE &&
   cmd=$(echo $AXISPERL $PODREMOVEPL -o $AXISDBD $AXISDBD.pod)
   echo $cmd &&
   eval $cmd &&
-  cmd=$(echo $AXISPERL $DBDTOHTMLPL -I ./dbd/ $AXISDBD.pod)
+  cmd=$(echo $AXISPERL $DBDTOHTMLPL -I $EPICS_BASE/dbd/ $AXISDBD.pod)
   echo $cmd &&
   eval $cmd &&
   mv $AXISRECORDHTML $AXISPWD/documentation/$AXISRECORDHTML
