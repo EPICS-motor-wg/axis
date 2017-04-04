@@ -8,14 +8,16 @@
 # Note that "#!" marks lines that can be uncommented.
 #
 # Add your declarations here
+EPICS_BASE ?= $(shell echo $$EPICS_BASE )
 
-SUPPORT=/home/torstenbogershausen/projects/epics/MCAG_setupMotionDemo.axis161013/epics-for-Motion/EPICS_BASE_3.15.2_GIT_ASYN_GIT_axis//support
+#$(EPICS_BASE)/../modules/asyn
+SUPPORT = $(EPICS_BASE)/../support
 -include $(TOP)/../configure/SUPPORT.$(EPICS_HOST_ARCH)
 
 # If any motor controller communication mechanism besides the VME backplane is
 # required, then ASYN must be defined.
 # Recommended ASYN release: R4-23
-ASYN=/home/torstenbogershausen/projects/epics/MCAG_setupMotionDemo.axis161013/epics-for-Motion/EPICS_BASE_3.15.2_GIT_ASYN_GIT_axis/modules/asyn
+ASYN = $(EPICS_BASE)/../modules/asyn
 
 # Need the sequencer and the busy record for the MM4005 and XPS trajectory scanning
 # Recommended SNCSEQ release: R2.1.16
@@ -24,7 +26,7 @@ ASYN=/home/torstenbogershausen/projects/epics/MCAG_setupMotionDemo.axis161013/ep
 BUSY=$(SUPPORT)/busy-1-6
 
 # Recommended EPICS release: R3.14.12.4
-EPICS_BASE=/home/torstenbogershausen/projects/epics/MCAG_setupMotionDemo.axis161013/epics-for-Motion/EPICS_BASE_3.15.2_GIT_ASYN_GIT_axis/base
+#EPICS_BASE=
 -include $(TOP)/../configure/EPICS_BASE.$(EPICS_HOST_ARCH)
 
 # The following must be defined for the MXmotor device driver.
