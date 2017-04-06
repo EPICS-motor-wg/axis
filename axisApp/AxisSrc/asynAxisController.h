@@ -127,6 +127,7 @@ typedef struct MotorStatus {
   double encoderPosition;    /**< Actual encoder position */
   double velocity;           /**< Actual velocity */
   epicsUInt32 status;        /**< Word containing status bits (motion done, limits, etc.) */
+  epicsUInt32 flags;         /**< Word containing flag bits  */
 } MotorStatus;
 
 enum ProfileTimeMode{

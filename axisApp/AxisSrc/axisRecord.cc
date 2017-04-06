@@ -1856,19 +1856,17 @@ LOGIC:
 ******************************************************************************/
 static int homing_wanted_and_allowed(axisRecord *pmr)
 {
-    msta_field msta;
-    msta.All = pmr->msta;
     int ret = 0;
     if (pmr->homf && !(pmr->mip & MIP_HOMF)) {
         ret = 1;
-        if (msta.Bits.RA_HOME_ON_LS)
+        if (pmr->mflg & MF_HOME_ON_LS)
            ; /* controller reported handle this fine */
         else if ((pmr->dir == motorDIR_Pos) ? pmr->hls : pmr->lls)
             ret = 0; /* sitting on the directed limit switch */
     }
     if (pmr->homr && !(pmr->mip & MIP_HOMR)) {
         ret = 1;
-        if (msta.Bits.RA_HOME_ON_LS)
+        if (pmr->mflg & MF_HOME_ON_LS)
            ; /* controller reported handle this fine */
         else if ((pmr->dir == motorDIR_Pos) ? pmr->lls : pmr->hls)
             ret = 0; /* sitting on the directed limit switch */
@@ -3726,7 +3724,7 @@ static void process_motor_info(axisRecord * pmr, bool initcall)
 
     if ((pmr->mip & MIP_HOMF) || (pmr->mip & MIP_HOMR))
     {
-        if (msta.Bits.RA_HOME_ON_LS)
+        if (pmr->mflg & MF_HOME_ON_LS)
             ls_active = false;    /*Suppress stop on LS if homing on LS is allowed */
     }
     
@@ -3738,15 +3736,16 @@ static void process_motor_info(axisRecord * pmr, bool initcall)
         MARK(M_LLS);
 
     /* If the motor has a problem, stop it if needed */
-    if ((ls_active == true || (msta.Bits.RA_PROBLEM && msta.Bits.RA_STOP_PROB)) && !msta.Bits.RA_DONE)
+    if ((ls_active == true ||
+         (msta.Bits.RA_PROBLEM && (pmr->mflg & MF_STOP_PROB))) && !msta.Bits.RA_DONE)
     {
         pmr->stop = 1;
         MARK(M_STOP);
-        printf("%s:%d STOP %s ls_active=%d PROBLEM=%d RA_STOP_PROB=%d\n",
+        printf("%s:%d STOP %s ls_active=%d PROBLEM=%d MF_STOP_PROB=%d\n",
                __FILE__, __LINE__,
                pmr->name, ls_active ? 1 : 0,
                msta.Bits.RA_PROBLEM ? 1 : 0,
-               msta.Bits.RA_STOP_PROB ? 1 : 0);
+               pmr->mflg & MF_STOP_PROB ? 1 : 0);
     }
 
     if (ls_active == true || msta.Bits.RA_PROBLEM)

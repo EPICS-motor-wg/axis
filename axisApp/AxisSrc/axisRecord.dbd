@@ -702,6 +702,11 @@ recordtype(axis) {
                 special(SPC_NOMOD)
                 interest(3)
         }
+        field(MFLG,DBF_ULONG) {
+                prompt("Motor Flags")
+                special(SPC_NOMOD)
+                interest(3)
+        }
         field(LVIO,DBF_SHORT) {
                 prompt("Limit violation")
                 special(SPC_NOMOD)

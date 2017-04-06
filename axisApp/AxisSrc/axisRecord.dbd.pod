@@ -939,6 +939,13 @@ The record is put into MAJOR STATE alarm if either SLIP_STALL or PROBLEM bits ar
 
 =cut
 
+=fields MFLG
+
+The motor flags as received from the hardware.  The MFLG bits are defined as follows:
+        MF_HOME_ON_LS: Homing on LS towards LS allowed (e.g. HOMF when HLS)
+        MF_STOP_PROB:  Stop the axis when RA_PROBLEM is set
+
+=cut
 
 =fields TDIR
 
@@ -1231,6 +1238,11 @@ See under Servo fields
         }
         field(MSTA,DBF_ULONG) {
                 prompt("Motor Status")
+                special(SPC_NOMOD)
+                interest(3)
+        }
+        field(MFLG,DBF_ULONG) {
+                prompt("Motor Flags")
                 special(SPC_NOMOD)
                 interest(3)
         }

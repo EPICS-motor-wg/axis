@@ -245,16 +245,26 @@ int  asynAxisAxis::getReferencingModeMove()
 asynStatus asynAxisAxis::setIntegerParam(int function, int value)
 {
   int mask;
-  epicsUInt32 status=0;
+  epicsUInt32 status=0, flags=0;
   // This assumes the parameters defined above are in the same order as the bits the motor record expects!
   if (function >= pC_->motorStatusDirection_ && 
-      function <= pC_->motorStopOnProblem_) {
+      function <= pC_->motorStatusHomed_) {
     status = status_.status;
     mask = 1 << (function - pC_->motorStatusDirection_);
     if (value) status |= mask;
     else       status &= ~mask;
     if (status != status_.status) {
       status_.status = status;
+      statusChanged_ = 1;
+    }
+  } else  if (function >= pC_->motorStatusHomeOnLs_ && 
+              function <= pC_->motorStopOnProblem_) {
+    flags = status_.flags;
+    mask = 1 << (function - pC_->motorStatusHomeOnLs_);
+    if (value) flags |= mask;
+    else       flags &= ~mask;
+    if (flags != status_.flags) {
+      status_.flags = flags;
       statusChanged_ = 1;
     }
   }

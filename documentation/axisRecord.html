@@ -655,6 +655,16 @@
 <th>Field</th><th>Summary</th><th>Type</th><th>DCT</th>
 <th>Default</th><th>Read</th><th>Write</th><th>CA PP</th>
 </tr>
+<tr><td class="cell">MFLG</td><td class="cell">Motor Flags</td><td class="cell">ULONG</td><td class="cell">No</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">No</td><td class="cell">No</td></tr></table></blockquote>
+
+<p>The motor flags as received from the hardware. The MFLG bits are defined as follows: MF_HOME_ON_LS: Homing on LS towards LS allowed (e.g. HOMF when HLS) MF_STOP_PROB: Stop the axis when RA_PROBLEM is set</p>
+
+
+
+<blockquote><table border="1"><tr>
+<th>Field</th><th>Summary</th><th>Type</th><th>DCT</th>
+<th>Default</th><th>Read</th><th>Write</th><th>CA PP</th>
+</tr>
 <tr><td class="cell">TDIR</td><td class="cell">Direction of Travel</td><td class="cell">SHORT</td><td class="cell">No</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">No</td><td class="cell">No</td></tr></table></blockquote>
 
 <p>The direction in which the motor is currently traveling (or was most recently traveling), as received from the hardware. If 0, the raw readback value should be decreasing.</p>
