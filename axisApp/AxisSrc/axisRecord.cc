@@ -922,7 +922,7 @@ static void doBackLashAfterMove(axisRecord *pmr)
         if (use_rel == true)
         {
             relpos = relpos * pmr->frac;
-            devSupMoveRelRaw(pmr, vel, vbase, bacc, relpos);
+            devSupMoveRelRaw(pmr, bvel, vbase, bacc, relpos);
         }
         else
         {
