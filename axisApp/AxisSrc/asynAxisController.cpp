@@ -88,8 +88,11 @@ asynAxisController::asynAxisController(const char *portName, int numAxes, int nu
   createParam(motorStatusCommsErrorString,       asynParamInt32,      &motorStatusCommsError_);
   createParam(motorStatusLowLimitString,         asynParamInt32,      &motorStatusLowLimit_);
   createParam(motorStatusHomedString,            asynParamInt32,      &motorStatusHomed_);
+
+  /* Addition flags which can be set by the specific driver */
   createParam(motorStatusHomeOnLsString,         asynParamInt32,      &motorStatusHomeOnLs_);
   createParam(motorStatusStopOnProblemString,    asynParamInt32,      &motorStopOnProblem_);
+  createParam(motorShowNotHomedString,           asynParamInt32,      &motorShowNotHomed_);
 
   // These are per-axis parameters for passing additional motor record information to the driver
   createParam(motorRecResolutionString,        asynParamFloat64,      &motorRecResolution_);
