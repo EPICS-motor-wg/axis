@@ -257,10 +257,10 @@ asynStatus asynAxisAxis::setIntegerParam(int function, int value)
       status_.status = status;
       statusChanged_ = 1;
     }
-  } else  if (function >= pC_->motorStatusHomeOnLs_ && 
-              function <= pC_->motorShowNotHomed_) {
+  } else  if (function >= pC_->motorFlagsHomeOnLs_ && 
+              function <= pC_->motorFlagsShowNotHomed_) {
     flags = status_.flags;
-    mask = 1 << (function - pC_->motorStatusHomeOnLs_);
+    mask = 1 << (function - pC_->motorFlagsHomeOnLs_);
     if (value) flags |= mask;
     else       flags &= ~mask;
     if (flags != status_.flags) {
@@ -345,17 +345,17 @@ void asynAxisAxis::updateMsgTxtField()
       int motorStatusProblem;
       int motorLatestCommand;
       int motorStatusHomed;
-      int motorShowNotHomed;
+      int motorFlagsShowNotHomed;
       pC_->getIntegerParam(axisNo_,pC_->motorStatusProblem_, &motorStatusProblem);
       if (motorStatusProblem) {
         setStringParam(pC_->motorMessageText_,"E: Problem");
         return;
       }
-      pC_->getIntegerParam(axisNo_,pC_->motorShowNotHomed_, &motorShowNotHomed);
+      pC_->getIntegerParam(axisNo_,pC_->motorFlagsShowNotHomed_, &motorFlagsShowNotHomed);
       pC_->getIntegerParam(axisNo_,pC_->motorStatusHomed_, &motorStatusHomed);
       pC_->getIntegerParam(axisNo_,pC_->motorLatestCommand_, &motorLatestCommand);
 
-      if (!motorStatusHomed && motorShowNotHomed) {
+      if (!motorStatusHomed && motorFlagsShowNotHomed) {
         setStringParam(pC_->motorMessageText_,"W: Axis not homed");
         return;
       }

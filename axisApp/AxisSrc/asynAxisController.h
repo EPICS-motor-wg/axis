@@ -64,9 +64,9 @@
 #define motorStatusHomedString          "MOTOR_STATUS_HOMED"
 
 /* Addition flags which can be set by the specific driver */
-#define motorStatusHomeOnLsString       "MOTOR_STATUS_HOME_ON_LS"
-#define motorStatusStopOnProblemString  "MOTOR_STATUS_STOP_ON_PROBLEM"
-#define motorShowNotHomedString         "MOTOR_STATUS_SHOW_NOT_HOMED"
+#define motorFlagsHomeOnLsString        "MOTOR_FLAGSS_HOME_ON_LS"
+#define motorFlagsStopOnProblemString   "MOTOR_FLAGS_STOP_ON_PROBLEM"
+#define motorFlagsShowNotHomedString    "MOTOR_FLAGS_SHOW_NOT_HOMED"
 
 /* These are per-axis parameters for passing additional motor record information to the driver */
 #define motorRecResolutionString        "MOTOR_REC_RESOLUTION"
@@ -286,9 +286,10 @@ class epicsShareClass asynAxisController : public asynPortDriver {
   int motorStatusCommsError_;
   int motorStatusLowLimit_;
   int motorStatusHomed_;
-  int motorStatusHomeOnLs_;
-  int motorStopOnProblem_;
-  int motorShowNotHomed_;
+
+  int motorFlagsHomeOnLs_;
+  int motorFlagsStopOnProblem_;
+  int motorFlagsShowNotHomed_;
 
   // These are per-axis parameters for passing additional motor record information to the driver
   int motorRecResolution_;
