@@ -17,11 +17,13 @@ TEMPLATES += axisApp/Db/softAxisTest.db
 TEMPLATES += axisApp/Db/EthercatMC.template
 TEMPLATES += axisApp/Db/EthercatMCdebug.template
 TEMPLATES += axisApp/Db/EthercatMChome.template
+TEMPLATES += axisApp/Db/IcePAP.template
 
 
 DBDS += axisApp/AxisSrc/axisSupport.dbd
 DBDS += axisApp/AxisSrc/axisRecord.dbd
 DBDS += axisApp/EthercatSrc/EthercatMCController.dbd
+DBDS += axisApp/IcePAPsrc/IcePAPController.dbd
 
 SUBSTITUTIONS=-none-
 
@@ -40,6 +42,8 @@ SOURCES += axisApp/AxisSrc/paramLib.c
 SOURCES += axisExApp/WithAsyn/WithAsynMain.c
 SOURCES += axisApp/EthercatSrc/EthercatMCAxis.cpp
 SOURCES += axisApp/EthercatSrc/EthercatMCController.cpp
+SOURCES += axisApp/IcePAPsrc/IcePAPAxis.cpp
+SOURCES += axisApp/IcePAPsrc/IcePAPController.cpp
 
 # What we don't need at ESS, but we may want to test-compile
 ifdef AXIS_DEV

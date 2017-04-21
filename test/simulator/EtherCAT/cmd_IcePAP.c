@@ -34,7 +34,7 @@ static void init_axis(int axis_no)
   }
   if (!init_done[axis_no]) {
     double valueLow = -1.0;
-    double valueHigh = 170.0;
+    double valueHigh = 180.0;
 
     hw_motor_init(axis_no,
                   MRES/ERES,               /* ReverseERES */

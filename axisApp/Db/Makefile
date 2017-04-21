@@ -21,6 +21,9 @@ DB += basic_asyn_axis.db
 DB += EthercatMC.template
 DB += EthercatMCdebug.template
 DB += EthercatMChome.template
+ifdef EPICSAXISICEPAP
+DB += IcePAP.template
+endif
 DB += IMS_extra.db
 DB += XPSAuxAi.db
 DB += XPSAuxAo.db

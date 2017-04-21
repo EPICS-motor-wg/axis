@@ -1,0 +1,51 @@
+record(axis,"$(PREFIX)$(MOTOR_NAME)")
+{
+	field(DESC,"$(DESC)")
+	field(DTYP,"asynAxis")
+	field(DIR,"$(DIR=0)")
+	field(VELO,"$(VELO)")
+	field(JVEL,"$(JVEL)")
+	field(VBAS,"$(VBAS=0)")
+	field(ACCL,"$(ACCL)")
+	field(JAR, "$(JAR=0)")
+	field(BDST,"$(BDST=0)")
+	field(DLY, "$(DLY=0)")
+	field(BVEL,"$(BVEL=0)")
+	field(BACC,"$(BACC=0)")
+	field(OUT,"@asyn($(MOTOR_PORT),$(AXIS_NO))")
+	field(MRES,"$(MRES)")
+	field(RDBD,"$(RDBD=0)")
+	field(ERES,"$(ERES=0)")
+	field(PREC,"$(PREC)")
+	field(EGU,"$(EGU=mm)")
+	field(DHLM,"$(DHLM)")
+	field(DLLM,"$(DLLM)")
+	field(RTRY,"$(RTRY=1)")
+	field(TWV,"1")
+}
+
+# The message text
+record(waveform, "$(PREFIX)$(R)MsgTxt") {
+    field(DTYP, "asynOctetRead")
+    field(INP, "@asyn($(MOTOR_PORT),$(AXIS_NO))MOTOR_MESSAGE_TEXT")
+    field(FTVL, "CHAR")
+    field(NELM, "80")
+    field(SCAN, "I/O Intr")
+}
+
+
+record(longin, "$(PREFIX)$(R)Err")
+{
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(MOTOR_PORT),$(AXIS_NO))MCUErr")
+    field(SCAN, "I/O Intr")
+}
+
+record(longout,"$(PREFIX)$(R)ErrRst") {
+    field(DESC, "Error Reset")
+    field(VAL,  0)
+    field(DTYP, "asynInt32")
+    field(PINI, "YES")
+    field(OUT,"@asyn($(MOTOR_PORT),$(AXIS_NO))ErrRst")
+}
+

@@ -26,6 +26,15 @@ PIGCS2Src_DEPEND_DIRS = AxisSrc
 DIRS += AttocubeSrc
 AttocubeSrc_DEPEND_DIRS = AxisSrc
 
+
+
+# Support for the IcePAP
+ifdef EPICSAXISICEPAP
+DIRS += IcePAPsrc
+IcePAPsrc_DEPEND_DIRS = AxisSrc
+endif
+
+
 # The Hytec support requires ipac
 ifdef IPAC
 DIRS += HytecSrc
