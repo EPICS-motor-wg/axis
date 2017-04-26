@@ -346,6 +346,8 @@ void asynAxisAxis::updateMsgTxtField()
       int motorLatestCommand;
       int motorStatusHomed;
       int motorFlagsShowNotHomed;
+      double motorHighLimit;
+      double motorLowLimit;
       pC_->getIntegerParam(axisNo_,pC_->motorStatusProblem_, &motorStatusProblem);
       if (motorStatusProblem) {
         setStringParam(pC_->motorMessageText_,"E: Problem");
@@ -358,6 +360,24 @@ void asynAxisAxis::updateMsgTxtField()
       if (!motorStatusHomed && motorFlagsShowNotHomed) {
         setStringParam(pC_->motorMessageText_,"W: Axis not homed");
         return;
+      }
+      /* If both soft limits are defined, and both are != 0,
+         check if the axis is below or above the range.
+         motorLowLimit == motorHighLimit == 0 means "no limits"
+         (e.g. a rotary axis) */
+      if (!pC_->getDoubleParam(axisNo_, pC_->motorLowLimit_, &motorLowLimit) &&
+          !pC_->getDoubleParam(axisNo_, pC_->motorHighLimit_, &motorHighLimit) &&
+          (motorLowLimit != 0.0 || motorHighLimit != 0.0)) {
+        double motorPosition;
+        pC_->getDoubleParam(axisNo_, pC_->motorPosition_, &motorPosition);
+        if (motorPosition < motorLowLimit) {
+          setStringParam(pC_->motorMessageText_,"W: Below soft limit");
+          return;
+        }
+        else if (motorPosition > motorHighLimit) {
+          setStringParam(pC_->motorMessageText_,"W: Above soft limit");
+          return;
+        }
       }
       if (motorLatestCommand == LATEST_COMMAND_STOP)
         setStringParam(pC_->motorMessageText_,"I: Stop");
