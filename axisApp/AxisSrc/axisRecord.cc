@@ -1875,6 +1875,92 @@ static int homing_wanted_and_allowed(axisRecord *pmr)
 }
 
 
+static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
+                          double relpos, double relbpos, double currpos, double newpos)
+{
+    double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
+    double vbase = pmr->vbas / fabs(pmr->mres); /* base speed      */
+    double vel = pmr->velo / fabs(pmr->mres);   /* normal speed    */
+    double acc = (vel - vbase) / pmr->accl;     /* normal accel.   */
+    double bvel = pmr->bvel / fabs(pmr->mres);  /* backlash speed  */
+    double bacc = (bvel - vbase) / pmr->bacc;   /* backlash accel. */
+    double rbdst1 = 1.0 + (fabs(pmr->bdst) / fabs(pmr->mres));
+    double velocity, position, accel;
+
+    /* AJF fix for the bug where the retry count is not incremented when doing retries */
+    /* This bug is seen when we use the readback link field                            */
+    pmr->mip |= MIP_MOVE;
+    MARK(M_MIP);
+    /* v1.96 Don't post dmov if special already did. */
+    if (pmr->dmov)
+    {
+        pmr->dmov = FALSE;
+        MARK(M_DMOV);
+    }
+    pmr->ldvl = pmr->dval;
+    pmr->lval = pmr->val;
+    pmr->lrvl = pmr->rval;
+
+    /* Backlash disabled, OR, no need for seperate backlash move
+     * since move is in preferred direction (preferred_dir==ON),
+     * AND, backlash acceleration and velocity are the same as slew values
+     * (BVEL == VELO, AND, BACC == ACCL). */
+    if ((fabs(pmr->bdst) <  fabs(pmr->mres)) ||
+        (preferred_dir == true && pmr->bvel == pmr->velo &&
+         pmr->bacc == pmr->accl))
+    {
+        velocity = vel;
+        accel = acc;
+        if (use_rel == true)
+            position = relpos * pmr->frac;
+        else
+            position = currpos + pmr->frac * (newpos - currpos);
+    }
+    /* IF move is in preferred direction, AND, current position is within backlash range. */
+    else if ((preferred_dir == true) &&
+             ((use_rel == true  && relbpos <= 1.0) ||
+              (use_rel == false && (fabs(newpos - currpos) <= rbdst1))
+             )
+            )
+    {
+/******************************************************************************
+ * Backlash correction imposes a much larger penalty on overshoot than on
+ * undershoot. Here, we allow user to specify (by .frac) the fraction of the
+ * backlash distance to move as a first approximation. When the motor stops and
+ * we're not yet at 'newpos', the callback will give us another chance, and
+ * we'll go .frac of the remaining distance, and so on. This algorithm is
+ * essential when the drive creeps after a move (e.g., piezo inchworm), and
+ * helpful when the readback device has a latency problem (e.g., interpolated
+ * encoder), or is a little nonlinear. (Blatantly nonlinear readback is not
+ * handled by the motor record.)
+ *****************************************************************************/
+        velocity = bvel;
+        accel = bacc;
+        if (use_rel == true)
+            position = relpos * pmr->frac;
+        else
+            position = currpos + pmr->frac * (newpos - currpos);
+    }
+    else
+    {
+        velocity = vel;
+        accel = acc;
+        if (use_rel == true)
+            position = relbpos;
+        else
+            position = bpos;
+        pmr->pp = TRUE;              /* do backlash from posprocess(). */
+    }
+
+    pmr->cdir = (pmr->rdif < 0.0) ? 0 : 1;
+    if (use_rel == true)
+        devSupMoveRelRaw(pmr, velocity, vbase, accel, position);
+    else
+        devSupMoveAbsRaw(pmr, velocity, vbase, accel, position);
+
+}
+/*************************************************************************/
+
 static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
 {
     int dir_positive = (pmr->dir == motorDIR_Pos);
@@ -2282,19 +2368,12 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
             double rbvpos = pmr->drbv / pmr->mres;      /* where motor is  */
             double currpos = pmr->ldvl / pmr->mres;     /* where we are    */
             double newpos = pmr->dval / pmr->mres;      /* where to go     */
-            double vbase = pmr->vbas / fabs(pmr->mres); /* base speed      */
-            double vel = pmr->velo / fabs(pmr->mres);   /* normal speed    */
-            double acc = (vel - vbase) / pmr->accl;     /* normal accel.   */
             /*
              * 'bpos' is one backlash distance away from 'newpos'.
              */
-            double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
-            double bvel = pmr->bvel / fabs(pmr->mres);  /* backlash speed  */
-            double bacc = (bvel - vbase) / pmr->bacc;   /* backlash accel. */
             bool use_rel, preferred_dir, too_small;
             double relpos = pmr->diff / pmr->mres;
             double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
-            double rbdst1 = 1.0 + (fabs(pmr->bdst) / fabs(pmr->mres));
             long rdbdpos = NINT(pmr->rdbd / fabs(pmr->mres)); /* retry deadband steps */
             long absdiff = labs(NINT(rbvpos)- NINT(newpos));
 
@@ -2435,80 +2514,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
             }
 
             if (pmr->mip == MIP_DONE || pmr->mip == MIP_RETRY)
-            {
-                double velocity, position, accel;
-
-                /* AJF fix for the bug where the retry count is not incremented when doing retries */
-                /* This bug is seen when we use the readback link field                            */
-                pmr->mip |= MIP_MOVE;
-                MARK(M_MIP);
-                /* v1.96 Don't post dmov if special already did. */
-                if (pmr->dmov)
-                {
-                    pmr->dmov = FALSE;
-                    MARK(M_DMOV);
-                }
-                pmr->ldvl = pmr->dval;
-                pmr->lval = pmr->val;
-                pmr->lrvl = pmr->rval;
-
-                /* Backlash disabled, OR, no need for seperate backlash move
-                 * since move is in preferred direction (preferred_dir==ON),
-                 * AND, backlash acceleration and velocity are the same as slew values
-                 * (BVEL == VELO, AND, BACC == ACCL). */
-                if ((fabs(pmr->bdst) <  fabs(pmr->mres)) ||
-                    (preferred_dir == true && pmr->bvel == pmr->velo &&
-                     pmr->bacc == pmr->accl))
-                {
-                    velocity = vel;
-                    accel = acc;
-                    if (use_rel == true)
-                        position = relpos * pmr->frac;
-                    else
-                        position = currpos + pmr->frac * (newpos - currpos);
-                }
-                /* IF move is in preferred direction, AND, current position is within backlash range. */
-                else if ((preferred_dir == true) &&
-                         ((use_rel == true  && relbpos <= 1.0) ||
-                          (use_rel == false && (fabs(newpos - currpos) <= rbdst1))
-                         )
-                        )
-                {
-/******************************************************************************
- * Backlash correction imposes a much larger penalty on overshoot than on
- * undershoot. Here, we allow user to specify (by .frac) the fraction of the
- * backlash distance to move as a first approximation. When the motor stops and
- * we're not yet at 'newpos', the callback will give us another chance, and
- * we'll go .frac of the remaining distance, and so on. This algorithm is
- * essential when the drive creeps after a move (e.g., piezo inchworm), and
- * helpful when the readback device has a latency problem (e.g., interpolated
- * encoder), or is a little nonlinear. (Blatantly nonlinear readback is not
- * handled by the motor record.)
- *****************************************************************************/
-                    velocity = bvel;
-                    accel = bacc;
-                    if (use_rel == true)
-                        position = relpos * pmr->frac;
-                    else
-                        position = currpos + pmr->frac * (newpos - currpos);
-                }
-                else
-                {
-                    velocity = vel;
-                    accel = acc;
-                    if (use_rel == true)
-                        position = relbpos;
-                    else
-                        position = bpos;
-                    pmr->pp = TRUE;              /* do backlash from posprocess(). */
-                }
-
-                pmr->cdir = (pmr->rdif < 0.0) ? 0 : 1;
-                if (use_rel == true)
-                    devSupMoveRelRaw(pmr, velocity, vbase, accel, position);
-                else
-                    devSupMoveAbsRaw(pmr, velocity, vbase, accel, position);
-            }
+                doRetryOrDone(pmr, use_rel, preferred_dir, relpos, relbpos, currpos, newpos);
         }
     }
     else if (pmr->sync && pmr->stup == motorSTUP_OFF && pmr->mip == MIP_DONE)
