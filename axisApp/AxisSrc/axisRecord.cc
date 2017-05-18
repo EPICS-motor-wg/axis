@@ -844,6 +844,26 @@ static void devSupMoveRelRaw(axisRecord *pmr, double vel, double vbase,
 #define MOVE_REL #ErrorMOVE_REL
 
 /*****************************************************************************/
+static void devSupMoveRelDial(axisRecord *pmr, double vel, double vbase,
+                              double accEGU, double relpos)
+{
+    /* Velocity and Accelerations are always > 0, use fabs(mres).
+     Position needs the sign of mres */
+    double amres = fabs(pmr->mres);
+    devSupMoveRelRaw(pmr, vel/amres, vbase/amres, accEGU/amres, relpos/pmr->mres);
+}
+/*****************************************************************************/
+
+static void devSupMoveAbsDial(axisRecord *pmr, double vel, double vbase,
+                              double accEGU, double pos)
+{
+    /* Velocity and Accelerations are always > 0, use fabs(mres).
+       Position needs the sign of mres */
+    double amres = fabs(pmr->mres);
+    devSupMoveAbsRaw(pmr, vel/amres, vbase/amres, accEGU/amres, pos/pmr->mres);
+}
+
+/*****************************************************************************/
 static void devSupJogRaw(axisRecord *pmr, double jogv, double vbase, double jacc)
 {
     struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
@@ -896,40 +916,40 @@ static void devSupSetEncRatio(axisRecord *pmr, double ep_mp[2])
 *****************************************************************************/
 static void doBackLashAfterMove(axisRecord *pmr)
 {
-    double vbase = pmr->vbas / fabs(pmr->mres);
-    double vel = pmr->velo / fabs(pmr->mres);
-    double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
+    double vbase = pmr->vbas;
+    double vel = pmr->velo;
+    double bpos = (pmr->dval - pmr->bdst);
 
     /* Use if encoder or ReadbackLink is in use. */
     bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
-    double relpos = pmr->diff / pmr->mres;
-    double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
+    double relpos = pmr->diff;
+    double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv);
 
     if (pmr->mip & MIP_JOG_STOP)
     {
         double acc = (vel - vbase) / pmr->accl;
         if (use_rel == true)
-            devSupMoveRelRaw(pmr, vel, vbase, acc, relbpos);
+            devSupMoveRelDial(pmr, vel, vbase, acc, relbpos);
         else
-            devSupMoveAbsRaw(pmr, vel, vbase, acc, bpos);
+            devSupMoveAbsDial(pmr, vel, vbase, acc, bpos);
         pmr->mip = MIP_JOG_BL1;
     }
     else
     {
-        double bvel = pmr->bvel / fabs(pmr->mres);
+        double bvel = pmr->bvel;
         double bacc = (bvel - vbase) / pmr->bacc;
 
         if (use_rel == true)
         {
             relpos = relpos * pmr->frac;
-            devSupMoveRelRaw(pmr, bvel, vbase, bacc, relpos);
+            devSupMoveRelDial(pmr, bvel, vbase, bacc, relpos);
         }
         else
         {
-            double currpos = pmr->dval / pmr->mres;
+            double currpos = pmr->dval;
             double newpos = bpos + pmr->frac * (currpos - bpos);
             pmr->rval = NINT(newpos);
-            devSupMoveAbsRaw(pmr, bvel, vbase, bacc, newpos);
+            devSupMoveAbsDial(pmr, bvel, vbase, bacc, newpos);
         }
         pmr->mip = MIP_MOVE_BL;
     }
@@ -940,15 +960,15 @@ static void doBackLashAfterJog(axisRecord *pmr)
 {
     /* First part of jog done. Do backlash correction. */
 
-    double bvel = pmr->bvel / fabs(pmr->mres);
-    double vbase = pmr->vbas / fabs(pmr->mres);
+    double bvel = pmr->bvel;
+    double vbase = pmr->vbas;
     double bacc = (bvel - vbase) / pmr->bacc;
-    double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
+    double bpos = (pmr->dval - pmr->bdst);
 
     /* Use if encoder or ReadbackLink is in use. */
     bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
-    double relpos = pmr->diff / pmr->mres;
-    double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
+    double relpos = pmr->diff;
+    double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv);
 
     /* Restore DMOV to false and UNMARK it so it is not posted. */
     pmr->dmov = FALSE;
@@ -957,14 +977,14 @@ static void doBackLashAfterJog(axisRecord *pmr)
     if (use_rel == true)
     {
         relpos = (relpos - relbpos) * pmr->frac;
-        devSupMoveRelRaw(pmr, bvel, vbase, bacc, relpos);
+        devSupMoveRelDial(pmr, bvel, vbase, bacc, relpos);
     }
     else
     {
-        double currpos = pmr->dval / pmr->mres;
+        double currpos = pmr->dval;
         double newpos = bpos + pmr->frac * (currpos - bpos);
         pmr->rval = NINT(newpos);
-        devSupMoveAbsRaw(pmr, bvel, vbase, bacc, newpos);
+        devSupMoveAbsDial(pmr, bvel, vbase, bacc, newpos);
     }
     pmr->cdir = (relpos < 0.0) ? 0 : 1;
 }
