@@ -73,7 +73,7 @@ IcePAPAxis::IcePAPAxis(IcePAPController *pC, int axisNo,
     pC_(pC)
 {
   memset(&drvlocal, 0, sizeof(drvlocal));
-  drvlocal.errbuf[1] = ' '; /* trigger setStringParam(pC_->eemcuErrMsg_ */
+  drvlocal.errbuf[1] = ' '; /* trigger setStringParam(pC_->EthercatMCErrMsg_ */
   drvlocal.cfg.axisFlags = axisFlags;
   if (axisFlags & AMPLIFIER_ON_FLAG_USING_CNEN) {
     setIntegerParam(pC->motorStatusGainSupport_, 1);
@@ -170,12 +170,12 @@ void IcePAPAxis::report(FILE *fp, int level)
 asynStatus IcePAPAxis::writeReadACK(void)
 {
   asynStatus status;
-  int eemcuErr = 0;
-  status = pC_->getIntegerParam(axisNo_, pC_->eemcuErr_, &eemcuErr);
-  if (status || eemcuErr) {
+  int EthercatMCErr = 0;
+  status = pC_->getIntegerParam(axisNo_, pC_->EthercatMCErr_, &EthercatMCErr);
+  if (status || EthercatMCErr) {
     asynPrint(pC_->pasynUserController_, ASYN_TRACE_ERROR|ASYN_TRACEIO_DRIVER,
-              "eemcuErr=%d status=%s (%d)\n",
-              eemcuErr,
+              "EthercatMCErr_=%d status=%s (%d)\n",
+              EthercatMCErr,
               pasynManager->strStatus(status), (int)status);
     return status;
   }
@@ -190,8 +190,8 @@ asynStatus IcePAPAxis::writeReadACK(void)
                   "out=%s in=%s return=%s (%d)\n",
                   pC_->outString_, pC_->inString_,
                   pasynManager->strStatus(status), (int)status);
-        setIntegerParam(pC_->eemcuErr_, 1);
-        setStringParam(pC_->eemcuErrMsg_, pC_->inString_);
+        setIntegerParam(pC_->EthercatMCErr_, 1);
+        //setStringParam(pC_->EthercatMCErrMsg_, pC_->inString_);
 
         return status;
       }
@@ -334,6 +334,62 @@ asynStatus IcePAPAxis::getFastValueFromAxis(const char* var, const char *extra, 
   return asynSuccess;
 }
 
+/** Gets a double from an axis
+ * \param[in] name of the variable to be retrieved
+ * \param[in] pointer to the integer result
+ *
+ */
+asynStatus IcePAPAxis::getValueFromAxis(const char* var, double *value)
+{
+  char format_string[100];
+  asynStatus comStatus;
+  double res=-1;
+
+  sprintf(pC_->outString_, "%d:?%s", axisNo_, var);
+  sprintf(format_string, "%d:?%s %%lf", axisNo_, var);
+  comStatus = pC_->writeReadOnErrorDisconnect();
+  if (comStatus) {
+    return comStatus;
+  } else {
+    int nvals = sscanf(pC_->inString_, format_string, &res);
+    if (nvals != 1) {
+      asynPrint(pC_->pasynUserController_, ASYN_TRACE_ERROR|ASYN_TRACEIO_DRIVER,
+                "nvals=%d format_string=\"%s\" command=\"%s\" response=\"%s\"\n",
+                nvals, format_string, pC_->outString_, pC_->inString_);
+      return asynError;
+    }
+  }
+  *value = res;
+  return asynSuccess;
+}
+
+asynStatus IcePAPAxis::readBackVelAcc(void)
+{
+  double vel = 0;
+  double acctime = -1;
+  double acc = -1;
+  double mres = 0;
+  asynStatus status = asynSuccess;
+  status = pC_->getDoubleParam(axisNo_, pC_->motorRecResolution_, &mres);
+  asynPrint(pC_->pasynUserController_, ASYN_TRACE_INFO,
+            "(%d) %s:%d status=%d mres=%f\n",
+            axisNo_, __FILE__, __LINE__, (int)status, mres);
+  if (status) return status;
+  if (!mres) return asynError;
+  status = getValueFromAxis("VELOCITY", &vel);
+  if (status) return status;
+  vel = vel * mres;
+  setDoubleParam(pC_->EthercatMCVel_RB_, vel);
+
+  status = getValueFromAxis("ACCTIME", &acctime);
+  if (status) return status;
+  if (!acctime) return asynError;
+  acc = vel / acctime;
+  setDoubleParam(pC_->EthercatMCAcc_RB_, acc);
+  setDoubleParam(pC_->EthercatMCDec_RB_, acc);
+  return status;
+}
+
 /** Move the axis to a position, either absolute or relative
  * \param[in] position in mm
  * \param[in] relative (0=absolute, otherwise relative)
@@ -349,9 +405,10 @@ asynStatus IcePAPAxis::move(double position, int relative, double minVelocity, d
   if (status == asynSuccess) status = stopAxisInternal(__FUNCTION__, 0);
   if (status == asynSuccess) status = setValueOnAxis("VELOCITY", (int)maxVelocity);
   if (status == asynSuccess) status = setValueOnAxis(relative ? "RMOVE" : "MOVE", (int)position);
-
+  readBackVelAcc();
   return status;
 }
+
 
 
 /** Home the motor, search the home position
@@ -364,7 +421,6 @@ asynStatus IcePAPAxis::move(double position, int relative, double minVelocity, d
 asynStatus IcePAPAxis::home(double minVelocity, double maxVelocity, double acceleration, int forwards)
 {
   asynStatus status = asynSuccess;
-
   drvlocal.lastCommandIsHoming = 1;
   /* The controller will do the home search, and change its internal
      raw value to what we specified in fPosition. Use 0 */
@@ -372,6 +428,7 @@ asynStatus IcePAPAxis::home(double minVelocity, double maxVelocity, double accel
   if ((drvlocal.cfg.axisFlags & AMPLIFIER_ON_FLAG_WHEN_HOMING) &&
       (status == asynSuccess)) status = enableAmplifier(1);
   if (status == asynSuccess) status = setValueOnAxis("HOME", -1);
+  readBackVelAcc();
   return status;
 }
 
@@ -387,6 +444,7 @@ asynStatus IcePAPAxis::moveVelocity(double minVelocity, double maxVelocity, doub
   asynStatus status = asynSuccess;
   drvlocal.lastCommandIsHoming = 0;
   if (status == asynSuccess) setValueOnAxis("JOG", (int)maxVelocity);
+  readBackVelAcc();
   return status;
 }
 
@@ -394,8 +452,8 @@ asynStatus IcePAPAxis::moveVelocity(double minVelocity, double maxVelocity, doub
 asynStatus IcePAPAxis::resetAxis(void)
 {
   asynStatus status = asynSuccess;
-  setIntegerParam(pC_->eemcuErr_, 0);
-  setStringParam(pC_->eemcuErrMsg_, "");
+  setIntegerParam(pC_->EthercatMCErr_, 0);
+  //setStringParam(pC_->EthercatMCErrMsg_, "");
 
   return status;
 }
@@ -535,9 +593,9 @@ asynStatus IcePAPAxis::poll(bool *moving)
   }
 
   if (memcmp(st_axis_status.errbuf, drvlocal.errbuf, sizeof(drvlocal.errbuf))) {
-    setIntegerParam(pC_->eemcuErr_, 0);
-    setIntegerParam(pC_->eemcuErrId_, 0);
-    setStringParam(pC_->eemcuErrMsg_, st_axis_status.errbuf);
+    setIntegerParam(pC_->EthercatMCErr_, 0);
+    //setIntegerParam(pC_->EthercatMCErrId_, 0);
+    //setStringParam(pC_->EthercatMCErrMsg_, st_axis_status.errbuf);
     memcpy(drvlocal.errbuf, st_axis_status.errbuf, sizeof(drvlocal.errbuf));
   }
 
@@ -562,15 +620,13 @@ asynStatus IcePAPAxis::setIntegerParam(int function, int value)
     if (drvlocal.cfg.axisFlags & AMPLIFIER_ON_FLAG_USING_CNEN) {
       (void)enableAmplifier(value);
     }
-#ifdef eemcuErrRstString
-  } else if (function == pC_->eemcuErrRst_) {
+  } else if (function == pC_->EthercatMCErrRst_) {
     asynPrint(pC_->pasynUserController_, ASYN_TRACE_INFO,
               "setIntegerParam(%d ErrRst_)=%d\n", axisNo_, value);
     if (value) {
       resetAxis();
     }
   }
-#endif
 
   //Call base class method
   status = asynAxisAxis::setIntegerParam(function, value);
@@ -580,10 +636,10 @@ asynStatus IcePAPAxis::setIntegerParam(int function, int value)
 asynStatus IcePAPAxis::setStringParam(int function, const char *value)
 {
   asynStatus status = asynSuccess;
-#ifdef eemcuErrMsgString
-  if (function == pC_->eemcuErrMsg_) {
+#ifdef EthercatMCErrMsgString
+  if (function == pC_->EthercatMCErrMsg_) {
     asynPrint(pC_->pasynUserController_, ASYN_TRACE_INFO,
-              "setStringParam(%d eemcuErrMsg_)=%s\n", axisNo_, value);
+              "setStringParam(%d EthercatMCErrMsg_)=%s\n", axisNo_, value);
   }
 #endif
 

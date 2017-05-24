@@ -35,12 +35,15 @@ IcePAPController::IcePAPController(const char *portName, const char *MotorPortNa
                         0, 0)  // Default priority and stack size
 {
   asynStatus status;
-  createParam(eemcuErrString,           asynParamInt32,       &eemcuErr_);
-  createParam(eemcuErrIdString,         asynParamInt32,       &eemcuErrId_);
-  createParam(eemcuErrMsgString,        asynParamOctet,       &eemcuErrMsg_);
 
-  createParam(eemcuErrRstString,        asynParamInt32,       &eemcuErrRst_);
+  createParam(EthercatMCErrString,           asynParamInt32,       &EthercatMCErr_);
+  /* Per axis */
+  createParam(EthercatMCVelActString,        asynParamFloat64,     &EthercatMCVelAct_);
+  createParam(EthercatMCVel_RBString,        asynParamFloat64,     &EthercatMCVel_RB_);
+  createParam(EthercatMCAcc_RBString,        asynParamFloat64,     &EthercatMCAcc_RB_);
+  createParam(EthercatMCDec_RBString,        asynParamFloat64,     &EthercatMCDec_RB_);
 
+  createParam(EthercatMCErrRstString,        asynParamInt32,       &EthercatMCErrRst_);
   /* Connect to IcePAP controller */
   status = pasynOctetSyncIO->connect(MotorPortName, 0, &pasynUserController_, NULL);
   if (status) {

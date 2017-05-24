@@ -9,10 +9,12 @@ FILENAME...   IcePAP.h
 #define AMPLIFIER_ON_FLAG_WHEN_HOMING  (1<<1)
 #define AMPLIFIER_ON_FLAG_USING_CNEN   (1<<2)
 
-#define eemcuErrString                  "Err"
-#define eemcuErrIdString                "ErrId"
-#define eemcuErrRstString               "ErrRst"
-#define eemcuErrMsgString               "ErrMsg"
+#define EthercatMCErrString                  "MCUErr"
+#define EthercatMCErrRstString               "ErrRst"
+#define EthercatMCVelActString               "VelAct"
+#define EthercatMCVel_RBString               "Vel-RB"
+#define EthercatMCAcc_RBString               "Acc-RB"
+#define EthercatMCDec_RBString               "Dec-RB"
 
 extern "C" {
   int IcePAPCreateAxis(const char *IcePAPName, int axisNo,
@@ -60,6 +62,8 @@ private:
 
   asynStatus getValueFromAxis(const char* var, unsigned, char *value);
   asynStatus getValueFromAxis(const char* var, int *value);
+  asynStatus getValueFromAxis(const char* var, double *value);
+  asynStatus readBackVelAcc(void);
   asynStatus getFastValueFromAxis(const char* var, const char *extra, int *value);
 
   asynStatus resetAxis(void);
@@ -85,18 +89,22 @@ public:
   void handleStatusChange(asynStatus status);
   asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value);
 
+
+
   /* First parameter */
-  int eemcuErr_;
+  int EthercatMCErr_;
 
   /* Add parameters here */
 
-  int eemcuErrMsg_;
-  int eemcuErrRst_;
-  int eemcuErrId_;
+  int EthercatMCVelAct_;
+  int EthercatMCVel_RB_;
+  int EthercatMCAcc_RB_;
+  int EthercatMCDec_RB_;
+  int EthercatMCErrRst_;
   /* Last parameter */
 
-  #define FIRST_VIRTUAL_PARAM eemcuErr_
-  #define LAST_VIRTUAL_PARAM eemcuErrId_
+  #define FIRST_VIRTUAL_PARAM EthercatMCErr_
+  #define LAST_VIRTUAL_PARAM EthercatMCErrRst_
   #define NUM_VIRTUAL_MOTOR_PARAMS ((int) (&LAST_VIRTUAL_PARAM - &FIRST_VIRTUAL_PARAM + 1))
 
   friend class IcePAPAxis;
