@@ -903,14 +903,20 @@ The current position of the motor, encoder, or readback link, as received from w
 
 =fields RMP
 
-The contents of the hardware's step-count register. This field contains the same information as the dial value, but in steps, rather than in engineering units. 
+The contents of the hardware's step-count register. Commanded position read from motor controller.
+Note: If the controller has a an encoder and if the controller allows to read back the "measured"
+position, we use the "measured" postion in EthercatMC and IcePAP.
+
 
 =cut
 
     
 =fields REP
 
-The contents of the hardware's encoder-count register. Ideally, this field contains the same information as the dial value, but in encoder counts, rather than in engineering units. 
+Raw Encoder Position.  The contents of the hardware's encoder-count register
+If the "Encoder Present" status bit is ON in the MSTA, REP is the raw
+encoder value read from the controller; if the status bit is OFF, REP
+is always zero.
 
 =cut
 
@@ -923,14 +929,14 @@ The motor status as received from the hardware.  The MSTA bits are defined as fo
         DONE: motion is complete.
         PLUS_LS: plus limit switch has been hit.
         HOMELS: state of the home limit switch.
-        Unused
-        POSITION: closed-loop position control is enabled.
+        Unused (or slip/stall enabled)
+        POSITION: closed-loop position control is enabled. (or power on)
         SLIP_STALL: Slip/Stall detected (eg. fatal following error)
         HOME: if at home position.
         PRESENT: encoder is present.
         PROBLEM: driver stopped polling, or hardware problem
         MOVING: non-zero velocity present.
-        GAIN_SUPPORT: motor supports closed-loop position control.
+        GAIN_SUPPORT: motor supports closed-loop position control (or supports power on).
         COMM_ERR: Controller communication error.
         MINUS_LS: minus limit switch has been hit.
         HOMED: the motor has been homed.
@@ -942,6 +948,7 @@ The record is put into MAJOR STATE alarm if either SLIP_STALL or PROBLEM bits ar
 =fields MFLG
 
 The motor flags as received from the hardware.  The MFLG bits are defined as follows:
+
         MF_HOME_ON_LS: Homing on LS towards LS allowed (e.g. HOMF when HLS)
         MF_STOP_PROB:  Stop the axis when RA_PROBLEM is set
 

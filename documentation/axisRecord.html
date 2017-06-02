@@ -609,7 +609,7 @@
 </tr>
 <tr><td class="cell">RMP</td><td class="cell">Raw Motor Position</td><td class="cell">LONG</td><td class="cell">No</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">No</td><td class="cell">No</td></tr></table></blockquote>
 
-<p>The contents of the hardware&#39;s step-count register. This field contains the same information as the dial value, but in steps, rather than in engineering units.</p>
+<p>The contents of the hardware&#39;s step-count register. Commanded position read from motor controller. Note: If the controller has a an encoder and if the controller allows to read back the &quot;measured&quot; position, we use the &quot;measured&quot; postion in EthercatMC and IcePAP.</p>
 
 
 
@@ -619,7 +619,7 @@
 </tr>
 <tr><td class="cell">REP</td><td class="cell">Raw Encoder Position</td><td class="cell">LONG</td><td class="cell">No</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">No</td><td class="cell">No</td></tr></table></blockquote>
 
-<p>The contents of the hardware&#39;s encoder-count register. Ideally, this field contains the same information as the dial value, but in encoder counts, rather than in engineering units.</p>
+<p>Raw Encoder Position. The contents of the hardware&#39;s encoder-count register If the &quot;Encoder Present&quot; status bit is ON in the MSTA, REP is the raw encoder value read from the controller; if the status bit is OFF, REP is always zero.</p>
 
 
 
@@ -635,14 +635,14 @@
         DONE: motion is complete.
         PLUS_LS: plus limit switch has been hit.
         HOMELS: state of the home limit switch.
-        Unused
-        POSITION: closed-loop position control is enabled.
+        Unused (or slip/stall enabled)
+        POSITION: closed-loop position control is enabled. (or power on)
         SLIP_STALL: Slip/Stall detected (eg. fatal following error)
         HOME: if at home position.
         PRESENT: encoder is present.
         PROBLEM: driver stopped polling, or hardware problem
         MOVING: non-zero velocity present.
-        GAIN_SUPPORT: motor supports closed-loop position control.
+        GAIN_SUPPORT: motor supports closed-loop position control (or supports power on).
         COMM_ERR: Controller communication error.
         MINUS_LS: minus limit switch has been hit.
         HOMED: the motor has been homed.</code></pre>
@@ -657,7 +657,10 @@
 </tr>
 <tr><td class="cell">MFLG</td><td class="cell">Motor Flags</td><td class="cell">ULONG</td><td class="cell">No</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">No</td><td class="cell">No</td></tr></table></blockquote>
 
-<p>The motor flags as received from the hardware. The MFLG bits are defined as follows: MF_HOME_ON_LS: Homing on LS towards LS allowed (e.g. HOMF when HLS) MF_STOP_PROB: Stop the axis when RA_PROBLEM is set</p>
+<p>The motor flags as received from the hardware. The MFLG bits are defined as follows:</p>
+
+<pre><code>        MF_HOME_ON_LS: Homing on LS towards LS allowed (e.g. HOMF when HLS)
+        MF_STOP_PROB:  Stop the axis when RA_PROBLEM is set</code></pre>
 
 
 
