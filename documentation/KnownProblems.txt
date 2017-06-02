@@ -1,0 +1,119 @@
+Definition:
+  MCU Motrion Control Unit
+  
+
+MRES for modern controllers
+  Many modern controllers have MRES configured in the MCU, and use
+  engineering units to talk to the IOC.
+  The record still counts in "motor Steps", which means that each time
+  a move() is done, the value is processed twice:
+  steps = newPOS[EGU] / MRES in record.
+  newPOS[EGU] = steps * MRES in the driver.
+  When the positin is read back in the poller, the revers appllies:
+  MCU --- newRBV[EGU] ----> driver
+  newRBV[steps] = newRBV[EGU] / MRES in driver
+  RBV[EGU] =  newRBV[steps] * MRES in record.
+  
+  
+  Some applications set set MRES to a very small value, like 1 um.
+  The driver is configured to do a har coded conversion when talking to
+  the MCU.
+  Other drivers forward MRES to the driver, and do inversion in the driver,
+  as described above.
+
+  The whole re-calculation with floating points doesn't feel ideal.
+  Does it work OK in practice, or is there any pain and motivation
+  to change anything and to remove all the forth-and-back transformations
+  when MRES == 1 ?
+
+Minimal movements, deadband, MRES, ERES, RRES
+
+  The current record is based on a stepper motor,
+  and all postions are rounded to a "step".
+
+  When the VAL field is updated, the position is converted
+  into steps, counted as an integer "npos = NINT(newpos)".
+  The when the new position is very close to the actual position,
+  and they are at the "same step" (in other words: too_small is true),
+  the motor doesn't have to move at all.
+  In fact, it can't move, and the record sets "dmov" to true
+  directly.
+  This may save some time, especially when the "auto-power-on" feature
+  is used, and we need to wait for the amplifier to be turned on.
+
+  Similar things should happen when an external encoder is used:
+  The can be skipped if the new "encoder tick position" is the same
+  as the old "encoder position".
+  This is, however, not always working as expected:
+  http://www.aps.anl.gov/epics/tech-talk/2015/msg01485.php
+  A possible workaround/bugfix is here:  
+  https://github.com/EuropeanSpallationSource/motor/commit/ff5349c6cfd83ac81260343b0bcb490293ac17e9
+  A better solution would be to introduce the SDBD field, see below.
+  
+True deadband handling, SDBD
+  "real" stepper motors can only be positioned at a whole step.
+  Many MCU support "microstepping", or support brushless motors.
+  The step size is no longer this important, as the motor can be positioned at
+  "any position" and the MCU users enginering units to communicate with the IOC.
+  All details about the motor are hidden behind the enginering units measurements.
+  On top of that, they take the feedback of an external encoder,
+  and close the position loop inside the controller.
+  Visible to the outside world is a "deadband". As long as the motor stays inside the
+  tolarance band, it is treated as "in position".
+
+  Does it make sense to change the current calculation of positions,
+  and the determination whether to move or not?
+
+if (fabs(delta(newPOS - oldPOS)) < SDBD)
+     do nothing but signal dmov=0 ; dmov=1 trnasition
+  else if URIP && fabs(delta) < RRES
+     do nothing but sigble dmov=0 ; dmov=1 trnasition
+  else if UEIP && fabs(delta) < ERES
+     do nothing but sigble dmov=0 ; dmov=1 trnasition
+  else if fabs(delta) < MRES
+     do nothing but sigble dmov=0 ; dmov=1 trnasition
+  else
+    do_the_motion()
+  
+Synchronization at startup.
+  When the record is started, the TCP/IP connection may not be established,
+  making the RRBV field to jump to 0 and back to the real position later.
+  Note: SNS does not use auto-connect at all. When the record is initiated,
+  the TCP/IP connection must be establised an working.
+  
+CNEN hijacked for amplifier on.
+  Should at least be documented.
+  A better solution is to seperate power on from close loop, rename the
+  fields and the functions.
+  (Work ongoing)
+
+Not yet started, but seams ready.
+  When a new position is commanded, some controllers report ready, but
+  haven't even start yet.
+  The ready status is relatet to the old movement.
+  This is a glitch.
+  It has been observed with controllers using mulit-threading, where
+  the communication thread is different from the motion thread.
+  (This seams to be true for many, if not all, controllers using TCP/IP)
+  I don't have a 100% generic solution here.
+  The EthercatMC driver uses a waitNumPollsBeforeReady:
+  When the motion is comanded, we wait n polls before calling
+  setIntegerParam(pC_->motorStatusDone_, 0);
+
+Values read out from the MCU and put into the record.
+  "modern controllers" are typically configured with an engineering tool.
+  It would be nice to read out the seetings from the controller and put
+  them into the record.
+  This is already possible with a model 3 driver, but I haven't done that yet.
+
+Refuse "wrong" soft limits.
+  The model 1 driver can refuse to set soft limits which conflict to the ones
+  in the controller:
+      rtnval = devSupUpdateLimitFromDial(pmr, command, tmp_limit);
+      if (rtnval != OK)
+      {
+          /* If an error occured, build_trans() has reset
+           * dial high or low limit to controller's value. */
+  This does not work for asyn based controllers
+  (We need to wait for the callback, and handle the response code)
+

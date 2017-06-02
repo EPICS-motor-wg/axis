@@ -1,0 +1,60 @@
+The DLY-STOP problem
+  When the motor is stopped, while in the DLY phase, the record may hang,
+  when the readback position doesn't change and the record is not processed.
+  http://www.aps.anl.gov/epics/tech-talk/2015/msg01786.php
+
+  A workaround is needed in each and every driver, one implementation of the suggested
+  workaround is here::
+  https://github.com/EuropeanSpallationSource/MCAG_Base_Project/commit/fc2b65ffbc332fc5808e104349defc9edbef33cc
+  A more generic solution may be nice to have.
+  
+Synchronization of RBV and VAL at IOC start
+  Should be done on startup, but is not always working with
+  an asyn motor (when the connection is not yet established,
+  and the record is processd the first time)
+  This is, what I can see, a bug.
+  
+Motor stopped when problem reported.
+  Some controllers need this to protect HW.
+  Some controllers do not want this, as the stop() will make the
+  problem go away, which is bad, when the problem needs to be analyzed.
+  
+  Solution: the driver can disable (or enable) this feature:
+  setIntegerParam(pC_->motorFlagsStopOnProblem_, 0);
+
+Motor done, when hitting a limit switch.
+  This is not true, when we home against a limit switch,
+  or if we go to a limit switch and then back to the home switch.
+  Solution:
+  setIntegerParam(pC_->motorFlagsHomeOnLs_, 1);
+  
+Homing when sitting on a limit switch.
+  Today:
+  When the high limit switch is hit, writing 1 to HOMF does nothing.
+  Espcecially recGblFwdLink(pmr) is not called.
+  This is a bug in MR, which needs to be fixed.
+
+  Some controllers will do the correct homing, even if a on a limit
+  switch, and HOMF and HOMR have the same effect.
+  Some controllers need this protection.
+  Others not.
+  Solution:
+  setIntegerParam(pC_->motorFlagsHomeOnLs_, 1);
+
+
+Encoder readback was crippled to 32 bit.
+  See documentation/FeadbackDataflow.ppt
+  commit 7a125b9c,
+  "Make it possible to use encoder readback > 32 bit"
+
+Motor stops while jogging.
+  When the motor stops because of e.g. an internal soft limit,
+  the state machine was confused: commit 81bbe334
+  "Record recognizes motor stop while jogging"
+  
+asyn-based simulator, automated test cases
+  Partly fixed:
+  There is a simulator for the Ethercat based controllers.
+  We can run against the simulator or real hardware.
+  More test cases needed.
+
