@@ -1,0 +1,110 @@
+This is a short introduction how a "write" to an EPICS PV is fiddled through
+the different layers in asynPortDriver, the generic model 3 driver and
+the overloaded methods in a specific driver.
+
+The call chain here is synchronus, at record init we don't use asyn queues.
+A write to a field in a record will be more complicated, since it involves
+the queue handling and locking which is not shown here.
+
+TODO:
+- document the flow when e.g. theVAL field is written in the record.
+- document the callbacks, as they are used with all asyn records.
+
+
+
+devAxisAsy.c:
+static asynStatus config_controller(struct axisRecord *pmr, motorAsynPvt *pPvt)
+{
+    asynUser *pasynUser;
+    asynStatus status;
+
+    pasynUser = pasynManager->duplicateAsynUser(pPvt->pasynUser, NULL, NULL);
+    /* Encoder ratio */
+    pasynUser->reason = pPvt->driverReasons[motorEncRatio];
+    pPvt->pasynFloat64->write(pPvt->asynFloat64Pvt, pasynUser, pmr->mres / pmr->eres);
+[]
+
+
+The pPvt->pasynFloat64->write() ends up in asynPortDriver.cpp:
+-------------------------------------
+extern "C" {static asynStatus writeFloat64(void *drvPvt, asynUser *pasynUser,
+                              epicsFloat64 value)
+{
+    asynPortDriver *pPvt = (asynPortDriver *)drvPvt;
+    asynStatus status;
+    
+    pPvt->lock();
+    status = pPvt->writeFloat64(pasynUser, value);
+    pPvt->unlock();
+}
+
+The pPvt->writeFloat64() ends up in asynAxisController.cpp:
+-------------------------------------
+asynStatus asynAxisController::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
+{
+  int function = pasynUser->reason;
+  asynAxisAxis *pAxis = getAxis(pasynUser);
+  if (!pAxis) return asynError;
+  axis = pAxis->axisNo_;
+
+  /* Set the parameter and readback in the parameter library. */
+  status = pAxis->setDoubleParam(function, value);
+
+The setDoubleParam() ends up in the axis object,
+in our case the overloaded version:
+-------------------------------------
+asynStatus EthercatMCAxis::setDoubleParam(int function, double value)
+{
+  // The derived class will do something special
+  if (function == pC_->motorHighLimit_) {
+    asynPrint(pC_->pasynUserController_, ASYN_TRACE_INFO,
+              "%s setDoubleParam(%d motorHighLimit_)=%g\n",
+               modulName, axisNo_, value);
+    drvlocal.motorHighLimit = value;
+    drvlocal.defined.motorHighLimit = 1;
+    drvlocal.dirty.motorLimits = 1;
+    setMotorLimitsOnAxisIfDefined();
+
+  // The derived class may or may not call the base class
+
+  // Call the base class method
+  status = asynAxisAxis::setDoubleParam(function, value);
+  return status;
+}
+The generic method in asynAxisAxis is called:
+-------------------------------------
+
+asynStatus asynAxisAxis::setDoubleParam(int function, double value)
+{
+  if (function == pC_->motorPosition_) {
+    if (value != status_.position) {
+        statusChanged_ = 1;
+        status_.position = value;
+    }
+  } else if (function == pC_->motorEncoderPosition_) {
+    if (value != status_.encoderPosition) {
+        statusChanged_ = 1;
+        status_.encoderPosition = value;
+    }
+  }  
+  // Call the base class method
+  return pC_->setDoubleParam(axisNo_, function, value);
+} 
+Now we call the setDoubleParam in asynPortDriver, which
+stores the value in the parameter library:
+-----------------------------------------------
+asynStatus asynPortDriver::setDoubleParam(int list, int index, double value)
+{
+    asynStatus status;
+    static const char *functionName = "setDoubleParam";
+    
+    status = this->params[list]->setDouble(index, value);
+    if (status) reportSetParamErrors(status, index, list, functionName);
+    return(status);
+}
+
+-----------------------------------------------
+Back in asynAxisController::writeFloat64(asynUser *pasynUser, epicsFloat64 value)
+ /* Do callbacks so higher layers see any changes */
+  pAxis->callParamCallbacks();
+  
