@@ -9,22 +9,19 @@ MRES for modern controllers
   a move() is done, the value is processed twice:
   steps = newPOS[EGU] / MRES in record.
   newPOS[EGU] = steps * MRES in the driver.
-  When the positin is read back in the poller, the revers appllies:
+  When the positin is read back in the poller, the revers applies:
   MCU --- newRBV[EGU] ----> driver
   newRBV[steps] = newRBV[EGU] / MRES in driver
   RBV[EGU] =  newRBV[steps] * MRES in record.
   
   
-  Some applications set set MRES to a very small value, like 1 um.
-  The driver is configured to do a har coded conversion when talking to
+  Some applications set MRES to a very small value, like 1 um.
+  The driver is configured to do a conversion when talking to
   the MCU.
   Other drivers forward MRES to the driver, and do inversion in the driver,
   as described above.
 
   The whole re-calculation with floating points doesn't feel ideal.
-  Does it work OK in practice, or is there any pain and motivation
-  to change anything and to remove all the forth-and-back transformations
-  when MRES == 1 ?
 
 Minimal movements, deadband, MRES, ERES, RRES
 
@@ -33,11 +30,10 @@ Minimal movements, deadband, MRES, ERES, RRES
 
   When the VAL field is updated, the position is converted
   into steps, counted as an integer "npos = NINT(newpos)".
-  The when the new position is very close to the actual position,
+  When the new position is very close to the actual position,
   and they are at the "same step" (in other words: too_small is true),
   the motor doesn't have to move at all.
-  In fact, it can't move, and the record sets "dmov" to true
-  directly.
+  In fact, it can't move, and the record sets "dmov" to true directly.
   This may save some time, especially when the "auto-power-on" feature
   is used, and we need to wait for the amplifier to be turned on.
 
@@ -54,12 +50,12 @@ True deadband handling, SDBD
   "real" stepper motors can only be positioned at a whole step.
   Many MCU support "microstepping", or support brushless motors.
   The step size is no longer this important, as the motor can be positioned at
-  "any position" and the MCU users enginering units to communicate with the IOC.
-  All details about the motor are hidden behind the enginering units measurements.
+  "any position". The MCU uses enginering units to communicate with the IOC.
+  All details about the motor are hidden using enginering units.
   On top of that, they take the feedback of an external encoder,
   and close the position loop inside the controller.
-  Visible to the outside world is a "deadband". As long as the motor stays inside the
-  tolarance band, it is treated as "in position".
+  Visible to the outside world is a "deadband". As long as the motor stays
+  inside the tolarance band, it is treated as "in position".
 
   Does it make sense to change the current calculation of positions,
   and the determination whether to move or not?
@@ -117,3 +113,22 @@ Refuse "wrong" soft limits.
   This does not work for asyn based controllers
   (We need to wait for the callback, and handle the response code)
 
+
+NTM, NTMF and overshoot
+  The documentation about NTM says
+  "how the record processes a new target position while the motor is in motion"
+  The current implementation does not distinguish between
+  a new value for the VAL field and an overshoot of a servo motor
+  (or a mis-configured motor which moves into the wrong direction)
+  Possible solution:
+
+FRAC
+  Used for devices like inchworms, piezo motors.
+  My problem is that the usage of FRAC field does not allow
+  any refactoring.
+  Knowing that
+  a) Modern piezo controllers do the closed loop locally (and don't need)
+  b) The FRAC field is better handled in the driver (and not the record)
+      it makes sense to remove it from the code, but keep it in the record.
+  If really needed, the functionality can be re-added again later.
+  
