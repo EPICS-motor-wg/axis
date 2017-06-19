@@ -2,11 +2,8 @@ The DLY-STOP problem
   When the motor is stopped, while in the DLY phase, the record may hang,
   when the readback position doesn't change and the record is not processed.
   http://www.aps.anl.gov/epics/tech-talk/2015/msg01786.php
-
-  A workaround is needed in each and every driver, one implementation of the suggested
-  workaround is here::
-  https://github.com/EuropeanSpallationSource/MCAG_Base_Project/commit/fc2b65ffbc332fc5808e104349defc9edbef33cc
-  A more generic solution may be nice to have.
+  fixed in commit 4b9e535abcfd3944587b91b082f855e9e00a081f,
+  "Record: motor record DLY and STOP problem"
   
 Synchronization of RBV and VAL at IOC start
   Should be done on startup, but is not always working with
@@ -40,7 +37,6 @@ Homing when sitting on a limit switch.
   Others not.
   Solution:
   setIntegerParam(pC_->motorFlagsHomeOnLs_, 1);
-
 
 Encoder readback was crippled to 32 bit.
   See documentation/FeadbackDataflow.ppt
