@@ -22,7 +22,7 @@ TEMPLATES += axisApp/Db/IcePAP.template
 
 DBDS += axisApp/AxisSrc/axisSupport.dbd
 DBDS += axisApp/AxisSrc/axisRecord.dbd
-DBDS += axisApp/EthercatSrc/EthercatMCController.dbd
+DBDS += axisApp/EthercatSrc/devEthercatMC.dbd
 DBDS += axisApp/IcePAPsrc/IcePAPController.dbd
 
 SUBSTITUTIONS=-none-
