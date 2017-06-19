@@ -17,11 +17,15 @@
 
 <h1 id="Axis-Record-axis">Axis Record (axis)</h1>
 
-<p>...</p>
+<p>The axis Record is a further development of the motor Record. All model 1 drivers have been removed.</p>
 
-<h3 id="Menu-motorDIR">Menu motorDIR</h3>
+<p>For improvements already done, see FixedProblems.txt</p>
 
-<p>User Direction</p>
+<p>Otherwise, see KnownProblems.txt</p>
+
+<h3 id="Menus">Menus</h3>
+
+<p>User Direction:</p>
 
 
 
@@ -36,6 +40,149 @@
 <td class='cell DBD_Menu index'>1</td>
 <td class='cell DBD_Menu identifier'>motorDIR_Neg</td>
 <td class='cell DBD_Menu choice'>Neg</td>
+</tr>
+</table></blockquote>
+
+<p>Set or use the VAL field:</p>
+
+
+
+<blockquote><table border="1"><tr>
+<th>Index</th><th>Identifier</th><th>Choice String</th></tr>
+<tr>
+<td class='cell DBD_Menu index'>0</td>
+<td class='cell DBD_Menu identifier'>motorSET_Use</td>
+<td class='cell DBD_Menu choice'>Use</td>
+</tr>
+<tr>
+<td class='cell DBD_Menu index'>1</td>
+<td class='cell DBD_Menu identifier'>motorSET_Set</td>
+<td class='cell DBD_Menu choice'>Set</td>
+</tr>
+</table></blockquote>
+
+<p>SET=Set set a position from without moving</p>
+
+<p>SET=Use move to the new position</p>
+
+<p>Change or freeze the OFF field:</p>
+
+
+
+<blockquote><table border="1"><tr>
+<th>Index</th><th>Identifier</th><th>Choice String</th></tr>
+<tr>
+<td class='cell DBD_Menu index'>0</td>
+<td class='cell DBD_Menu identifier'>motorFOFF_Variable</td>
+<td class='cell DBD_Menu choice'>Variable</td>
+</tr>
+<tr>
+<td class='cell DBD_Menu index'>1</td>
+<td class='cell DBD_Menu identifier'>motorFOFF_Frozen</td>
+<td class='cell DBD_Menu choice'>Frozen</td>
+</tr>
+</table></blockquote>
+
+<p>When the position is set. SET=Set Freeze the offset when</p>
+
+<p>FOFF = Variable When setting the position, the OFF field is changed</p>
+
+<p>FOFF = Frozen When setting the position, the OFF field stays unchanged and the value is send to the controller.</p>
+
+<p>Ir present, use an external encoder or RDBL Link as read back:</p>
+
+
+
+<blockquote><table border="1"><tr>
+<th>Index</th><th>Identifier</th><th>Choice String</th></tr>
+<tr>
+<td class='cell DBD_Menu index'>0</td>
+<td class='cell DBD_Menu identifier'>motorUEIP_No</td>
+<td class='cell DBD_Menu choice'>No</td>
+</tr>
+<tr>
+<td class='cell DBD_Menu index'>1</td>
+<td class='cell DBD_Menu identifier'>motorUEIP_Yes</td>
+<td class='cell DBD_Menu choice'>Yes</td>
+</tr>
+</table></blockquote>
+
+<p>Retry mode:</p>
+
+
+
+<blockquote><table border="1"><tr>
+<th>Index</th><th>Identifier</th><th>Choice String</th></tr>
+<tr>
+<td class='cell DBD_Menu index'>0</td>
+<td class='cell DBD_Menu identifier'>motorRMOD_D</td>
+<td class='cell DBD_Menu choice'>Default</td>
+</tr>
+<tr>
+<td class='cell DBD_Menu index'>1</td>
+<td class='cell DBD_Menu identifier'>motorRMOD_A</td>
+<td class='cell DBD_Menu choice'>Arithmetic</td>
+</tr>
+<tr>
+<td class='cell DBD_Menu index'>2</td>
+<td class='cell DBD_Menu identifier'>motorRMOD_G</td>
+<td class='cell DBD_Menu choice'>Geometric</td>
+</tr>
+<tr>
+<td class='cell DBD_Menu index'>3</td>
+<td class='cell DBD_Menu identifier'>motorRMOD_I</td>
+<td class='cell DBD_Menu choice'>In-Position</td>
+</tr>
+</table></blockquote>
+
+<p>Stop Pause Move, Go:</p>
+
+
+
+<blockquote><table border="1"><tr>
+<th>Index</th><th>Identifier</th><th>Choice String</th></tr>
+<tr>
+<td class='cell DBD_Menu index'>0</td>
+<td class='cell DBD_Menu identifier'>motorSPMG_Stop</td>
+<td class='cell DBD_Menu choice'>Stop</td>
+</tr>
+<tr>
+<td class='cell DBD_Menu index'>1</td>
+<td class='cell DBD_Menu identifier'>motorSPMG_Pause</td>
+<td class='cell DBD_Menu choice'>Pause</td>
+</tr>
+<tr>
+<td class='cell DBD_Menu index'>2</td>
+<td class='cell DBD_Menu identifier'>motorSPMG_Move</td>
+<td class='cell DBD_Menu choice'>Move</td>
+</tr>
+<tr>
+<td class='cell DBD_Menu index'>3</td>
+<td class='cell DBD_Menu identifier'>motorSPMG_Go</td>
+<td class='cell DBD_Menu choice'>Go</td>
+</tr>
+</table></blockquote>
+
+<p>Status update:</p>
+
+
+
+<blockquote><table border="1"><tr>
+<th>Index</th><th>Identifier</th><th>Choice String</th></tr>
+<tr>
+<td class='cell DBD_Menu index'>0</td>
+<td class='cell DBD_Menu identifier'>motorSTUP_OFF</td>
+<td class='cell DBD_Menu choice'>OFF</td>
+</tr>
+<tr>
+<td class='cell DBD_Menu index'>1</td>
+<td class='cell DBD_Menu identifier'>motorSTUP_ON</td>
+<td class='cell DBD_Menu choice'>ON</td>
+</tr>
+<tr>
+<td class='cell DBD_Menu index'>2</td>
+<td class='cell DBD_Menu identifier'>motorSTUP_BUSY</td>
+<td class='cell DBD_Menu choice'>BUSY</td>
 </tr>
 </table></blockquote>
 
@@ -631,21 +778,21 @@
 
 <p>The motor status as received from the hardware. The MSTA bits are defined as follows:</p>
 
-<pre><code>        DIRECTION: last raw direction; (0:Negative, 1:Positive)
-        DONE: motion is complete.
-        PLUS_LS: plus limit switch has been hit.
-        HOMELS: state of the home limit switch.
-        Unused (or slip/stall enabled)
-        POSITION: closed-loop position control is enabled. (or power on)
-        SLIP_STALL: Slip/Stall detected (eg. fatal following error)
-        HOME: if at home position.
-        PRESENT: encoder is present.
-        PROBLEM: driver stopped polling, or hardware problem
-        MOVING: non-zero velocity present.
-        GAIN_SUPPORT: motor supports closed-loop position control (or supports power on).
-        COMM_ERR: Controller communication error.
-        MINUS_LS: minus limit switch has been hit.
-        HOMED: the motor has been homed.</code></pre>
+<pre><code>        Bit  0: DIRECTION: last raw direction; (0:Negative, 1:Positive)
+        Bit  1: DONE: motion is complete.
+        Bit  2: PLUS_LS: plus limit switch has been hit.
+        Bit  3: HOMELS: state of the home limit switch.
+        Bit  4: Unused (or slip/stall enabled)
+        Bit  5: POSITION: closed-loop position control is enabled. (or power on)
+        Bit  6: SLIP_STALL: Slip/Stall detected (eg. fatal following error)
+        Bit  7: HOME: if at home position.
+        Bit  8: PRESENT: encoder is present.
+        Bit  9: PROBLEM: driver stopped polling, or hardware problem
+        Bit 10: MOVING: non-zero velocity present.
+        Bit 11: GAIN_SUPPORT: motor supports closed-loop position control (or supports power on).
+        Bit 12: COMM_ERR: Controller communication error.
+        Bit 13: MINUS_LS: minus limit switch has been hit.
+        Bit 14: HOMED: the motor has been homed.</code></pre>
 
 <p>The record is put into MAJOR STATE alarm if either SLIP_STALL or PROBLEM bits are detected. If HLSV is set, then the record is put into HIGH alarm if either a high soft limit or hard limit (PLUS_LS) has been reached. Similary for the low limits.</p>
 
@@ -659,8 +806,8 @@
 
 <p>The motor flags as received from the hardware. The MFLG bits are defined as follows:</p>
 
-<pre><code>        MF_HOME_ON_LS: Homing on LS towards LS allowed (e.g. HOMF when HLS)
-        MF_STOP_PROB:  Stop the axis when RA_PROBLEM is set</code></pre>
+<pre><code>        Bit 0: MF_HOME_ON_LS: Homing on LS towards LS allowed (e.g. HOMF when HLS)
+        Bit 1: MF_STOP_PROB:  Stop the axis when RA_PROBLEM is set</code></pre>
 
 
 
@@ -846,7 +993,7 @@
 </tr>
 <tr><td class="cell">INIT</td><td class="cell">Startup commands</td><td class="cell">STRING [40]</td><td class="cell">Yes</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">No</td></tr><tr><td class="cell">PREM</td><td class="cell">Pre-move commands</td><td class="cell">STRING [40]</td><td class="cell">Yes</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">No</td></tr><tr><td class="cell">POST</td><td class="cell">Post-move commands</td><td class="cell">STRING [40]</td><td class="cell">Yes</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">No</td></tr></table></blockquote>
 
-<p>None of INIT, PREM or POST is currently supported.</p>
+<p>None of INIT, PREM or POST is currently supported, probably because no model 3 driver seams to need it.</p>
 
 
 

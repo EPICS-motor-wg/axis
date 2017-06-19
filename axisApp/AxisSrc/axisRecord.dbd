@@ -34,10 +34,6 @@ menu(motorSET) {
         choice(motorSET_Use,"Use")
         choice(motorSET_Set,"Set")
 }
-menu(motorMODE) {
-        choice(motorMODE_Position,"Position")
-        choice(motorMODE_Velocity,"Velocity")
-}
 menu(motorUEIP) {
         choice(motorUEIP_No,"No")
         choice(motorUEIP_Yes,"Yes")
@@ -283,7 +279,7 @@ recordtype(axis) {
                 menu(motorUEIP)
         }
         field(URIP,DBF_MENU) {
-                prompt("Use RDBL Link If Presen")
+                prompt("Use RDBL Link If Present")
                 promptgroup(GUI_COMMON)
                 special(SPC_MOD)
                 pp(TRUE)

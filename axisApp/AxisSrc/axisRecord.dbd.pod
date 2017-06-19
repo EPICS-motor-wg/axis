@@ -23,13 +23,53 @@
 
 =title Axis Record (axis)
 
-...
+The axis Record is a further development of the motor Record.
+All model 1 drivers have been removed.
 
-=head3 Menu motorDIR
+For improvements already done, see FixedProblems.txt
 
-User Direction
+Otherwise, see KnownProblems.txt
+
+
+=head3 Menus
+
+User Direction:
 
 =menu motorDIR
+
+Set or use the VAL field:
+
+=menu motorSET
+
+SET=Set set a position from without moving 
+
+SET=Use move to the new position 
+
+Change or freeze the OFF field:
+
+=menu motorFOFF
+
+When the position is set. SET=Set Freeze the offset when 
+
+FOFF = Variable When setting the position, the OFF field is changed
+
+FOFF = Frozen   When setting the position, the OFF field stays unchanged and the value is send to the controller.
+
+Ir present, use an external encoder or RDBL Link as read back:
+
+=menu motorUEIP
+
+Retry mode:
+
+=menu motorRMOD
+
+Stop Pause Move, Go:
+
+=menu motorSPMG
+
+Status update:
+
+=menu motorSTUP
 
 =head2 Parameter Fields
 
@@ -52,10 +92,6 @@ menu(motorDIR) {
 menu(motorSET) {
         choice(motorSET_Use,"Use")
         choice(motorSET_Set,"Set")
-}
-menu(motorMODE) {
-        choice(motorMODE_Position,"Position")
-        choice(motorMODE_Velocity,"Velocity")
 }
 menu(motorUEIP) {
         choice(motorUEIP_No,"No")
@@ -302,7 +338,7 @@ recordtype(axis) {
                 menu(motorUEIP)
         }
         field(URIP,DBF_MENU) {
-                prompt("Use RDBL Link If Presen")
+                prompt("Use RDBL Link If Present")
                 promptgroup(GUI_COMMON)
                 special(SPC_MOD)
                 pp(TRUE)
@@ -925,21 +961,21 @@ is always zero.
 
 The motor status as received from the hardware.  The MSTA bits are defined as follows:
 
-        DIRECTION: last raw direction; (0:Negative, 1:Positive)
-        DONE: motion is complete.
-        PLUS_LS: plus limit switch has been hit.
-        HOMELS: state of the home limit switch.
-        Unused (or slip/stall enabled)
-        POSITION: closed-loop position control is enabled. (or power on)
-        SLIP_STALL: Slip/Stall detected (eg. fatal following error)
-        HOME: if at home position.
-        PRESENT: encoder is present.
-        PROBLEM: driver stopped polling, or hardware problem
-        MOVING: non-zero velocity present.
-        GAIN_SUPPORT: motor supports closed-loop position control (or supports power on).
-        COMM_ERR: Controller communication error.
-        MINUS_LS: minus limit switch has been hit.
-        HOMED: the motor has been homed.
+        Bit  0: DIRECTION: last raw direction; (0:Negative, 1:Positive)
+        Bit  1: DONE: motion is complete.
+        Bit  2: PLUS_LS: plus limit switch has been hit.
+        Bit  3: HOMELS: state of the home limit switch.
+        Bit  4: Unused (or slip/stall enabled)
+        Bit  5: POSITION: closed-loop position control is enabled. (or power on)
+        Bit  6: SLIP_STALL: Slip/Stall detected (eg. fatal following error)
+        Bit  7: HOME: if at home position.
+        Bit  8: PRESENT: encoder is present.
+        Bit  9: PROBLEM: driver stopped polling, or hardware problem
+        Bit 10: MOVING: non-zero velocity present.
+        Bit 11: GAIN_SUPPORT: motor supports closed-loop position control (or supports power on).
+        Bit 12: COMM_ERR: Controller communication error.
+        Bit 13: MINUS_LS: minus limit switch has been hit.
+        Bit 14: HOMED: the motor has been homed.
 
 The record is put into MAJOR STATE alarm if either SLIP_STALL or PROBLEM bits are detected. If HLSV is set, then the record is put into HIGH alarm if either a high soft limit or hard limit (PLUS_LS) has been reached. Similary for the low limits. 
 
@@ -949,8 +985,8 @@ The record is put into MAJOR STATE alarm if either SLIP_STALL or PROBLEM bits ar
 
 The motor flags as received from the hardware.  The MFLG bits are defined as follows:
 
-        MF_HOME_ON_LS: Homing on LS towards LS allowed (e.g. HOMF when HLS)
-        MF_STOP_PROB:  Stop the axis when RA_PROBLEM is set
+        Bit 0: MF_HOME_ON_LS: Homing on LS towards LS allowed (e.g. HOMF when HLS)
+        Bit 1: MF_STOP_PROB:  Stop the axis when RA_PROBLEM is set
 
 =cut
 
@@ -1083,7 +1119,7 @@ For VME based devices (i.e., OMS VME8/44, OMS VME58 and V544) this is the VME ca
 
 =fields INIT, PREM, POST
 
-None of INIT, PREM or POST is currently supported.
+None of INIT, PREM or POST is currently supported, probably because no model 3 driver seams to need it.
 
 =cut
 
