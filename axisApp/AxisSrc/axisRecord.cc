@@ -914,24 +914,29 @@ static void devSupSetEncRatio(axisRecord *pmr, double ep_mp[2])
 /*****************************************************************************
   High level functions which are used by the state machine
 *****************************************************************************/
-static void doBackLashAfterMove(axisRecord *pmr)
+static void doBackLash(axisRecord *pmr)
 {
     /* Use if encoder or ReadbackLink is in use. */
     bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
 
+    /* Restore DMOV to false and UNMARK it so it is not posted. */
+    pmr->dmov = FALSE;
+    UNMARK(M_DMOV);
+    
     if (pmr->mip & MIP_JOG_STOP)
     {
         double acc = (pmr->velo - pmr->vbas) / pmr->accl;
-        double relbpos = (pmr->dval - pmr->bdst) - pmr->drbv;
-        double bpos = (pmr->dval - pmr->bdst);
         if (use_rel == true)
-            devSupMoveRelDial(pmr, pmr->velo, pmr->vbas, acc, relbpos);
+            devSupMoveRelDial(pmr, pmr->velo, pmr->vbas, acc,
+                              pmr->dval - pmr->bdst - pmr->drbv);
         else
-            devSupMoveAbsDial(pmr, pmr->velo, pmr->vbas, acc, bpos);
+            devSupMoveAbsDial(pmr, pmr->velo, pmr->vbas, acc,
+                              pmr->dval - pmr->bdst);
         pmr->mip = MIP_JOG_BL1;
     }
-    else
+    else if(pmr->mip & MIP_MOVE)
     {
+        /* First part of move done. Do backlash correction. */
         double bacc = (pmr->bvel - pmr->vbas) / pmr->bacc;
         if (use_rel == true)
         {
@@ -944,34 +949,23 @@ static void doBackLashAfterMove(axisRecord *pmr)
         }
         pmr->mip = MIP_MOVE_BL;
     }
-    pmr->cdir = (pmr->diff < 0.0) ? 0 : 1;
-}
-/*****************************************************************************/
-static void doBackLashAfterJog(axisRecord *pmr)
-{
-    /* First part of jog done. Do backlash correction. */
-
-    double bacc = (pmr->bvel - pmr->vbas) / pmr->bacc;
-
-    /* Use if encoder or ReadbackLink is in use. */
-    bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
-
-    /* Restore DMOV to false and UNMARK it so it is not posted. */
-    pmr->dmov = FALSE;
-    UNMARK(M_DMOV);
-
-    if (use_rel == true)
+    else if (pmr->mip & MIP_JOG_BL1)
     {
-        double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv);
-        devSupMoveRelDial(pmr, pmr->bvel, pmr->vbas, bacc, pmr->diff - relbpos);
+        /* First part of jog done. Do backlash correction. */
+        double bacc = (pmr->bvel - pmr->vbas) / pmr->bacc;
+        if (use_rel == true)
+        {
+            devSupMoveRelDial(pmr, pmr->bvel, pmr->vbas, bacc, pmr->bdst);
+        }
+        else
+        {
+            pmr->rval = NINT(pmr->dval);
+            devSupMoveAbsDial(pmr, pmr->bvel, pmr->vbas, bacc, pmr->dval);
+        }
+        pmr->mip = MIP_JOG_BL2;
     }
-    else
-    {
-        double bpos = pmr->dval - pmr->bdst;
-        double newpos = bpos + (pmr->dval - bpos);
-        pmr->rval = NINT(newpos);
-        devSupMoveAbsDial(pmr, pmr->bvel, pmr->vbas, bacc, newpos);
-    }
+    pmr->pp = TRUE;
+
     pmr->cdir = (pmr->diff < 0.0) ? 0 : 1;
 }
 
@@ -1083,21 +1077,14 @@ static long postProcess(axisRecord * pmr)
     {
         if (fabs(pmr->bdst) >=  fabs(pmr->mres))
         {
-            /* Restore DMOV to false and UNMARK it so it is not posted. */
-            pmr->dmov = FALSE;
-            UNMARK(M_DMOV);
-            /* First part of move done. Do backlash correction. */
-            doBackLashAfterMove(pmr);
-            pmr->pp = TRUE;
+            doBackLash(pmr);
         }
         pmr->mip &= ~MIP_JOG_STOP;
         pmr->mip &= ~MIP_MOVE;
     }
     else if (pmr->mip & MIP_JOG_BL1)
     {
-        doBackLashAfterJog(pmr);
-        pmr->mip = MIP_JOG_BL2;
-        pmr->pp = TRUE;
+        doBackLash(pmr);
     }
     /* Save old values for next call. */
     pmr->lval = pmr->val;
