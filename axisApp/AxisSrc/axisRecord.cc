@@ -1570,6 +1570,103 @@ process_exit:
 }
 
 
+/*************************************************************************/
+static int homing_wanted_and_allowed(axisRecord *pmr)
+{
+    int ret = 0;
+    if (pmr->homf && !(pmr->mip & MIP_HOMF)) {
+        ret = 1;
+        if (pmr->mflg & MF_HOME_ON_LS)
+           ; /* controller reported handle this fine */
+        else if ((pmr->dir == motorDIR_Pos) ? pmr->hls : pmr->lls)
+            ret = 0; /* sitting on the directed limit switch */
+    }
+    if (pmr->homr && !(pmr->mip & MIP_HOMR)) {
+        ret = 1;
+        if (pmr->mflg & MF_HOME_ON_LS)
+           ; /* controller reported handle this fine */
+        else if ((pmr->dir == motorDIR_Pos) ? pmr->lls : pmr->hls)
+            ret = 0; /* sitting on the directed limit switch */
+    }
+    return ret;
+}
+
+
+/*************************************************************************/
+static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
+                          double relpos, double relbpos, double currpos, double newpos)
+{
+    double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
+    double vbase = pmr->vbas / fabs(pmr->mres); /* base speed      */
+    double vel = pmr->velo / fabs(pmr->mres);   /* normal speed    */
+    double acc = (vel - vbase) / pmr->accl;     /* normal accel.   */
+    double bvel = pmr->bvel / fabs(pmr->mres);  /* backlash speed  */
+    double bacc = (bvel - vbase) / pmr->bacc;   /* backlash accel. */
+    double rbdst1 = 1.0 + (fabs(pmr->bdst) / fabs(pmr->mres));
+    double velocity, position, accel;
+
+    /* AJF fix for the bug where the retry count is not incremented when doing retries */
+    /* This bug is seen when we use the readback link field                            */
+    pmr->mip |= MIP_MOVE;
+    MARK(M_MIP);
+    /* v1.96 Don't post dmov if special already did. */
+    if (pmr->dmov)
+    {
+        pmr->dmov = FALSE;
+        MARK(M_DMOV);
+    }
+    pmr->ldvl = pmr->dval;
+    pmr->lval = pmr->val;
+    pmr->lrvl = pmr->rval;
+
+    /* Backlash disabled, OR, no need for seperate backlash move
+     * since move is in preferred direction (preferred_dir==ON),
+     * AND, backlash acceleration and velocity are the same as slew values
+     * (BVEL == VELO, AND, BACC == ACCL). */
+    if ((fabs(pmr->bdst) <  fabs(pmr->mres)) ||
+        (preferred_dir == true && pmr->bvel == pmr->velo &&
+         pmr->bacc == pmr->accl))
+    {
+        velocity = vel;
+        accel = acc;
+        if (use_rel == true)
+            position = relpos;
+        else
+            position = newpos;
+    }
+    /* IF move is in preferred direction, AND, current position is within backlash range. */
+    else if ((preferred_dir == true) &&
+             ((use_rel == true  && relbpos <= 1.0) ||
+              (use_rel == false && (fabs(newpos - currpos) <= rbdst1))
+             )
+            )
+    {
+        velocity = bvel;
+        accel = bacc;
+        if (use_rel == true)
+            position = relpos;
+        else
+            position = newpos;
+    }
+    else
+    {
+        velocity = vel;
+        accel = acc;
+        if (use_rel == true)
+            position = relbpos;
+        else
+            position = bpos;
+        pmr->pp = TRUE;              /* do backlash from posprocess(). */
+    }
+
+    pmr->cdir = (pmr->rdif < 0.0) ? 0 : 1;
+    if (use_rel == true)
+        devSupMoveRelRaw(pmr, velocity, vbase, accel, position);
+    else
+        devSupMoveAbsRaw(pmr, velocity, vbase, accel, position);
+
+}
+
 /******************************************************************************
         do_work()
 Here, we do the real work of processing the motor record.
@@ -1847,101 +1944,6 @@ LOGIC:
     
     
 ******************************************************************************/
-static int homing_wanted_and_allowed(axisRecord *pmr)
-{
-    int ret = 0;
-    if (pmr->homf && !(pmr->mip & MIP_HOMF)) {
-        ret = 1;
-        if (pmr->mflg & MF_HOME_ON_LS)
-           ; /* controller reported handle this fine */
-        else if ((pmr->dir == motorDIR_Pos) ? pmr->hls : pmr->lls)
-            ret = 0; /* sitting on the directed limit switch */
-    }
-    if (pmr->homr && !(pmr->mip & MIP_HOMR)) {
-        ret = 1;
-        if (pmr->mflg & MF_HOME_ON_LS)
-           ; /* controller reported handle this fine */
-        else if ((pmr->dir == motorDIR_Pos) ? pmr->lls : pmr->hls)
-            ret = 0; /* sitting on the directed limit switch */
-    }
-    return ret;
-}
-
-
-static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
-                          double relpos, double relbpos, double currpos, double newpos)
-{
-    double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
-    double vbase = pmr->vbas / fabs(pmr->mres); /* base speed      */
-    double vel = pmr->velo / fabs(pmr->mres);   /* normal speed    */
-    double acc = (vel - vbase) / pmr->accl;     /* normal accel.   */
-    double bvel = pmr->bvel / fabs(pmr->mres);  /* backlash speed  */
-    double bacc = (bvel - vbase) / pmr->bacc;   /* backlash accel. */
-    double rbdst1 = 1.0 + (fabs(pmr->bdst) / fabs(pmr->mres));
-    double velocity, position, accel;
-
-    /* AJF fix for the bug where the retry count is not incremented when doing retries */
-    /* This bug is seen when we use the readback link field                            */
-    pmr->mip |= MIP_MOVE;
-    MARK(M_MIP);
-    /* v1.96 Don't post dmov if special already did. */
-    if (pmr->dmov)
-    {
-        pmr->dmov = FALSE;
-        MARK(M_DMOV);
-    }
-    pmr->ldvl = pmr->dval;
-    pmr->lval = pmr->val;
-    pmr->lrvl = pmr->rval;
-
-    /* Backlash disabled, OR, no need for seperate backlash move
-     * since move is in preferred direction (preferred_dir==ON),
-     * AND, backlash acceleration and velocity are the same as slew values
-     * (BVEL == VELO, AND, BACC == ACCL). */
-    if ((fabs(pmr->bdst) <  fabs(pmr->mres)) ||
-        (preferred_dir == true && pmr->bvel == pmr->velo &&
-         pmr->bacc == pmr->accl))
-    {
-        velocity = vel;
-        accel = acc;
-        if (use_rel == true)
-            position = relpos;
-        else
-            position = newpos;
-    }
-    /* IF move is in preferred direction, AND, current position is within backlash range. */
-    else if ((preferred_dir == true) &&
-             ((use_rel == true  && relbpos <= 1.0) ||
-              (use_rel == false && (fabs(newpos - currpos) <= rbdst1))
-             )
-            )
-    {
-        velocity = bvel;
-        accel = bacc;
-        if (use_rel == true)
-            position = relpos;
-        else
-            position = newpos;
-    }
-    else
-    {
-        velocity = vel;
-        accel = acc;
-        if (use_rel == true)
-            position = relbpos;
-        else
-            position = bpos;
-        pmr->pp = TRUE;              /* do backlash from posprocess(). */
-    }
-
-    pmr->cdir = (pmr->rdif < 0.0) ? 0 : 1;
-    if (use_rel == true)
-        devSupMoveRelRaw(pmr, velocity, vbase, accel, position);
-    else
-        devSupMoveAbsRaw(pmr, velocity, vbase, accel, position);
-
-}
-/*************************************************************************/
 
 static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
 {
