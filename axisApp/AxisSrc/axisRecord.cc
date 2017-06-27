@@ -916,16 +916,14 @@ static void devSupSetEncRatio(axisRecord *pmr, double ep_mp[2])
 *****************************************************************************/
 static void doBackLashAfterMove(axisRecord *pmr)
 {
-    double bpos = (pmr->dval - pmr->bdst);
-
     /* Use if encoder or ReadbackLink is in use. */
     bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
-    double relpos = pmr->diff;
-    double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv);
 
     if (pmr->mip & MIP_JOG_STOP)
     {
         double acc = (pmr->velo - pmr->vbas) / pmr->accl;
+        double relbpos = (pmr->dval - pmr->bdst) - pmr->drbv;
+        double bpos = (pmr->dval - pmr->bdst);
         if (use_rel == true)
             devSupMoveRelDial(pmr, pmr->velo, pmr->vbas, acc, relbpos);
         else
@@ -935,22 +933,18 @@ static void doBackLashAfterMove(axisRecord *pmr)
     else
     {
         double bacc = (pmr->bvel - pmr->vbas) / pmr->bacc;
-
         if (use_rel == true)
         {
-            relpos = relpos * pmr->frac;
-            devSupMoveRelDial(pmr, pmr->bvel, pmr->vbas, bacc, relpos);
+            devSupMoveRelDial(pmr, pmr->bvel, pmr->vbas, bacc, pmr->diff);
         }
         else
         {
-            double currpos = pmr->dval;
-            double newpos = bpos + pmr->frac * (currpos - bpos);
-            pmr->rval = NINT(newpos);
-            devSupMoveAbsDial(pmr, pmr->bvel, pmr->vbas, bacc, newpos);
+            pmr->rval = NINT(pmr->dval);
+            devSupMoveAbsDial(pmr, pmr->bvel, pmr->vbas, bacc, pmr->dval);
         }
         pmr->mip = MIP_MOVE_BL;
     }
-    pmr->cdir = (relpos < 0.0) ? 0 : 1;
+    pmr->cdir = (pmr->diff < 0.0) ? 0 : 1;
 }
 /*****************************************************************************/
 static void doBackLashAfterJog(axisRecord *pmr)
@@ -961,7 +955,6 @@ static void doBackLashAfterJog(axisRecord *pmr)
 
     /* Use if encoder or ReadbackLink is in use. */
     bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
-    double relpos = pmr->diff;
 
     /* Restore DMOV to false and UNMARK it so it is not posted. */
     pmr->dmov = FALSE;
@@ -970,17 +963,16 @@ static void doBackLashAfterJog(axisRecord *pmr)
     if (use_rel == true)
     {
         double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv);
-        relpos = (relpos - relbpos) * pmr->frac;
-        devSupMoveRelDial(pmr, pmr->bvel, pmr->vbas, bacc, relpos);
+        devSupMoveRelDial(pmr, pmr->bvel, pmr->vbas, bacc, pmr->diff - relbpos);
     }
     else
     {
         double bpos = pmr->dval - pmr->bdst;
-        double newpos = bpos + pmr->frac * (pmr->dval - bpos);
+        double newpos = bpos + (pmr->dval - bpos);
         pmr->rval = NINT(newpos);
         devSupMoveAbsDial(pmr, pmr->bvel, pmr->vbas, bacc, newpos);
     }
-    pmr->cdir = (relpos < 0.0) ? 0 : 1;
+    pmr->cdir = (pmr->diff < 0.0) ? 0 : 1;
 }
 
 /*****************************************************************************/
@@ -1926,9 +1918,9 @@ static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
         velocity = vel;
         accel = acc;
         if (use_rel == true)
-            position = relpos * pmr->frac;
+            position = relpos;
         else
-            position = currpos + pmr->frac * (newpos - currpos);
+            position = newpos;
     }
     /* IF move is in preferred direction, AND, current position is within backlash range. */
     else if ((preferred_dir == true) &&
@@ -1937,23 +1929,12 @@ static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
              )
             )
     {
-/******************************************************************************
- * Backlash correction imposes a much larger penalty on overshoot than on
- * undershoot. Here, we allow user to specify (by .frac) the fraction of the
- * backlash distance to move as a first approximation. When the motor stops and
- * we're not yet at 'newpos', the callback will give us another chance, and
- * we'll go .frac of the remaining distance, and so on. This algorithm is
- * essential when the drive creeps after a move (e.g., piezo inchworm), and
- * helpful when the readback device has a latency problem (e.g., interpolated
- * encoder), or is a little nonlinear. (Blatantly nonlinear readback is not
- * handled by the motor record.)
- *****************************************************************************/
         velocity = bvel;
         accel = bacc;
         if (use_rel == true)
-            position = relpos * pmr->frac;
+            position = relpos;
         else
-            position = currpos + pmr->frac * (newpos - currpos);
+            position = newpos;
     }
     else
     {
