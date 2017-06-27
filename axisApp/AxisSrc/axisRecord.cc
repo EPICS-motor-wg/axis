@@ -1719,6 +1719,167 @@ static void newMRES_ERES_UEIP(axisRecord *pmr)
 
 }
 
+/**********************************************************************/
+static RTN_STATUS doDVALchangedOrNOTdoneMoving(axisRecord *pmr)
+{
+    int dir_positive = (pmr->dir == motorDIR_Pos);
+    int dir = dir_positive ? 1 : -1;
+    int old_lvio = pmr->lvio;
+    /** Calc new raw position, and do a (backlash-corrected?) move. **/
+    double rbvpos = pmr->drbv / pmr->mres;      /* where motor is  */
+    double currpos = pmr->ldvl / pmr->mres;     /* where we are    */
+    double newpos = pmr->dval / pmr->mres;      /* where to go     */
+    /*
+     * 'bpos' is one backlash distance away from 'newpos'.
+     */
+    bool use_rel, preferred_dir, too_small;
+    double relpos = pmr->diff / pmr->mres;
+    double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
+    long rdbdpos = NINT(pmr->rdbd / fabs(pmr->mres)); /* retry deadband steps */
+    long absdiff = labs(NINT(rbvpos)- NINT(newpos));
+
+    /*** Use if encoder or ReadbackLink is in use. ***/
+    if (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip))
+        use_rel = true;
+    else
+        use_rel = false;
+
+    /*
+     * Post new values, recalc .val to reflect the change in .dval. (We
+     * no longer know the origin of the .dval change.  If user changed
+     * .val, we're ok as we are, but if .dval was changed directly, we
+     * must make .val agree.)
+     */
+    pmr->val = pmr->dval * dir + pmr->off;
+    if (pmr->val != pmr->lval)
+        MARK(M_VAL);
+    pmr->rval = NINT(pmr->dval / pmr->mres);
+    if (pmr->rval != pmr->lrvl)
+        MARK(M_RVAL);
+
+    /* Don't move if we're within retry deadband. */
+
+    too_small = false;
+    if ((pmr->mip & MIP_RETRY) == 0)
+    {
+        if (absdiff < 1)
+            too_small = true;
+    }
+    else if (absdiff < rdbdpos)
+        too_small = true;
+
+    if (too_small == true)
+    {
+        if (pmr->dmov == FALSE && (pmr->mip == MIP_DONE || pmr->mip == MIP_RETRY))
+        {
+            pmr->dmov = TRUE;
+            MARK(M_DMOV);
+            if (pmr->mip != MIP_DONE)
+            {
+                pmr->mip = MIP_DONE;
+                MARK(M_MIP);
+            }
+        }
+        /* Update previous target positions. */
+        pmr->ldvl = pmr->dval;
+        pmr->lval = pmr->val;
+        pmr->lrvl = pmr->rval;
+        return(OK);
+    }
+
+    /* reset retry counter if this is not a retry */
+    if ((pmr->mip & MIP_RETRY) == 0)
+    {
+        if (pmr->rcnt != 0)
+            MARK(M_RCNT);
+        pmr->rcnt = 0;
+    }
+    else if (pmr->rmod == motorRMOD_A) /* Do arthmetic sequence retries. */
+    {
+        double factor = (pmr->rtry - pmr->rcnt + 1.0) / pmr->rtry;
+        
+        relpos *= factor;
+        if (fabs(relpos) < 1.0)
+            relpos = (relpos > 0.0) ? 1.0 : -1.0;
+        
+        relbpos *= factor;
+        if (fabs(relbpos) < 1.0)
+            relbpos = (relbpos > 0.0) ? 1.0 : -1.0;
+    }
+    else if (pmr->rmod == motorRMOD_G) /* Do geometric sequence retries. */
+    {
+        double factor;
+
+        factor = 1 / pow(2.0, (pmr->rcnt - 1));
+
+        relpos *= factor;
+        if (fabs(relpos) < 1.0)
+            relpos = (relpos > 0.0) ? 1.0 : -1.0;
+        
+        relbpos *= factor;
+        if (fabs(relbpos) < 1.0)
+            relbpos = (relbpos > 0.0) ? 1.0 : -1.0;
+    }
+    else if (pmr->rmod == motorRMOD_I) /* DC motor like In-position retries. */
+        return(OK);
+    else if (pmr->rmod == motorRMOD_D) /* Do default, linear, retries. */
+        ;
+    else
+        errPrintf(-1, __FILE__, __LINE__, "Invalid RMOD field value: = %d", pmr->rmod);
+
+    if (((use_rel == false) && ((pmr->dval > pmr->ldvl) == (pmr->bdst > 0))) ||
+        ((use_rel == true)  && ((pmr->diff > 0)         == (pmr->bdst > 0))))
+        preferred_dir = true;
+    else
+        preferred_dir = false;
+
+    /* Check for soft-travel limit violation */
+    if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
+        pmr->lvio = false;
+    /* LVIO = TRUE, AND, Move request towards valid travel limit range. */
+    else if (((pmr->dval > pmr->dhlm) && (pmr->dval < pmr->ldvl)) ||
+             ((pmr->dval < pmr->dllm) && (pmr->dval > pmr->ldvl)))
+        pmr->lvio = false;
+    else
+    {
+        if (preferred_dir == true)
+            pmr->lvio = ((pmr->dval > pmr->dhlm) || (pmr->dval < pmr->dllm));
+        else
+        {
+            double bdstpos = pmr->dval - pmr->bdst;
+            pmr->lvio = ((bdstpos > pmr->dhlm) || (bdstpos < pmr->dllm));
+        }
+    }
+
+    if (pmr->lvio != old_lvio)
+        MARK(M_LVIO);
+    if (pmr->lvio)
+    {
+        pmr->val = pmr->lval;
+        MARK(M_VAL);
+        pmr->dval = pmr->ldvl;
+        MARK(M_DVAL);
+        pmr->rval = pmr->lrvl;
+        MARK(M_RVAL);
+        if ((pmr->mip & MIP_RETRY) != 0)
+        {
+            pmr->mip = MIP_DONE;
+            MARK(M_MIP);
+        }
+        if (pmr->mip == MIP_DONE && pmr->dmov == FALSE)
+        {
+            pmr->dmov = TRUE;
+            MARK(M_DMOV);
+        }
+        return(OK);
+    }
+
+    if (pmr->mip == MIP_DONE || pmr->mip == MIP_RETRY)
+        doRetryOrDone(pmr, use_rel, preferred_dir, relpos, relbpos, currpos, newpos);
+
+    return(OK);
+}
+
 /******************************************************************************
         do_work()
 Here, we do the real work of processing the motor record.
@@ -2001,10 +2162,8 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
 {
     int dir_positive = (pmr->dir == motorDIR_Pos);
     int dir = dir_positive ? 1 : -1;
-    int set = pmr->set;
     bool stop_or_pause = (pmr->spmg == motorSPMG_Stop ||
                              pmr->spmg == motorSPMG_Pause) ? true : false;
-    int old_lvio = pmr->lvio;
     mmap_field mmap_bits;
 
     Debug(3, "do_work: begin\n");
@@ -2295,7 +2454,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
     if (pmr->val != pmr->lval)
     {
         MARK(M_VAL);
-        if (set && !pmr->foff)
+        if (pmr->set && !pmr->foff)
         {
             /*
              * Act directly on .val. and return. User wants to redefine .val
@@ -2331,12 +2490,10 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
     /* IF DVAL field has changed, OR, NOT done moving. */
     if (pmr->dval != pmr->ldvl || !pmr->dmov)
     {
-        epicsFloat64 localDiff;
-
+        epicsFloat64 localDiff = pmr->dval - pmr->drbv;
         if (pmr->dval != pmr->ldvl)
             MARK(M_DVAL);
 
-        localDiff = pmr->dval - pmr->drbv;
         if (pmr->diff != localDiff)
         {
             pmr->diff = localDiff;
@@ -2345,167 +2502,14 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
 
         pmr->rdif = NINT(pmr->diff / pmr->mres);
         MARK(M_RDIF);
-        if (set)
+        if (pmr->set)
         {
             if ((pmr->mip & MIP_LOAD_P) == 0) /* Test for LOAD_POS completion. */
                 load_pos(pmr);
             /* device support will call us back when load is done. */
             return(OK);
         }
-        else
-        {
-            /** Calc new raw position, and do a (backlash-corrected?) move. **/
-            double rbvpos = pmr->drbv / pmr->mres;      /* where motor is  */
-            double currpos = pmr->ldvl / pmr->mres;     /* where we are    */
-            double newpos = pmr->dval / pmr->mres;      /* where to go     */
-            /*
-             * 'bpos' is one backlash distance away from 'newpos'.
-             */
-            bool use_rel, preferred_dir, too_small;
-            double relpos = pmr->diff / pmr->mres;
-            double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
-            long rdbdpos = NINT(pmr->rdbd / fabs(pmr->mres)); /* retry deadband steps */
-            long absdiff = labs(NINT(rbvpos)- NINT(newpos));
-
-            /*** Use if encoder or ReadbackLink is in use. ***/
-            if (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip))
-                use_rel = true;
-            else
-                use_rel = false;
-
-            /*
-             * Post new values, recalc .val to reflect the change in .dval. (We
-             * no longer know the origin of the .dval change.  If user changed
-             * .val, we're ok as we are, but if .dval was changed directly, we
-             * must make .val agree.)
-             */
-            pmr->val = pmr->dval * dir + pmr->off;
-            if (pmr->val != pmr->lval)
-                MARK(M_VAL);
-            pmr->rval = NINT(pmr->dval / pmr->mres);
-            if (pmr->rval != pmr->lrvl)
-                MARK(M_RVAL);
-
-            /* Don't move if we're within retry deadband. */
-
-            too_small = false;
-            if ((pmr->mip & MIP_RETRY) == 0)
-            {
-                if (absdiff < 1)
-                    too_small = true;
-            }
-            else if (absdiff < rdbdpos)
-                too_small = true;
-
-            if (too_small == true)
-            {
-                if (pmr->dmov == FALSE && (pmr->mip == MIP_DONE || pmr->mip == MIP_RETRY))
-                {
-                    pmr->dmov = TRUE;
-                    MARK(M_DMOV);
-                    if (pmr->mip != MIP_DONE)
-                    {
-                        pmr->mip = MIP_DONE;
-                        MARK(M_MIP);
-                    }
-                }
-                /* Update previous target positions. */
-                pmr->ldvl = pmr->dval;
-                pmr->lval = pmr->val;
-                pmr->lrvl = pmr->rval;
-                return(OK);
-            }
-
-            /* reset retry counter if this is not a retry */
-            if ((pmr->mip & MIP_RETRY) == 0)
-            {
-                if (pmr->rcnt != 0)
-                    MARK(M_RCNT);
-                pmr->rcnt = 0;
-            }
-            else if (pmr->rmod == motorRMOD_A) /* Do arthmetic sequence retries. */
-            {
-                double factor = (pmr->rtry - pmr->rcnt + 1.0) / pmr->rtry;
-                
-                relpos *= factor;
-                if (fabs(relpos) < 1.0)
-                    relpos = (relpos > 0.0) ? 1.0 : -1.0;
-                
-                relbpos *= factor;
-                if (fabs(relbpos) < 1.0)
-                    relbpos = (relbpos > 0.0) ? 1.0 : -1.0;
-            }
-            else if (pmr->rmod == motorRMOD_G) /* Do geometric sequence retries. */
-            {
-                double factor;
-
-                factor = 1 / pow(2.0, (pmr->rcnt - 1));
-
-                relpos *= factor;
-                if (fabs(relpos) < 1.0)
-                    relpos = (relpos > 0.0) ? 1.0 : -1.0;
-                
-                relbpos *= factor;
-                if (fabs(relbpos) < 1.0)
-                    relbpos = (relbpos > 0.0) ? 1.0 : -1.0;
-            }
-            else if (pmr->rmod == motorRMOD_I) /* DC motor like In-position retries. */
-                return(OK);
-            else if (pmr->rmod == motorRMOD_D) /* Do default, linear, retries. */
-                ;
-            else
-                errPrintf(-1, __FILE__, __LINE__, "Invalid RMOD field value: = %d", pmr->rmod);
-
-            if (((use_rel == false) && ((pmr->dval > pmr->ldvl) == (pmr->bdst > 0))) ||
-                ((use_rel == true)  && ((pmr->diff > 0)         == (pmr->bdst > 0))))
-                preferred_dir = true;
-            else
-                preferred_dir = false;
-
-            /* Check for soft-travel limit violation */
-            if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
-                pmr->lvio = false;
-            /* LVIO = TRUE, AND, Move request towards valid travel limit range. */
-            else if (((pmr->dval > pmr->dhlm) && (pmr->dval < pmr->ldvl)) ||
-                     ((pmr->dval < pmr->dllm) && (pmr->dval > pmr->ldvl)))
-                pmr->lvio = false;
-            else
-            {
-                if (preferred_dir == true)
-                    pmr->lvio = ((pmr->dval > pmr->dhlm) || (pmr->dval < pmr->dllm));
-                else
-                {
-                    double bdstpos = pmr->dval - pmr->bdst;
-                    pmr->lvio = ((bdstpos > pmr->dhlm) || (bdstpos < pmr->dllm));
-                }
-            }
-
-            if (pmr->lvio != old_lvio)
-                MARK(M_LVIO);
-            if (pmr->lvio)
-            {
-                pmr->val = pmr->lval;
-                MARK(M_VAL);
-                pmr->dval = pmr->ldvl;
-                MARK(M_DVAL);
-                pmr->rval = pmr->lrvl;
-                MARK(M_RVAL);
-                if ((pmr->mip & MIP_RETRY) != 0)
-                {
-                    pmr->mip = MIP_DONE;
-                    MARK(M_MIP);
-                }
-                if (pmr->mip == MIP_DONE && pmr->dmov == FALSE)
-                {
-                    pmr->dmov = TRUE;
-                    MARK(M_DMOV);
-                }
-                return(OK);
-            }
-
-            if (pmr->mip == MIP_DONE || pmr->mip == MIP_RETRY)
-                doRetryOrDone(pmr, use_rel, preferred_dir, relpos, relbpos, currpos, newpos);
-        }
+        return doDVALchangedOrNOTdoneMoving(pmr);
     }
     else if (pmr->sync && pmr->stup == motorSTUP_OFF && pmr->mip == MIP_DONE)
     {
