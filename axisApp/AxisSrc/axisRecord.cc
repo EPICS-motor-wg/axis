@@ -1667,6 +1667,58 @@ static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
 
 }
 
+/*************************************************************************/
+static void newMRES_ERES_UEIP(axisRecord *pmr)
+{
+    /* encoder pulses, motor pulses */
+    double ep_mp[2];
+    long m;
+    msta_field msta;
+
+    /* Set the encoder ratio.  Note this is blatantly device dependent. */
+    msta.All = pmr->msta;
+    if (msta.Bits.EA_PRESENT)
+    {
+        /* defend against divide by zero */
+        if (fabs(pmr->mres) < 1.e-9)
+        {
+            pmr->mres = 1.;
+            MARK(M_MRES);
+        }
+        if (pmr->eres == 0.0)
+        {
+            pmr->eres = pmr->mres;
+            MARK(M_ERES);
+        }
+        /* Calculate encoder ratio. */
+        for (m = 10000000; (m > 1) &&
+             (fabs(m / pmr->eres) > 1.e6 || fabs(m / pmr->mres) > 1.e6); m /= 10);
+        ep_mp[0] = fabs(m / pmr->eres);
+        ep_mp[1] = fabs(m / pmr->mres);
+    }
+    else
+    {
+        ep_mp[0] = 1.;
+        ep_mp[1] = 1.;
+    }
+
+    /* Make sure retry deadband is achievable */
+    enforceMinRetryDeadband(pmr);
+
+    if (msta.Bits.EA_PRESENT)
+    {
+        devSupSetEncRatio(pmr,ep_mp);
+    }
+    if (pmr->set)
+    {
+        pmr->pp = TRUE;
+        devSupGetInfo(pmr);
+    }
+    else if ((pmr->mip & MIP_LOAD_P) == 0) /* Test for LOAD_POS completion. */
+        load_pos(pmr);
+
+}
+
 /******************************************************************************
         do_work()
 Here, we do the real work of processing the motor record.
@@ -2073,53 +2125,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
     mmap_bits.All = pmr->mmap; /* Initialize for MARKED. */
     if (MARKED(M_MRES) || MARKED(M_ERES) || MARKED(M_UEIP))
     {
-        /* encoder pulses, motor pulses */
-        double ep_mp[2];
-        long m;
-        msta_field msta;
-
-        /* Set the encoder ratio.  Note this is blatantly device dependent. */
-        msta.All = pmr->msta;
-        if (msta.Bits.EA_PRESENT)
-        {
-            /* defend against divide by zero */
-            if (fabs(pmr->mres) < 1.e-9)
-            {
-                pmr->mres = 1.;
-                MARK(M_MRES);
-            }
-            if (pmr->eres == 0.0)
-            {
-                pmr->eres = pmr->mres;
-                MARK(M_ERES);
-            }
-            /* Calculate encoder ratio. */
-            for (m = 10000000; (m > 1) &&
-                 (fabs(m / pmr->eres) > 1.e6 || fabs(m / pmr->mres) > 1.e6); m /= 10);
-            ep_mp[0] = fabs(m / pmr->eres);
-            ep_mp[1] = fabs(m / pmr->mres);
-        }
-        else
-        {
-            ep_mp[0] = 1.;
-            ep_mp[1] = 1.;
-        }
-
-        /* Make sure retry deadband is achievable */
-        enforceMinRetryDeadband(pmr);
-
-        if (msta.Bits.EA_PRESENT)
-        {
-            devSupSetEncRatio(pmr,ep_mp);
-        }
-        if (pmr->set)
-        {
-            pmr->pp = TRUE;
-            devSupGetInfo(pmr);
-        }
-        else if ((pmr->mip & MIP_LOAD_P) == 0) /* Test for LOAD_POS completion. */
-            load_pos(pmr);
-
+        newMRES_ERES_UEIP(pmr);
         return(OK);
     }
     /*** Collect .val (User value) changes from all sources. ***/
