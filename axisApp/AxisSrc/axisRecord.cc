@@ -1363,15 +1363,6 @@ static long process(dbCommon *arg)
 
         if (pmr->movn)
         {
-            int sign_rdif = (pmr->rdif < 0) ? 0 : 1;
-            double ntm_deadband =  pmr->ntmf * (fabs(pmr->bdst) + pmr->rdbd);
-            bool move_or_retry;
-            
-            if ((pmr->mip & MIP_RETRY) != 0 || (pmr->mip & MIP_MOVE) != 0)
-                move_or_retry = true;
-            else
-                move_or_retry = false;
-
             /* Since other sources can now initiate motor moves (e.g. Asyn
              * motors, written to by other records), make dmov track the state
              * of movn (inverted).
@@ -1382,26 +1373,6 @@ static long process(dbCommon *arg)
                 pmr->mip |= MIP_EXTERNAL;
                 MARK(M_MIP);
                 pmr->pp = TRUE;
-            }
-
-            /* Test for new target position in opposite direction of current
-               motion.
-             */     
-            if (pmr->ntm == menuYesNoYES &&
-                (sign_rdif != pmr->cdir) &&
-                (fabs(pmr->diff) > ntm_deadband) &&
-                (move_or_retry == true) &&
-                (pmr->mip & MIP_STOP) == 0)
-            {
-
-                /* We're going in the wrong direction. Readback problem? */
-                printf("%s:%d STOP %s diff=%g ntm_deadband=%g\n",
-                       __FILE__, __LINE__,
-                       pmr->name, fabs(pmr->diff), ntm_deadband);
-                devSupStop(pmr);
-                pmr->mip |= MIP_STOP;
-                MARK(M_MIP);
-                pmr->pp = FALSE; /* Don't post process the previous move. */
             }
             status = 0;
         }
@@ -3086,15 +3057,6 @@ pidcof:
         {
             pmr->stup = motorSTUP_OFF;
             db_post_events(pmr, &pmr->stup, DBE_VAL_LOG);
-            return(ERROR);      /* Prevent record processing. */
-        }
-        break;
-
-    case axisRecordNTMF:
-        if (pmr->ntmf < 2)
-        {
-            pmr->ntmf = 2;
-            db_post_events(pmr, &pmr->ntmf, DBE_VAL_LOG);
             return(ERROR);      /* Prevent record processing. */
         }
         break;

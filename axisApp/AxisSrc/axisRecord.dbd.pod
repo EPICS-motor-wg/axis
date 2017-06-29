@@ -1070,22 +1070,6 @@ Implementation dependent, typically one of these:
 
 =cut
 
-=fields NTM
-
-The requirements on how the record processes a new target position while the motor is in motion are as follows;
-Case #1: The record is given a new position, which is in the opposite direction from the current motor motion. If NTM is "YES", the motor is immediately stopped and given a motion command to the new position. If NTM is "NO ", the motor completes the previous move before it is given a motion command to the new position.
-Case #2: The record is given a new position, which is in the same direction as the current motor motion, but the new position is closer to the motor's current position than the original target position. If NTM is "YES", the motor is stopped after it has gone past the new position; then a command is given to return to the new position. If NTM is "NO", the motor completes the previous move before it is given a motion command to the new position.
-Case #3: The record is given a new position, which is in the same direction as the current motor motion, but the new position is further from the motor's current position than the original position. After the motor reaches the original target position and stops, a command is given to the new target position. This case is independent of NTM.
-NTM defaults to "YES". It should be set to "NO" only for soft motors. Soft motors should be configured with NTM set to "NO" to prevent Case #1 above from interfering with "hard" motors using backlash correction. 
-
-=cut
-
-=fields NTMF
-
-Determines NTM deadband = NTMF * (|BDST| + RDBD). NTMF must be >= 2. The NTM deadband prevents NTM logic from issuing a STOP command at the end of a DC motor move that overshoots its' target position.
-
-=cut
-
 =head2 Alarm
 
 =fields HLSV
@@ -1129,13 +1113,7 @@ After a "hard" motor initiated move, Soft Channel device support automatically s
 
 =cut
 
-=fields NTM, NTMF
-
-See under Servo fields
-
-=cut
-
-    
+  
         field(HOMF,DBF_SHORT) {
                 prompt("Home Forward")
                 special(SPC_MOD)
@@ -1426,20 +1404,6 @@ See under Servo fields
                 interest(1)
                 menu(menuYesNo)
                 initial("NO")
-        }
-        field(NTM,DBF_MENU) {
-                prompt("New Target Monitor")
-                promptgroup(GUI_COMMON)
-                interest(1)
-                menu(menuYesNo)
-                initial("YES")
-        }
-        field(NTMF,DBF_USHORT) {
-                initial("2")
-                promptgroup(GUI_COMMON)
-                prompt("NTM Deadband Factor")
-                special(SPC_MOD)
-                interest(1)
         }
         field(HVEL,DBF_DOUBLE) {
                 prompt("Home Velocity (EGU/s)")

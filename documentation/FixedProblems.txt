@@ -54,3 +54,13 @@ asyn-based simulator, automated test cases
   We can run against the simulator or real hardware.
   More test cases needed.
 
+NTM not working as documented - Servo motor stopped at overshoot
+  The documentation of the NTM said:
+  "If NTM is "YES", the motor is immediately stopped and given a motion
+  command to the new position".
+  Actually, there was no code for this, the movement did always complete.
+  The only code that was left was the stop at overshoot, which frequently
+  confused users of servo motors.
+  Remove the NTM/NTMF fields.
+  If needed new code can be added later.
+  

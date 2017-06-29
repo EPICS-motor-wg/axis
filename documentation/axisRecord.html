@@ -919,26 +919,6 @@
         Enable/Disable Closed loop in the motion controller
         Enable/Disable Amplifier on/off</code></pre>
 
-
-
-<blockquote><table border="1"><tr>
-<th>Field</th><th>Summary</th><th>Type</th><th>DCT</th>
-<th>Default</th><th>Read</th><th>Write</th><th>CA PP</th>
-</tr>
-<tr><td class="cell">NTM</td><td class="cell">New Target Monitor</td><td class="cell">MENU (<a href='#Menu_menuYesNo'>menuYesNo</a>)</td><td class="cell">Yes</td><td class="cell">YES</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">No</td></tr></table></blockquote>
-
-<p>The requirements on how the record processes a new target position while the motor is in motion are as follows; Case #1: The record is given a new position, which is in the opposite direction from the current motor motion. If NTM is &quot;YES&quot;, the motor is immediately stopped and given a motion command to the new position. If NTM is &quot;NO &quot;, the motor completes the previous move before it is given a motion command to the new position. Case #2: The record is given a new position, which is in the same direction as the current motor motion, but the new position is closer to the motor&#39;s current position than the original target position. If NTM is &quot;YES&quot;, the motor is stopped after it has gone past the new position; then a command is given to return to the new position. If NTM is &quot;NO&quot;, the motor completes the previous move before it is given a motion command to the new position. Case #3: The record is given a new position, which is in the same direction as the current motor motion, but the new position is further from the motor&#39;s current position than the original position. After the motor reaches the original target position and stops, a command is given to the new target position. This case is independent of NTM. NTM defaults to &quot;YES&quot;. It should be set to &quot;NO&quot; only for soft motors. Soft motors should be configured with NTM set to &quot;NO&quot; to prevent Case #1 above from interfering with &quot;hard&quot; motors using backlash correction.</p>
-
-
-
-<blockquote><table border="1"><tr>
-<th>Field</th><th>Summary</th><th>Type</th><th>DCT</th>
-<th>Default</th><th>Read</th><th>Write</th><th>CA PP</th>
-</tr>
-<tr><td class="cell">NTMF</td><td class="cell">NTM Deadband Factor</td><td class="cell">USHORT</td><td class="cell">Yes</td><td class="cell">2</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">No</td></tr></table></blockquote>
-
-<p>Determines NTM deadband = NTMF * (|BDST| + RDBD). NTMF must be &gt;= 2. The NTM deadband prevents NTM logic from issuing a STOP command at the end of a DC motor move that overshoots its&#39; target position.</p>
-
 <h2 id="Alarm">Alarm</h2>
 
 
@@ -1004,16 +984,6 @@
 <tr><td class="cell">LOCK</td><td class="cell">Soft Channel Position Lock</td><td class="cell">MENU (<a href='#Menu_menuYesNo'>menuYesNo</a>)</td><td class="cell">Yes</td><td class="cell">NO</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">No</td></tr></table></blockquote>
 
 <p>After a &quot;hard&quot; motor initiated move, Soft Channel device support automatically synchronizes a &quot;soft&quot; motor&#39;s target position with a &quot;hard&quot; motor&#39;s readback position. Soft Channel device support detects that the &quot;hard&quot; motor has initiated the move when it sees the PV pointed to by DINP go false, while the &quot;soft&quot; record&#39;s DMOV is true. Automatic synchronization is undesirable in a multi-axis application. Hence, setting the LOCK field to &quot;YES&quot; disables this automatic synchronization.</p>
-
-
-
-<blockquote><table border="1"><tr>
-<th>Field</th><th>Summary</th><th>Type</th><th>DCT</th>
-<th>Default</th><th>Read</th><th>Write</th><th>CA PP</th>
-</tr>
-<tr><td class="cell">NTM</td><td class="cell">New Target Monitor</td><td class="cell">MENU (<a href='#Menu_menuYesNo'>menuYesNo</a>)</td><td class="cell">Yes</td><td class="cell">YES</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">No</td></tr><tr><td class="cell">NTMF</td><td class="cell">NTM Deadband Factor</td><td class="cell">USHORT</td><td class="cell">Yes</td><td class="cell">2</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">No</td></tr></table></blockquote>
-
-<p>See under Servo fields</p>
 
 <p>...</p>
 
