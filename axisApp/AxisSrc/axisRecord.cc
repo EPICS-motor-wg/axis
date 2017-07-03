@@ -437,6 +437,103 @@ calls.
 /* To end a transaction and send accumulated commands to the motor... */
 #define SEND_MSG()                              (*pdset->end_trans)(pmr)
 
+/******************************************************************************
+ * Debug MIP and MIP changes
+ * Not yet used (needs better printing)
+*******************************************************************************/
+
+//#define MIPDEBUG
+#ifdef MIPDEBUG
+
+static void dbgMipToString(unsigned v, char *buf, size_t buflen)
+{
+  memset(buf, 0, buflen);
+  snprintf(buf, buflen-1,
+           "'%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s'",
+           v & MIP_JOGF      ? "Jf " : "",
+           v & MIP_JOGR      ? "Jr " : "",
+           v & MIP_JOG_BL1   ? "J1 " : "",
+           v & MIP_HOMF      ? "Hf " : "",
+           v & MIP_HOMR      ? "Jr " : "",
+           v & MIP_MOVE      ? "Mo " : "",
+           v & MIP_RETRY     ? "Ry " : "",
+           v & MIP_LOAD_P    ? "Lp " : "",
+           v & MIP_MOVE_BL   ? "Mb " : "",
+           v & MIP_STOP      ? "St " : "",
+           v & MIP_DELAY_REQ ? "Dr " : "",
+           v & MIP_DELAY_ACK ? "Da " : "",
+           v & MIP_JOG_REQ   ? "jR " : "",
+           v & MIP_JOG_STOP  ? "jS " : "",
+           v & MIP_JOG_BL2   ? "J2 " : "",
+           v & MIP_EXTERNAL  ? "Ex " : "");
+}
+
+/*  abbreviated Bits: */
+/* Jf Jr J1 Hf Hr Mo Rt Lp MB St Dr Da JR Js J2 Ex */
+/* 16 bits * 3 + NUL + spare */
+#define MBLE 50
+
+#define MIP_SET_BIT(v)                               \
+  do {                                               \
+    char dbuf[MBLE];                                 \
+    char obuf[MBLE];                                 \
+    char nbuf[MBLE];                                 \
+    epicsUInt16 old = pmr->mip;                      \
+    mipSetBit(pmr,(v));                              \
+    dbgMipToString(v, dbuf, sizeof(dbuf));           \
+    dbgMipToString(old, obuf, sizeof(obuf));         \
+    dbgMipToString(pmr->mip, nbuf, sizeof(nbuf));    \
+    fprintf(stdout,                                  \
+            "%s:%d mipSetBit %s %s old=%s new=%s\n", \
+            __FILE__, __LINE__, pmr->name,           \
+            dbuf, obuf, nbuf);                       \
+    fflush(stdout);                                  \
+  }                                                  \
+  while(0)
+
+
+#define MIP_CLR_BIT(v)                               \
+  do {                                               \
+    char dbuf[MBLE];                                 \
+    char obuf[MBLE];                                 \
+    char nbuf[MBLE];                                 \
+    epicsUInt16 old = pmr->mip;                      \
+    mipClrBit(pmr,(v));                              \
+    dbgMipToString(v, dbuf, sizeof(dbuf));           \
+    dbgMipToString(old, obuf, sizeof(obuf));         \
+    dbgMipToString(pmr->mip, nbuf, sizeof(nbuf));    \
+    fprintf(stdout,                                  \
+            "%s:%d mipClrBit %s %s old=%s new=%s\n", \
+            __FILE__, __LINE__, pmr->name,           \
+            dbuf, obuf, nbuf);                       \
+    fflush(stdout);                                  \
+  }                                                  \
+  while(0)
+
+#define MIP_SET_VAL(v)                               \
+  do {                                               \
+    char dbuf[MBLE];                                 \
+    char obuf[MBLE];                                 \
+    char nbuf[MBLE];                                 \
+    epicsUInt16 old = pmr->mip;                      \
+    mipSetMip(pmr,(v));                              \
+    dbgMipToString(v, dbuf, sizeof(dbuf));           \
+    dbgMipToString(old, obuf, sizeof(obuf));         \
+    dbgMipToString(pmr->mip, nbuf, sizeof(nbuf));    \
+    fprintf(stdout,                                  \
+            "%s:%d mipSetVal %s %s old=%s new=%s\n", \
+            __FILE__, __LINE__, pmr->name,           \
+            dbuf, obuf, nbuf);                       \
+    fflush(stdout);                                  \
+    }                                                \
+  while(0)
+
+#else
+#define MIP_SET_BIT(v) mipSetBit(pmr,(v))
+#define MIP_CLR_BIT(v) mipClrBit(pmr,(v))
+#define MIP_SET_VAL(v) mipSetMip(pmr,(v))
+#endif
+
 
 /*
 The DLY feature uses the OSI facility, callbackRequestDelayed(), to issue a
