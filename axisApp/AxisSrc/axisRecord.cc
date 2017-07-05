@@ -752,13 +752,9 @@ static long init_record(dbCommon* arg, int pass)
     MARK(M_MOVN);
     pmr->lspg = pmr->spmg = motorSPMG_Go;
     MARK(M_SPMG);
-    pmr->diff = pmr->dval - pmr->drbv;
-    MARK(M_DIFF);
-    pmr->rdif = NINT(pmr->diff / pmr->mres);
-    MARK(M_RDIF);
-    pmr->lval = pmr->val;
-    pmr->ldvl = pmr->dval;
-    pmr->lrvl = pmr->rval;
+    pmr->priv->last.val = pmr->val;
+    pmr->priv->last.dval = pmr->dval;
+    pmr->priv->last.rval = pmr->rval;
     pmr->lvio = 0;              /* init limit-violation field */
 
     if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
@@ -798,7 +794,6 @@ LOGIC:
             VAL  <- RBV
             DVAL <- DRBV
             RVAL <- DVAL converted to motor steps.
-            DIFF <- RDIF <- 0
     ENDIF
     IF done with either load-position or load-encoder-ratio commands.
         Clear MIP.
@@ -1037,7 +1032,7 @@ static void doBackLash(axisRecord *pmr)
         double bacc = (pmr->bvel - pmr->vbas) / pmr->bacc;
         if (use_rel == true)
         {
-            devSupMoveRelDial(pmr, pmr->bvel, pmr->vbas, bacc, pmr->diff);
+            devSupMoveRelDial(pmr, pmr->bvel, pmr->vbas, bacc, pmr->dval - pmr->drbv);
         }
         else
         {
@@ -1063,7 +1058,7 @@ static void doBackLash(axisRecord *pmr)
     }
     pmr->pp = TRUE;
 
-    pmr->cdir = (pmr->diff < 0.0) ? 0 : 1;
+    pmr->cdir = (pmr->dval - pmr->drbv) < 0.0 ? 0 : 1;
 }
 
 /*****************************************************************************/
@@ -1128,10 +1123,6 @@ static long postProcess(axisRecord * pmr)
         MARK(M_DVAL);
         pmr->rval = NINT(pmr->dval / pmr->mres);
         MARK(M_RVAL);
-        pmr->diff = 0.;
-        MARK(M_DIFF);
-        pmr->rdif = 0;
-        MARK(M_RDIF);
     }
 
     if (pmr->mip & MIP_LOAD_P)
@@ -1184,9 +1175,9 @@ static long postProcess(axisRecord * pmr)
         doBackLash(pmr);
     }
     /* Save old values for next call. */
-    pmr->lval = pmr->val;
-    pmr->ldvl = pmr->dval;
-    pmr->lrvl = pmr->rval;
+    pmr->priv->last.val = pmr->val;
+    pmr->priv->last.dval = pmr->dval;
+    pmr->priv->last.rval = pmr->rval;
     pmr->mip &= ~MIP_STOP;
     MARK(M_MIP);
     return(OK);
@@ -1202,14 +1193,14 @@ that it will happen when we return.
 static void maybeRetry(axisRecord * pmr)
 {
     bool user_cdir;
+    double diff = pmr->dval - pmr->drbv;
 
     /* Commanded direction in user coordinates. */
     user_cdir = ((pmr->dir == motorDIR_Pos) == (pmr->mres >= 0)) ? pmr->cdir : !pmr->cdir;
-
-    if ((fabs(pmr->diff) >= pmr->rdbd) && !(pmr->hls && user_cdir) && !(pmr->lls && !user_cdir))
+    if ((fabs(diff) >= pmr->rdbd) && !(pmr->hls && user_cdir) && !(pmr->lls && !user_cdir))
     {
         /* No, we're not close enough.  Try again. */
-        Debug(1, "maybeRetry: not close enough; diff = %f\n", pmr->diff);
+        Debug(1, "maybeRetry: not close enough; diff = %f\n", diff);
         /* If max retry count is zero, retry is disabled */
         if (pmr->rtry == 0)
             pmr->mip &= MIP_JOG_REQ; /* Clear everything, except jog request;
@@ -1224,9 +1215,9 @@ static void maybeRetry(axisRecord * pmr)
                 if ((pmr->jogf && !pmr->hls) || (pmr->jogr && !pmr->lls))
                     pmr->mip |= MIP_JOG_REQ;
 
-                pmr->lval = pmr->val;
-                pmr->ldvl = pmr->dval;
-                pmr->lrvl = pmr->rval;
+                pmr->priv->last.val = pmr->val;
+                pmr->priv->last.dval = pmr->dval;
+                pmr->priv->last.rval = pmr->rval;
 
                 /* We should probably be triggering alarms here. */
                 pmr->miss = 1;
@@ -1244,7 +1235,7 @@ static void maybeRetry(axisRecord * pmr)
     else
     {
         /* Yes, we're close enough to the desired value. */
-        Debug(1, "maybeRetry: close enough; diff = %f\n", pmr->diff);
+        Debug(1, "maybeRetry: close enough; diff = %f\n", diff);
         pmr->mip &= MIP_JOG_REQ;/* Clear everything, except jog request; for
                                  * jog reactivation in postProcess(). */
         if (pmr->miss)
@@ -1511,7 +1502,7 @@ static long process(dbCommon *arg)
             
             if (pmr->pp)
             {
-                if ((pmr->val != pmr->lval) &&
+                if ((pmr->val != pmr->priv->last.val) &&
                    !(pmr->mip & MIP_STOP)   &&
                    !(pmr->mip & MIP_JOG_STOP))
                 {
@@ -1662,7 +1653,7 @@ static int homing_wanted_and_allowed(axisRecord *pmr)
 
 /*************************************************************************/
 static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
-                          double relpos, double relbpos, double currpos, double newpos)
+                          double relpos, double relbpos, double rbvpos, double newpos)
 {
     double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
     double vbase = pmr->vbas / fabs(pmr->mres); /* base speed      */
@@ -1683,9 +1674,9 @@ static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
         pmr->dmov = FALSE;
         MARK(M_DMOV);
     }
-    pmr->ldvl = pmr->dval;
-    pmr->lval = pmr->val;
-    pmr->lrvl = pmr->rval;
+    pmr->priv->last.dval = pmr->dval;
+    pmr->priv->last.val = pmr->val;
+    pmr->priv->last.rval = pmr->rval;
 
     /* Backlash disabled, OR, no need for seperate backlash move
      * since move is in preferred direction (preferred_dir==ON),
@@ -1705,7 +1696,7 @@ static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
     /* IF move is in preferred direction, AND, current position is within backlash range. */
     else if ((preferred_dir == true) &&
              ((use_rel == true  && relbpos <= 1.0) ||
-              (use_rel == false && (fabs(newpos - currpos) <= rbdst1))
+              (use_rel == false && (fabs(newpos - rbvpos) <= rbdst1))
              )
             )
     {
@@ -1727,7 +1718,7 @@ static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
         pmr->pp = TRUE;              /* do backlash from posprocess(). */
     }
 
-    pmr->cdir = (pmr->rdif < 0.0) ? 0 : 1;
+    pmr->cdir = (pmr->dval - pmr->drbv) < 0.0 ? 0 : 1;
     if (use_rel == true)
         devSupMoveRelRaw(pmr, velocity, vbase, accel, position);
     else
@@ -1795,13 +1786,14 @@ static RTN_STATUS doDVALchangedOrNOTdoneMoving(axisRecord *pmr)
     int old_lvio = pmr->lvio;
     /** Calc new raw position, and do a (backlash-corrected?) move. **/
     double rbvpos = pmr->drbv / pmr->mres;      /* where motor is  */
-    double currpos = pmr->ldvl / pmr->mres;     /* where we are    */
     double newpos = pmr->dval / pmr->mres;      /* where to go     */
     /*
      * 'bpos' is one backlash distance away from 'newpos'.
      */
-    bool use_rel, preferred_dir, too_small;
-    double relpos = pmr->diff / pmr->mres;
+    bool use_rel, too_small;
+    bool preferred_dir = true;
+    double diff = pmr->dval - pmr->drbv;
+    double relpos = diff / pmr->mres;
     double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
     long rdbdpos = NINT(pmr->rdbd / fabs(pmr->mres)); /* retry deadband steps */
     long absdiff = labs(NINT(rbvpos)- NINT(newpos));
@@ -1819,10 +1811,10 @@ static RTN_STATUS doDVALchangedOrNOTdoneMoving(axisRecord *pmr)
      * must make .val agree.)
      */
     pmr->val = pmr->dval * dir + pmr->off;
-    if (pmr->val != pmr->lval)
+    if (pmr->val != pmr->priv->last.val)
         MARK(M_VAL);
     pmr->rval = NINT(pmr->dval / pmr->mres);
-    if (pmr->rval != pmr->lrvl)
+    if (pmr->rval != pmr->priv->last.rval)
         MARK(M_RVAL);
 
     /* Don't move if we're within retry deadband. */
@@ -1849,9 +1841,9 @@ static RTN_STATUS doDVALchangedOrNOTdoneMoving(axisRecord *pmr)
             }
         }
         /* Update previous target positions. */
-        pmr->ldvl = pmr->dval;
-        pmr->lval = pmr->val;
-        pmr->lrvl = pmr->rval;
+        pmr->priv->last.dval = pmr->dval;
+        pmr->priv->last.val = pmr->val;
+        pmr->priv->last.rval = pmr->rval;
         return(OK);
     }
 
@@ -1895,18 +1887,18 @@ static RTN_STATUS doDVALchangedOrNOTdoneMoving(axisRecord *pmr)
     else
         errPrintf(-1, __FILE__, __LINE__, "Invalid RMOD field value: = %d", pmr->rmod);
 
-    if (((use_rel == false) && ((pmr->dval > pmr->ldvl) == (pmr->bdst > 0))) ||
-        ((use_rel == true)  && ((pmr->diff > 0)         == (pmr->bdst > 0))))
-        preferred_dir = true;
-    else
-        preferred_dir = false;
-
+    /* No backlash distance: always preferred */
+    if (pmr->bdst) {
+        int newDir = diff > 0;
+        if (newDir != (pmr->bdst > 0))
+            preferred_dir = false;
+    }
     /* Check for soft-travel limit violation */
     if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
         pmr->lvio = false;
     /* LVIO = TRUE, AND, Move request towards valid travel limit range. */
-    else if (((pmr->dval > pmr->dhlm) && (pmr->dval < pmr->ldvl)) ||
-             ((pmr->dval < pmr->dllm) && (pmr->dval > pmr->ldvl)))
+    else if (((pmr->dval > pmr->dhlm) && (pmr->dval < pmr->priv->last.dval)) ||
+             ((pmr->dval < pmr->dllm) && (pmr->dval > pmr->priv->last.dval)))
         pmr->lvio = false;
     else
     {
@@ -1923,11 +1915,11 @@ static RTN_STATUS doDVALchangedOrNOTdoneMoving(axisRecord *pmr)
         MARK(M_LVIO);
     if (pmr->lvio)
     {
-        pmr->val = pmr->lval;
+        pmr->val = pmr->priv->last.val;
         MARK(M_VAL);
-        pmr->dval = pmr->ldvl;
+        pmr->dval = pmr->priv->last.dval;
         MARK(M_DVAL);
-        pmr->rval = pmr->lrvl;
+        pmr->rval = pmr->priv->last.rval;
         MARK(M_RVAL);
         if ((pmr->mip & MIP_RETRY) != 0)
         {
@@ -1943,7 +1935,7 @@ static RTN_STATUS doDVALchangedOrNOTdoneMoving(axisRecord *pmr)
     }
 
     if (pmr->mip == MIP_DONE || pmr->mip == MIP_RETRY)
-        doRetryOrDone(pmr, use_rel, preferred_dir, relpos, relbpos, currpos, newpos);
+        doRetryOrDone(pmr, use_rel, preferred_dir, relpos, relbpos, rbvpos, newpos);
 
     return(OK);
 }
@@ -2511,7 +2503,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
             pmr->lrlv = pmr->rlv;
         }
         /* New raw value.  Propagate to .dval and act later. */
-        if (pmr->rval != pmr->lrvl)
+        if (pmr->rval != pmr->priv->last.rval)
             pmr->dval = pmr->rval * pmr->mres;  /* Later, we'll act on this. */
     }
 
@@ -2519,7 +2511,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
     * Now we either act directly on the .val change and return, or we
     * propagate it into a .dval change.
     */
-    if (pmr->val != pmr->lval)
+    if (pmr->val != pmr->priv->last.val)
     {
         MARK(M_VAL);
         if (pmr->set && !pmr->foff)
@@ -2537,7 +2529,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
 
             set_userlimits(pmr);        /* Translate dial limits to user limits. */
 
-            pmr->lval = pmr->val;
+            pmr->priv->last.val = pmr->val;
             pmr->mip = MIP_DONE;
             MARK(M_MIP);
             pmr->dmov = TRUE;
@@ -2556,20 +2548,10 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
         return(OK);
     
     /* IF DVAL field has changed, OR, NOT done moving. */
-    if (pmr->dval != pmr->ldvl || !pmr->dmov)
+    if (pmr->dval != pmr->priv->last.dval || !pmr->dmov)
     {
-        epicsFloat64 localDiff = pmr->dval - pmr->drbv;
-        if (pmr->dval != pmr->ldvl)
+        if (pmr->dval != pmr->priv->last.dval)
             MARK(M_DVAL);
-
-        if (pmr->diff != localDiff)
-        {
-            pmr->diff = localDiff;
-            MARK(M_DIFF);
-        }
-
-        pmr->rdif = NINT(pmr->diff / pmr->mres);
-        MARK(M_RDIF);
         if (pmr->set)
         {
             if ((pmr->mip & MIP_LOAD_P) == 0) /* Test for LOAD_POS completion. */
@@ -2808,7 +2790,7 @@ static long special(DBADDR *paddr, int after)
         /* new offset */
     case axisRecordOFF:
         pmr->val = pmr->dval * dir + pmr->off;
-        pmr->lval = pmr->ldvl * dir + pmr->off;
+        pmr->priv->last.val = pmr->priv->last.dval * dir + pmr->off;
         pmr->rbv = pmr->drbv * dir + pmr->off;
         MARK(M_VAL);
         MARK(M_RBV);
@@ -3577,18 +3559,6 @@ static void monitor(axisRecord * pmr)
         UNMARK(M_DRBV);
     }
     
-    if ((local_mask = monitor_mask | (MARKED(M_DIFF) ? DBE_VAL_LOG : 0)))
-    {
-        db_post_events(pmr, &pmr->diff, local_mask);
-        UNMARK(M_DIFF);
-    }
-    
-    if ((local_mask = monitor_mask | (MARKED(M_RDIF) ? DBE_VAL_LOG : 0)))
-    {
-        db_post_events(pmr, &pmr->rdif, local_mask);
-        UNMARK(M_RDIF);
-    }
-    
     if ((local_mask = monitor_mask | (MARKED(M_MSTA) ? DBE_VAL_LOG : 0)))
     {
         msta_field msta;
@@ -3835,11 +3805,6 @@ static void process_motor_info(axisRecord * pmr, bool initcall)
 
     if (pmr->athm != old_athm)
         MARK(M_ATHM);
-
-    pmr->diff = pmr->dval - pmr->drbv;
-    MARK(M_DIFF);
-    pmr->rdif = NINT(pmr->diff / pmr->mres);
-    MARK(M_RDIF);
 }
 
 /* Calc and load new raw position into motor w/out moving it. */
@@ -3847,11 +3812,11 @@ static void load_pos(axisRecord * pmr)
 {
     double newpos = pmr->dval / pmr->mres;
 
-    pmr->ldvl = pmr->dval;
-    pmr->lval = pmr->val;
+    pmr->priv->last.dval = pmr->dval;
+    pmr->priv->last.val = pmr->val;
     if (pmr->rval != (epicsInt32) NINT(newpos))
         MARK(M_RVAL);
-    pmr->lrvl = pmr->rval = (epicsInt32) NINT(newpos);
+    pmr->priv->last.rval = pmr->rval = (epicsInt32) NINT(newpos);
 
     if (pmr->foff)
     {
@@ -3861,7 +3826,7 @@ static void load_pos(axisRecord * pmr)
         else
             pmr->val = pmr->off - pmr->dval;
         MARK(M_VAL);
-        pmr->lval = pmr->val;
+        pmr->priv->last.val = pmr->val;
     }
     else
     {
@@ -4258,11 +4223,11 @@ static void syncTargetPosition(axisRecord *pmr)
     pmr->rbv = pmr->drbv * dir + pmr->off;
     MARK(M_RBV);
 
-    pmr->val  = pmr->lval = pmr->rbv ;
+    pmr->val  = pmr->priv->last.val = pmr->rbv ;
     MARK(M_VAL);
-    pmr->dval = pmr->ldvl = pmr->drbv;
+    pmr->dval = pmr->priv->last.dval = pmr->drbv;
     MARK(M_DVAL);
-    pmr->rval = pmr->lrvl = NINT(pmr->dval / pmr->mres);
+    pmr->rval = pmr->priv->last.rval = NINT(pmr->dval / pmr->mres);
     MARK(M_RVAL);
 }
 

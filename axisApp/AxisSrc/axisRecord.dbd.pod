@@ -670,7 +670,7 @@ The maximum number of times the record will try again to move to the desired pos
 
  (0:"Unity", 1:"Arthmetic", 2:"Geometric", 3:"In-Position")
 
-RMOD allows the user to select different ways of calculating the retry distance move. The default mode (Unity) moves the motor a relative distance based on the dial error (DIFF field). Badly behaved devices (piezo motors) can oscillate around their target position in this mode. Hence, two other modes were added to allow a decreasing response from the record after each retry.
+RMOD allows the user to select different ways of calculating the retry distance move. The default mode (Unity) moves the motor a relative distance based on the dial error (DIFF = DRBV-LDVL). Badly behaved devices (piezo motors) can oscillate around their target position in this mode. Hence, two other modes were added to allow a decreasing response from the record after each retry.
 
 The Arithmetic mode generates an arithmetic sequence of corrections. For example, if the max. retry count (RTRY) is 10, then the retries will proceed as follows; DIFF * (1.0), DIFF * (9/10), DIFF * (8/10), etc.
 
@@ -915,21 +915,6 @@ Delay (in seconds) the time between motor controller done and record done (i.e.,
 
 =cut
 
-
-=fields DIFF
-
-DIFF is the difference, in engineering units, between the desired motor position, and the readback device's report of the current position.
-
-=cut
-
-
-=fields RDIF
-
-RDIF is the same difference in "raw" units (normally, steps). 
-
-=cut
-
-
 =fields RRBV
 
 The current position of the motor, encoder, or readback link, as received from whatever source has been selected to provide position information. The units associated with this field depend on the source. 
@@ -1166,32 +1151,17 @@ After a "hard" motor initiated move, Soft Channel device support automatically s
                 special(SPC_MOD)
                 pp(TRUE)
         }
-        field(LVAL,DBF_DOUBLE) {
-                prompt("Last User Des Val (EGU)")
-                special(SPC_NOMOD)
-                interest(1)
-        }
         field(DVAL,DBF_DOUBLE) {
                 asl(ASL0)
                 prompt("Dial Desired Value (EGU")
                 special(SPC_MOD)
                 pp(TRUE)
         }
-        field(LDVL,DBF_DOUBLE) {
-                prompt("Last Dial Des Val (EGU)")
-                special(SPC_NOMOD)
-                interest(1)
-        }
         field(RVAL,DBF_LONG) {
                 asl(ASL0)
                 prompt("Raw Desired Value (step")
                 special(SPC_MOD)
                 pp(TRUE)
-        }
-        field(LRVL,DBF_LONG) {
-                prompt("Last Raw Des Val (steps")
-                special(SPC_NOMOD)
-                interest(1)
         }
         field(RLV,DBF_DOUBLE) {
                 asl(ASL0)
@@ -1210,14 +1180,6 @@ After a "hard" motor initiated move, Soft Channel device support automatically s
         }
         field(DRBV,DBF_DOUBLE) {
                 prompt("Dial Readback Value")
-                special(SPC_NOMOD)
-        }
-        field(DIFF,DBF_DOUBLE) {
-                prompt("Difference dval-drbv")
-                special(SPC_NOMOD)
-        }
-        field(RDIF,DBF_LONG) {
-                prompt("Difference rval-rrbv")
                 special(SPC_NOMOD)
         }
         field(CDIR,DBF_SHORT) {

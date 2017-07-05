@@ -374,7 +374,7 @@
 
 <pre><code> (0:&quot;Unity&quot;, 1:&quot;Arthmetic&quot;, 2:&quot;Geometric&quot;, 3:&quot;In-Position&quot;)</code></pre>
 
-<p>RMOD allows the user to select different ways of calculating the retry distance move. The default mode (Unity) moves the motor a relative distance based on the dial error (DIFF field). Badly behaved devices (piezo motors) can oscillate around their target position in this mode. Hence, two other modes were added to allow a decreasing response from the record after each retry.</p>
+<p>RMOD allows the user to select different ways of calculating the retry distance move. The default mode (Unity) moves the motor a relative distance based on the dial error (DIFF = DRBV-LDVL). Badly behaved devices (piezo motors) can oscillate around their target position in this mode. Hence, two other modes were added to allow a decreasing response from the record after each retry.</p>
 
 <p>The Arithmetic mode generates an arithmetic sequence of corrections. For example, if the max. retry count (RTRY) is 10, then the retries will proceed as follows; DIFF * (1.0), DIFF * (9/10), DIFF * (8/10), etc.</p>
 
@@ -717,26 +717,6 @@
 <tr><td class="cell">DLY</td><td class="cell">Readback settle time (s)</td><td class="cell">DOUBLE</td><td class="cell">Yes</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">No</td></tr></table></blockquote>
 
 <p>Delay (in seconds) the time between motor controller done and record done (i.e., DMOV).</p>
-
-
-
-<blockquote><table border="1"><tr>
-<th>Field</th><th>Summary</th><th>Type</th><th>DCT</th>
-<th>Default</th><th>Read</th><th>Write</th><th>CA PP</th>
-</tr>
-<tr><td class="cell">DIFF</td><td class="cell">Difference dval-drbv</td><td class="cell">DOUBLE</td><td class="cell">No</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">No</td><td class="cell">No</td></tr></table></blockquote>
-
-<p>DIFF is the difference, in engineering units, between the desired motor position, and the readback device&#39;s report of the current position.</p>
-
-
-
-<blockquote><table border="1"><tr>
-<th>Field</th><th>Summary</th><th>Type</th><th>DCT</th>
-<th>Default</th><th>Read</th><th>Write</th><th>CA PP</th>
-</tr>
-<tr><td class="cell">RDIF</td><td class="cell">Difference rval-rrbv</td><td class="cell">LONG</td><td class="cell">No</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">No</td><td class="cell">No</td></tr></table></blockquote>
-
-<p>RDIF is the same difference in &quot;raw&quot; units (normally, steps).</p>
 
 
 

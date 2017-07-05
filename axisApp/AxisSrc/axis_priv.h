@@ -14,6 +14,11 @@ extern "C" {
       double position;           /**< Commanded motor position */
       double encoderPosition;    /**< Actual encoder position */
     } readBack;
+    struct {
+      double val;               /* last .VAL */
+      double dval;               /* last .DVAL */
+      double rval;               /* last .RVAL */
+    } last;
   };
   
 #ifdef __cplusplus

@@ -514,11 +514,6 @@ recordtype(axis) {
 
 
 
-
-
-
-
-
     
 
 
@@ -599,32 +594,17 @@ recordtype(axis) {
                 special(SPC_MOD)
                 pp(TRUE)
         }
-        field(LVAL,DBF_DOUBLE) {
-                prompt("Last User Des Val (EGU)")
-                special(SPC_NOMOD)
-                interest(1)
-        }
         field(DVAL,DBF_DOUBLE) {
                 asl(ASL0)
                 prompt("Dial Desired Value (EGU")
                 special(SPC_MOD)
                 pp(TRUE)
         }
-        field(LDVL,DBF_DOUBLE) {
-                prompt("Last Dial Des Val (EGU)")
-                special(SPC_NOMOD)
-                interest(1)
-        }
         field(RVAL,DBF_LONG) {
                 asl(ASL0)
                 prompt("Raw Desired Value (step")
                 special(SPC_MOD)
                 pp(TRUE)
-        }
-        field(LRVL,DBF_LONG) {
-                prompt("Last Raw Des Val (steps")
-                special(SPC_NOMOD)
-                interest(1)
         }
         field(RLV,DBF_DOUBLE) {
                 asl(ASL0)
@@ -643,14 +623,6 @@ recordtype(axis) {
         }
         field(DRBV,DBF_DOUBLE) {
                 prompt("Dial Readback Value")
-                special(SPC_NOMOD)
-        }
-        field(DIFF,DBF_DOUBLE) {
-                prompt("Difference dval-drbv")
-                special(SPC_NOMOD)
-        }
-        field(RDIF,DBF_LONG) {
-                prompt("Difference rval-rrbv")
                 special(SPC_NOMOD)
         }
         field(CDIR,DBF_SHORT) {
