@@ -18,6 +18,10 @@ extern "C" {
       double val;               /* last .VAL */
       double dval;               /* last .DVAL */
       double rval;               /* last .RVAL */
+      double rlv;                /* Last Rel Value (EGU) */
+      double alst;               /* Last Value Archived */
+      double mlst;               /* Last Val Monitored */
+      short  dmov;               /* last .DMOV */
     } last;
   };
   

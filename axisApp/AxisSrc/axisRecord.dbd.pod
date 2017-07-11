@@ -1169,11 +1169,6 @@ After a "hard" motor initiated move, Soft Channel device support automatically s
                 special(SPC_MOD)
                 pp(TRUE)
         }
-        field(LRLV,DBF_DOUBLE) {
-                prompt("Last Rel Value (EGU)")
-                special(SPC_NOMOD)
-                interest(1)
-        }
         field(RBV,DBF_DOUBLE) {
                 prompt("User Readback Value")
                 special(SPC_NOMOD)
@@ -1207,11 +1202,6 @@ After a "hard" motor initiated move, Soft Channel device support automatically s
         field(DMOV,DBF_SHORT) {
                 prompt("Done moving to value")
                 promptgroup(GUI_COMMON)
-                special(SPC_NOMOD)
-                initial("1")
-        }
-        field(LDMV,DBF_SHORT) {
-                prompt("Last Done moving value")
                 special(SPC_NOMOD)
                 initial("1")
         }
@@ -1399,16 +1389,6 @@ After a "hard" motor initiated move, Soft Channel device support automatically s
                 prompt("Monitor Deadband")
                 promptgroup(GUI_COMMON)
                 interest(1)
-        }
-	field(ALST,DBF_DOUBLE) {
-                prompt("Last Value Archived")
-                special(SPC_NOMOD)
-                interest(3)
-        }
-        field(MLST,DBF_DOUBLE) {
-                prompt("Last Val Monitored")
-                special(SPC_NOMOD)
-                interest(3)
         }
 	field(SYNC,DBF_SHORT) {
 		prompt("Sync position")

@@ -1395,10 +1395,10 @@ Exit:
     Update record timestamp, call recGblGetTimeStamp().
     Process alarms, call alarm_sub().
     Monitor changes to record fields, call monitor().
-    IF Done Moving field (DMOV) is TRUE, AND, Last Done Moving (LDMV) was False.
+    IF Done Moving field (DMOV) is TRUE, AND, Last Done Moving was False.
         Process the forward-scan-link record, call recGblFwdLink().
     ENDIF
-    Update Last Done Moving (LDMV).
+    Update Last Done Moving (pmr->priv->last.dmov).
     Set Processing Active indicator field (PACT) false.
     Exit.
 
@@ -1619,9 +1619,9 @@ process_exit:
     alarm_sub(pmr);                     /* If we've violated alarm limits, yell. */
     monitor(pmr);               /* If values have changed, broadcast them. */
 
-    if (pmr->dmov != 0 && pmr->ldmv == 0)   /* Test for False to True transition. */
+    if (pmr->dmov != 0 && pmr->priv->last.dmov == 0)   /* Test for False to True transition. */
         recGblFwdLink(pmr);                 /* Process the forward-scan-link record. */
-    pmr->ldmv = pmr->dmov;
+    pmr->priv->last.dmov = pmr->dmov;
 
     pmr->pact = 0;
     Debug(4, "process:---------------------- end; motor \"%s\"\n", pmr->name);
@@ -2494,13 +2494,13 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
          * relative" field (just like the .val field, but relative instead of
          * absolute.)
          */
-        if (pmr->rlv != pmr->lrlv)
+        if (pmr->rlv != pmr->priv->last.rlv)
         {
             pmr->val += pmr->rlv;
             /* Later, we'll act on this. */
             pmr->rlv = 0.;
             MARK(M_RLV);
-            pmr->lrlv = pmr->rlv;
+            pmr->priv->last.rlv = pmr->rlv;
         }
         /* New raw value.  Propagate to .dval and act later. */
         if (pmr->rval != pmr->priv->last.rval)
@@ -2622,7 +2622,7 @@ static long special(DBADDR *paddr, int after)
                 if (pmr->dmov == TRUE)
                 {
                     pmr->dmov = FALSE;
-                    pmr->ldmv = pmr->dmov;
+                    pmr->priv->last.dmov = pmr->dmov;
                     db_post_events(pmr, &pmr->dmov, DBE_VAL_LOG);
                 }
                 return(OK);
@@ -3522,11 +3522,11 @@ static void monitor(axisRecord * pmr)
             local_mask |= DBE_VALUE;
         else
         {
-            delta = fabs(pmr->mlst - pmr->rbv);
+            delta = fabs(pmr->priv->last.mlst - pmr->rbv);
             if (delta > pmr->mdel)
             {
                 local_mask |= DBE_VALUE;
-                pmr->mlst = pmr->rbv; /* update last value monitored */
+                pmr->priv->last.mlst = pmr->rbv; /* update last value monitored */
             }
         }
 
@@ -3534,11 +3534,11 @@ static void monitor(axisRecord * pmr)
             local_mask |= DBE_LOG;
         else
         {
-            delta = fabs(pmr->alst - pmr->rbv);
+            delta = fabs(pmr->priv->last.alst - pmr->rbv);
             if (delta > pmr->adel)
             {
                 local_mask |= DBE_LOG;
-                pmr->alst = pmr->rbv; /* update last archive value monitored */
+                pmr->priv->last.alst = pmr->rbv; /* update last archive value monitored */
             }
         }
 
