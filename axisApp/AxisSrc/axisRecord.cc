@@ -936,26 +936,6 @@ static void devSupMoveRelRaw(axisRecord *pmr, double vel, double vbase,
 #define MOVE_REL #ErrorMOVE_REL
 
 /*****************************************************************************/
-static void devSupMoveRelDial(axisRecord *pmr, double vel, double vbase,
-                              double accEGU, double relpos)
-{
-    /* Velocity and Accelerations are always > 0, use fabs(mres).
-     Position needs the sign of mres */
-    double amres = fabs(pmr->mres);
-    devSupMoveRelRaw(pmr, vel/amres, vbase/amres, accEGU/amres, relpos/pmr->mres);
-}
-/*****************************************************************************/
-
-static void devSupMoveAbsDial(axisRecord *pmr, double vel, double vbase,
-                              double accEGU, double pos)
-{
-    /* Velocity and Accelerations are always > 0, use fabs(mres).
-       Position needs the sign of mres */
-    double amres = fabs(pmr->mres);
-    devSupMoveAbsRaw(pmr, vel/amres, vbase/amres, accEGU/amres, pos/pmr->mres);
-}
-
-/*****************************************************************************/
 static void devSupJogRaw(axisRecord *pmr, double jogv, double vbase, double jacc)
 {
     struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
@@ -1003,14 +983,46 @@ static void devSupSetEncRatio(axisRecord *pmr, double ep_mp[2])
     SEND_MSG();
 }
 
+/*****************************************************************************/
+static void doMoveRelDial(axisRecord *pmr, double vel, double vbase,
+                          double accEGU, double relpos)
+{
+    /* Velocity and Accelerations are always > 0, use fabs(mres).
+     Position needs the sign of mres */
+    double amres = fabs(pmr->mres);
+    devSupMoveRelRaw(pmr, vel/amres, vbase/amres, accEGU/amres, relpos/pmr->mres);
+    pmr->cdir = relpos < 0.0 ? 0 : 1;
+}
+/*****************************************************************************/
+
+static void doMoveAbsDial(axisRecord *pmr, double vel, double vbase,
+                          double accEGU, double position)
+{
+    /* Velocity and Accelerations are always > 0, use fabs(mres).
+       Position needs the sign of mres */
+    double amres = fabs(pmr->mres);
+    double diff = position - pmr->drbv;
+    devSupMoveAbsRaw(pmr, vel/amres, vbase/amres, accEGU/amres, position/pmr->mres);
+    pmr->cdir = diff < 0.0 ? 0 : 1;
+}
+
+static void doMoveDialPosition(axisRecord *pmr, double vel, double vbase,
+                               double accEGU, double position)
+{
+    /* Use if encoder or ReadbackLink is in use. */
+    bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
+    double diff = position - pmr->drbv;
+    if (use_rel)
+        doMoveRelDial(pmr, vel, vbase, accEGU, diff);
+    else
+        doMoveAbsDial(pmr, vel, vbase, accEGU, position);
+}
+
 /*****************************************************************************
   High level functions which are used by the state machine
 *****************************************************************************/
 static void doBackLash(axisRecord *pmr)
 {
-    /* Use if encoder or ReadbackLink is in use. */
-    bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
-
     /* Restore DMOV to false and UNMARK it so it is not posted. */
     pmr->dmov = FALSE;
     UNMARK(M_DMOV);
@@ -1018,47 +1030,29 @@ static void doBackLash(axisRecord *pmr)
     if (pmr->mip & MIP_JOG_STOP)
     {
         double acc = (pmr->velo - pmr->vbas) / pmr->accl;
-        if (use_rel == true)
-            devSupMoveRelDial(pmr, pmr->velo, pmr->vbas, acc,
-                              pmr->dval - pmr->bdst - pmr->drbv);
-        else
-            devSupMoveAbsDial(pmr, pmr->velo, pmr->vbas, acc,
-                              pmr->dval - pmr->bdst);
+        doMoveDialPosition(pmr, pmr->velo, pmr->vbas, acc,
+                           pmr->dval - pmr->bdst);
         pmr->mip = MIP_JOG_BL1;
     }
     else if(pmr->mip & MIP_MOVE)
     {
         /* First part of move done. Do backlash correction. */
         double bacc = (pmr->bvel - pmr->vbas) / pmr->bacc;
-        if (use_rel == true)
-        {
-            devSupMoveRelDial(pmr, pmr->bvel, pmr->vbas, bacc, pmr->dval - pmr->drbv);
-        }
-        else
-        {
-            pmr->rval = NINT(pmr->dval);
-            devSupMoveAbsDial(pmr, pmr->bvel, pmr->vbas, bacc, pmr->dval);
-        }
+        doMoveDialPosition(pmr, pmr->bvel, pmr->vbas, bacc,
+                           pmr->dval);
+        pmr->rval = NINT(pmr->dval);
         pmr->mip = MIP_MOVE_BL;
     }
     else if (pmr->mip & MIP_JOG_BL1)
     {
         /* First part of jog done. Do backlash correction. */
         double bacc = (pmr->bvel - pmr->vbas) / pmr->bacc;
-        if (use_rel == true)
-        {
-            devSupMoveRelDial(pmr, pmr->bvel, pmr->vbas, bacc, pmr->bdst);
-        }
-        else
-        {
-            pmr->rval = NINT(pmr->dval);
-            devSupMoveAbsDial(pmr, pmr->bvel, pmr->vbas, bacc, pmr->dval);
-        }
+        doMoveDialPosition(pmr, pmr->bvel, pmr->vbas, bacc,
+                           pmr->dval);
+        pmr->rval = NINT(pmr->dval);
         pmr->mip = MIP_JOG_BL2;
     }
     pmr->pp = TRUE;
-
-    pmr->cdir = (pmr->dval - pmr->drbv) < 0.0 ? 0 : 1;
 }
 
 /*****************************************************************************/
@@ -1655,15 +1649,20 @@ static int homing_wanted_and_allowed(axisRecord *pmr)
 static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
                           double relpos, double relbpos, double rbvpos, double newpos)
 {
-    double bpos = (pmr->dval - pmr->bdst) / pmr->mres;
-    double vbase = pmr->vbas / fabs(pmr->mres); /* base speed      */
-    double vel = pmr->velo / fabs(pmr->mres);   /* normal speed    */
-    double acc = (vel - vbase) / pmr->accl;     /* normal accel.   */
-    double bvel = pmr->bvel / fabs(pmr->mres);  /* backlash speed  */
-    double bacc = (bvel - vbase) / pmr->bacc;   /* backlash accel. */
-    double rbdst1 = 1.0 + (fabs(pmr->bdst) / fabs(pmr->mres));
-    double velocity, position, accel;
+    double absmres = fabs(pmr->mres);
+    double bpos = pmr->dval - pmr->bdst;
+    double vbase = pmr->vbas; /* base speed      */
+    double acc = (pmr->velo - vbase) / pmr->accl;     /* normal accel.   */
+    double bacc = (pmr->bvel - vbase) / pmr->bacc;   /* backlash accel. */
+    double rbdst1 = fabs(pmr->bdst) + absmres;
 
+    if (fabs(relpos) < absmres)
+        relpos = (relpos > 0.0) ? absmres : -absmres;
+        
+    if (fabs(relbpos) < absmres)
+        relbpos = (relbpos > 0.0) ? absmres : -absmres;
+
+    
     /* AJF fix for the bug where the retry count is not incremented when doing retries */
     /* This bug is seen when we use the readback link field                            */
     pmr->mip |= MIP_MOVE;
@@ -1682,48 +1681,36 @@ static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
      * since move is in preferred direction (preferred_dir==ON),
      * AND, backlash acceleration and velocity are the same as slew values
      * (BVEL == VELO, AND, BACC == ACCL). */
-    if ((fabs(pmr->bdst) <  fabs(pmr->mres)) ||
+    if ((fabs(pmr->bdst) < absmres) ||
         (preferred_dir == true && pmr->bvel == pmr->velo &&
          pmr->bacc == pmr->accl))
     {
-        velocity = vel;
-        accel = acc;
         if (use_rel == true)
-            position = relpos;
+            doMoveRelDial(pmr, pmr->velo, vbase, acc, relpos);
         else
-            position = newpos;
+            doMoveAbsDial(pmr, pmr->velo, vbase, acc, newpos);
     }
     /* IF move is in preferred direction, AND, current position is within backlash range. */
     else if ((preferred_dir == true) &&
-             ((use_rel == true  && relbpos <= 1.0) ||
+             ((use_rel == true  && relbpos <= absmres) ||
               (use_rel == false && (fabs(newpos - rbvpos) <= rbdst1))
              )
             )
     {
-        velocity = bvel;
-        accel = bacc;
         if (use_rel == true)
-            position = relpos;
+            doMoveRelDial(pmr, pmr->bvel, vbase, bacc, relpos);
         else
-            position = newpos;
+            doMoveAbsDial(pmr, pmr->bvel, vbase, bacc, newpos);
     }
     else
     {
-        velocity = vel;
-        accel = acc;
         if (use_rel == true)
-            position = relbpos;
+            doMoveRelDial(pmr, pmr->velo, vbase, acc, relbpos);
         else
-            position = bpos;
+            doMoveAbsDial(pmr, pmr->velo, vbase, acc, bpos);
         pmr->pp = TRUE;              /* do backlash from posprocess(). */
     }
-
     pmr->cdir = (pmr->dval - pmr->drbv) < 0.0 ? 0 : 1;
-    if (use_rel == true)
-        devSupMoveRelRaw(pmr, velocity, vbase, accel, position);
-    else
-        devSupMoveAbsRaw(pmr, velocity, vbase, accel, position);
-
 }
 
 /*************************************************************************/
@@ -1784,19 +1771,18 @@ static RTN_STATUS doDVALchangedOrNOTdoneMoving(axisRecord *pmr)
     int dir_positive = (pmr->dir == motorDIR_Pos);
     int dir = dir_positive ? 1 : -1;
     int old_lvio = pmr->lvio;
-    /** Calc new raw position, and do a (backlash-corrected?) move. **/
-    double rbvpos = pmr->drbv / pmr->mres;      /* where motor is  */
-    double newpos = pmr->dval / pmr->mres;      /* where to go     */
+    /** Calc new dial position, and do a (backlash-corrected?) move. **/
+    double rbvpos = pmr->drbv;   /* where motor is  */
+    double newpos = pmr->dval;      /* where to go     */
     /*
      * 'bpos' is one backlash distance away from 'newpos'.
      */
     bool use_rel, too_small;
     bool preferred_dir = true;
     double diff = pmr->dval - pmr->drbv;
-    double relpos = diff / pmr->mres;
-    double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
-    long rdbdpos = NINT(pmr->rdbd / fabs(pmr->mres)); /* retry deadband steps */
-    long absdiff = labs(NINT(rbvpos)- NINT(newpos));
+    double relpos = diff;
+    double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv);
+    double absdiff = fabs(diff);
 
     /*** Use if encoder or ReadbackLink is in use. ***/
     if (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip))
@@ -1822,10 +1808,10 @@ static RTN_STATUS doDVALchangedOrNOTdoneMoving(axisRecord *pmr)
     too_small = false;
     if ((pmr->mip & MIP_RETRY) == 0)
     {
-        if (absdiff < 1)
+        if (absdiff < fabs(pmr->mres))
             too_small = true;
     }
-    else if (absdiff < rdbdpos)
+    else if (absdiff < fabs(pmr->rdbd))
         too_small = true;
 
     if (too_small == true)
@@ -1857,28 +1843,16 @@ static RTN_STATUS doDVALchangedOrNOTdoneMoving(axisRecord *pmr)
     else if (pmr->rmod == motorRMOD_A) /* Do arthmetic sequence retries. */
     {
         double factor = (pmr->rtry - pmr->rcnt + 1.0) / pmr->rtry;
-        
         relpos *= factor;
-        if (fabs(relpos) < 1.0)
-            relpos = (relpos > 0.0) ? 1.0 : -1.0;
-        
         relbpos *= factor;
-        if (fabs(relbpos) < 1.0)
-            relbpos = (relbpos > 0.0) ? 1.0 : -1.0;
     }
     else if (pmr->rmod == motorRMOD_G) /* Do geometric sequence retries. */
     {
         double factor;
 
         factor = 1 / pow(2.0, (pmr->rcnt - 1));
-
         relpos *= factor;
-        if (fabs(relpos) < 1.0)
-            relpos = (relpos > 0.0) ? 1.0 : -1.0;
-        
         relbpos *= factor;
-        if (fabs(relbpos) < 1.0)
-            relbpos = (relbpos > 0.0) ? 1.0 : -1.0;
     }
     else if (pmr->rmod == motorRMOD_I) /* DC motor like In-position retries. */
         return(OK);
