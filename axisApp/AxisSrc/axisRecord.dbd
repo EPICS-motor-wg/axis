@@ -404,6 +404,13 @@ recordtype(axis) {
                 interest(2)
                 menu(menuAlarmSevr)
         }
+        field(MISV,DBF_MENU) {
+                prompt("MISS Severity")
+                promptgroup(GUI_COMMON)
+                pp(TRUE)
+                interest(2)
+                menu(menuAlarmSevr)
+        }
         field(RDBD,DBF_DOUBLE) {
                 prompt("Retry Deadband (EGU)")
                 promptgroup(GUI_COMMON)

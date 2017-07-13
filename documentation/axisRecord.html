@@ -362,7 +362,7 @@
 </tr>
 <tr><td class="cell">RTRY</td><td class="cell">Max retry count</td><td class="cell">SHORT</td><td class="cell">Yes</td><td class="cell">10</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">No</td></tr></table></blockquote>
 
-<p>The maximum number of times the record will try again to move to the desired position. When the retry limit is reached, the record will declare the motion finished. If the desired position was not reached, the field MISS will be set to 1.</p>
+<p>The maximum number of times the record will try again to move to the desired position. When the retry limit is reached, the record will declare the motion finished. If the desired position was not reached, the field MISS will be set to 1. If configured in MISV, the record is put into STATE alarm.</p>
 
 
 
@@ -907,11 +907,11 @@
 <th>Field</th><th>Summary</th><th>Type</th><th>DCT</th>
 <th>Default</th><th>Read</th><th>Write</th><th>CA PP</th>
 </tr>
-<tr><td class="cell">HLSV</td><td class="cell">HW Limit Violation Svr</td><td class="cell">MENU (<a href='menuAlarmSevr.html'>menuAlarmSevr</a>)</td><td class="cell">Yes</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">Yes</td></tr></table></blockquote>
+<tr><td class="cell">HLSV</td><td class="cell">HW Limit Violation Svr</td><td class="cell">MENU (<a href='menuAlarmSevr.html'>menuAlarmSevr</a>)</td><td class="cell">Yes</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">Yes</td></tr><tr><td class="cell">MISV</td><td class="cell">MISS Severity</td><td class="cell">MENU (<a href='menuAlarmSevr.html'>menuAlarmSevr</a>)</td><td class="cell">Yes</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">Yes</td></tr></table></blockquote>
 
-<p>If HLSW is not 0, the record is put into major alarm if the soft limits are violated or a limit switch is hit.</p>
+<p>If HLSV is not 0, the record is put into state alarm if the soft limits are violated or a limit switch is hit.</p>
 
-<p>If you miss a field to put the record into minor alarm when MISS is 1, send us a pull request.</p>
+<p>If MISV is not 0, the record is put into state alarm when the MISS field is 1.</p>
 
 <h2 id="Miscellaneous-fields">Miscellaneous fields</h2>
 

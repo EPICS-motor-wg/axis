@@ -463,6 +463,13 @@ recordtype(axis) {
                 interest(2)
                 menu(menuAlarmSevr)
         }
+        field(MISV,DBF_MENU) {
+                prompt("MISS Severity")
+                promptgroup(GUI_COMMON)
+                pp(TRUE)
+                interest(2)
+                menu(menuAlarmSevr)
+        }
         field(RDBD,DBF_DOUBLE) {
                 prompt("Retry Deadband (EGU)")
                 promptgroup(GUI_COMMON)
@@ -661,7 +668,7 @@ When the motor has finished a complete motion, possibly including backlash takeo
 
 =fields RTRY
 
-The maximum number of times the record will try again to move to the desired position. When the retry limit is reached, the record will declare the motion finished. If the desired position was not reached, the field MISS will be set to 1.
+The maximum number of times the record will try again to move to the desired position. When the retry limit is reached, the record will declare the motion finished. If the desired position was not reached, the field MISS will be set to 1. If configured in MISV, the record is put into STATE alarm. 
 
 =cut
 
@@ -1057,11 +1064,11 @@ Implementation dependent, typically one of these:
 
 =head2 Alarm
 
-=fields HLSV
+=fields HLSV,MISV
 
-If HLSW is not 0, the record is put into major alarm if the soft limits are violated or a limit switch is hit.
+If HLSV is not 0, the record is put into state alarm if the soft limits are violated or a limit switch is hit.
 
-If you miss a field to put the record into minor alarm when MISS is 1, send us a pull request.
+If MISV is not 0, the record is put into state alarm when the MISS field is 1.
 
 =cut
 

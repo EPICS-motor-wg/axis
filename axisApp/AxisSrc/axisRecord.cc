@@ -1213,7 +1213,7 @@ static void maybeRetry(axisRecord * pmr)
                 pmr->priv->last.dval = pmr->dval;
                 pmr->priv->last.rval = pmr->rval;
 
-                /* We should probably be triggering alarms here. */
+                /* Alarms, if configured in MISV, are done in alarm_sub() */
                 pmr->miss = 1;
                 MARK_AUX(M_MISS);
             }
@@ -3414,6 +3414,11 @@ static void alarm_sub(axisRecord * pmr)
     if ((msta.Bits.EA_SLIP_STALL != 0) || (msta.Bits.RA_PROBLEM != 0))
     {
       recGblSetSevr((dbCommon *) pmr, STATE_ALARM, MAJOR_ALARM);
+    }
+    if (pmr->misv && pmr->miss)
+    {
+        recGblSetSevr((dbCommon *) pmr, STATE_ALARM, pmr->misv);
+        return;
     }
 
     return;
