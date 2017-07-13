@@ -392,9 +392,6 @@ void asynAxisAxis::updateMsgTxtField()
   pC_->getIntegerParam(axisNo_,pC_->motorLatestCommand_, &motorLatestCommand);
   if (motorStatusMoving) {
     switch (motorLatestCommand) {
-    case LATEST_COMMAND_STOP:
-        setStringParam(pC_->motorMessageText_,"I: Stopped");
-        break;
     case LATEST_COMMAND_HOMING:
         setStringParam(pC_->motorMessageText_,"I: Homing");
         break;
@@ -410,6 +407,11 @@ void asynAxisAxis::updateMsgTxtField()
     case LATEST_COMMAND_MOVE_VEL:
         setStringParam(pC_->motorMessageText_,"I: Moving vel");
         break;
+    case LATEST_COMMAND_STOP:
+        /* Stopped, but moving */
+         pC_->setIntegerParam(axisNo_, pC_->motorLatestCommand_,
+                              LATEST_COMMAND_UNDEFINED);
+         /* fall through */
     default:
         setStringParam(pC_->motorMessageText_,"I: Moving");
     }
@@ -434,8 +436,11 @@ void asynAxisAxis::updateMsgTxtField()
     case LATEST_COMMAND_MOVE_VEL:
         setStringParam(pC_->motorMessageText_,"I: Move vel");
         break;
+    case LATEST_COMMAND_UNDEFINED:
+        setStringParam(pC_->motorMessageText_," ");
+        break;
     default:
-        setStringParam(pC_->motorMessageText_,"I: Move");
+        setStringParam(pC_->motorMessageText_,"I: Unkown");
     }
   }
 }
