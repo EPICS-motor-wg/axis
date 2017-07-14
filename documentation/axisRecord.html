@@ -216,7 +216,7 @@
 </tr>
 <tr><td class="cell">MRES</td><td class="cell">Motor Step Size (EGU)</td><td class="cell">DOUBLE</td><td class="cell">Yes</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">Yes</td></tr><tr><td class="cell">SREV</td><td class="cell">Steps per Revolution</td><td class="cell">LONG</td><td class="cell">Yes</td><td class="cell">200</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">Yes</td></tr><tr><td class="cell">UREV</td><td class="cell">EGU's per Revolution</td><td class="cell">DOUBLE</td><td class="cell">Yes</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">Yes</td></tr></table></blockquote>
 
-<p>MRES, and (SREV,UREV) represent two ways of specifying the motor resolution--the distance or angle, in engineering units (EGU&#39;s), associated with a single motor step. The equation relating these quantities is &quot;MRES = UREV/SREV &quot;. Initially, SREV has the value 200, the number of full steps per revolution for most stepper motors, and the record never changes this field. Only the user can change it.</p>
+<p>MRES, and (SREV,UREV) represent two ways of specifying the motor resolution--the distance or angle, in engineering units (EGU&#39;s), associated with a single motor step. If the motor step size is unkown (because the controller communicates in engineering units) MRES is the factor between the EGU in the record and the EGU in the controller. Example: If both the record and the controller use &quot;mm&quot;, set MRES to 1.0 If the record would use meter and the controller mm, set MRES to 0.001 See SBDB for a minimal movement The equation relating these quantities is &quot;MRES = UREV/SREV &quot;. Initially, SREV has the value 200, the number of full steps per revolution for most stepper motors, and the record never changes this field. Only the user can change it.</p>
 
 <p>When MRES is changed, the record sets UREV = MRES*SREV.</p>
 
@@ -343,6 +343,16 @@
 <p>This field supports closed-loop control of pathological devices for which drive values are not expected to compare reproducibly with readback values. (Inchworms and other friction-driven devices are good examples: the number of steps taken by an inchworm motor is a very poor indicator of the distance it has traveled.)</p>
 
 <p>In a move from position CURRENT to position TARGET, the record will ask hardware to move a distance FRAC*(TARGET-CURRENT). When that motion is complete, the record will request a motion of FRAC*(remaining distance), and so on until the target position has been reached.</p>
+
+
+
+<blockquote><table border="1"><tr>
+<th>Field</th><th>Summary</th><th>Type</th><th>DCT</th>
+<th>Default</th><th>Read</th><th>Write</th><th>CA PP</th>
+</tr>
+<tr><td class="cell">SDBD</td><td class="cell">Setpoint Deadband (EGU)</td><td class="cell">DOUBLE</td><td class="cell">Yes</td><td class="cell">&nbsp;</td><td class="cell">Yes</td><td class="cell">Yes</td><td class="cell">No</td></tr></table></blockquote>
+
+<p>Set point Dead Band - the minimal distance a motor can be moved. For an &quot;open loop stepper motor&quot; this the same as MRES. When the controller has an encoder and closes the position loop, it may be MRES or ERES, depending on the controller. In any case: SDBD &lt;= RDBD</p>
 
 
 

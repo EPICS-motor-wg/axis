@@ -582,8 +582,12 @@ Make RDBD >= MRES.
 static void enforceMinRetryDeadband(axisRecord * pmr)
 {
     double min_rdbd;
-
-    min_rdbd = fabs(pmr->mres);
+    if (!pmr->sdbd)
+    { /* SDBD is 0, set it to MRES */
+        pmr->sdbd = fabs(pmr->mres);
+        db_post_events(pmr, &pmr->sdbd, DBE_VAL_LOG);
+    }
+    min_rdbd = pmr->sdbd;
 
     if (pmr->rdbd < min_rdbd)
     {
@@ -759,7 +763,7 @@ static long init_record(dbCommon* arg, int pass)
 
     if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
         ;
-    else if ((pmr->drbv > pmr->dhlm + pmr->mres) || (pmr->drbv < pmr->dllm - pmr->mres))
+    else if ((pmr->drbv > pmr->dhlm + pmr->sdbd) || (pmr->drbv < pmr->dllm - pmr->sdbd))
     {
         pmr->lvio = 1;
         MARK(M_LVIO);
@@ -1157,7 +1161,7 @@ static long postProcess(axisRecord * pmr)
     }
     else if (pmr->mip & MIP_JOG_STOP || pmr->mip & MIP_MOVE)
     {
-        if (fabs(pmr->bdst) >=  fabs(pmr->mres))
+        if (fabs(pmr->bdst) >=  fabs(pmr->sdbd))
         {
             doBackLash(pmr);
         }
@@ -1649,18 +1653,17 @@ static int homing_wanted_and_allowed(axisRecord *pmr)
 static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
                           double relpos, double relbpos, double rbvpos, double newpos)
 {
-    double absmres = fabs(pmr->mres);
     double bpos = pmr->dval - pmr->bdst;
     double vbase = pmr->vbas; /* base speed      */
     double acc = (pmr->velo - vbase) / pmr->accl;     /* normal accel.   */
     double bacc = (pmr->bvel - vbase) / pmr->bacc;   /* backlash accel. */
-    double rbdst1 = fabs(pmr->bdst) + absmres;
+    double rbdst1 = fabs(pmr->bdst) + pmr->sdbd;
 
-    if (fabs(relpos) < absmres)
-        relpos = (relpos > 0.0) ? absmres : -absmres;
+    if (fabs(relpos) < pmr->sdbd)
+        relpos = (relpos > 0.0) ? pmr->sdbd : -pmr->sdbd;
         
-    if (fabs(relbpos) < absmres)
-        relbpos = (relbpos > 0.0) ? absmres : -absmres;
+    if (fabs(relbpos) < pmr->sdbd)
+        relbpos = (relbpos > 0.0) ? pmr->sdbd : -pmr->sdbd;
 
     
     /* AJF fix for the bug where the retry count is not incremented when doing retries */
@@ -1681,7 +1684,7 @@ static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
      * since move is in preferred direction (preferred_dir==ON),
      * AND, backlash acceleration and velocity are the same as slew values
      * (BVEL == VELO, AND, BACC == ACCL). */
-    if ((fabs(pmr->bdst) < absmres) ||
+    if ((fabs(pmr->bdst) < pmr->sdbd) ||
         (preferred_dir == true && pmr->bvel == pmr->velo &&
          pmr->bacc == pmr->accl))
     {
@@ -1692,7 +1695,7 @@ static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
     }
     /* IF move is in preferred direction, AND, current position is within backlash range. */
     else if ((preferred_dir == true) &&
-             ((use_rel == true  && relbpos <= absmres) ||
+             ((use_rel == true  && relbpos <= pmr->sdbd) ||
               (use_rel == false && (fabs(newpos - rbvpos) <= rbdst1))
              )
             )
@@ -1808,7 +1811,7 @@ static RTN_STATUS doDVALchangedOrNOTdoneMoving(axisRecord *pmr)
     too_small = false;
     if ((pmr->mip & MIP_RETRY) == 0)
     {
-        if (absdiff < fabs(pmr->mres))
+        if (absdiff < pmr->sdbd)
             too_small = true;
     }
     else if (absdiff < fabs(pmr->rdbd))
@@ -2739,7 +2742,8 @@ static long special(DBADDR *paddr, int after)
         }
         break;
 
-        /* new rdbd */
+        /* new sdbd ot rdbd */
+    case axisRecordSDBD:
     case axisRecordRDBD:
         enforceMinRetryDeadband(pmr);
         break;

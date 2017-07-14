@@ -476,6 +476,12 @@ recordtype(axis) {
                 special(SPC_MOD)
                 interest(1)
         }
+        field(SDBD,DBF_DOUBLE) {
+                prompt("Setpoint Deadband (EGU)")
+                promptgroup(GUI_COMMON)
+                special(SPC_MOD)
+                interest(1)
+        }
         field(RCNT,DBF_SHORT) {
                 prompt("Retry count")
                 special(SPC_NOMOD)
@@ -535,6 +541,12 @@ It is not normally written to directly by the user.
 
 MRES, and (SREV,UREV) represent two ways of specifying the motor resolution--the distance or angle,
 in engineering units (EGU's), associated with a single motor step.
+If the motor step size is unkown (because the controller communicates 
+in engineering units) MRES is the factor between the EGU in the record
+and the EGU in the controller.
+Example: If both the record and the controller use "mm", set MRES to 1.0
+If the record would use meter and the controller mm, set MRES to 0.001
+See SBDB for a minimal movement
 The equation relating these quantities is "MRES = UREV/SREV ". 
 Initially, SREV has the value 200, the number of full steps per revolution for most stepper motors,
 and the record never changes this field. Only the user can change it. 
@@ -659,6 +671,18 @@ In a move from position CURRENT to position TARGET, the record will ask hardware
 
 =cut
 
+
+=fields SDBD
+
+Set point Dead Band - the minimal distance a motor can be moved.
+For an "open loop stepper motor" this the same as MRES.
+When the controller has an encoder and closes the position loop,
+it may be MRES or ERES, depending on the controller.
+In any case: SDBD <= RDBD
+
+
+
+=cut
 
 =fields RDBD
 
