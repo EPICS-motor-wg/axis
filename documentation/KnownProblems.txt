@@ -23,54 +23,6 @@ MRES for modern controllers
 
   The whole re-calculation with floating points doesn't feel ideal.
 
-Minimal movements, deadband, MRES, ERES, RRES
-
-  The current record is based on a stepper motor,
-  and all postions are rounded to a "step".
-
-  When the VAL field is updated, the position is converted
-  into steps, counted as an integer "npos = NINT(newpos)".
-  When the new position is very close to the actual position,
-  and they are at the "same step" (in other words: too_small is true),
-  the motor doesn't have to move at all.
-  In fact, it can't move, and the record sets "dmov" to true directly.
-  This may save some time, especially when the "auto-power-on" feature
-  is used, and we need to wait for the amplifier to be turned on.
-
-  Similar things should happen when an external encoder is used:
-  The can be skipped if the new "encoder tick position" is the same
-  as the old "encoder position".
-  This is, however, not always working as expected:
-  http://www.aps.anl.gov/epics/tech-talk/2015/msg01485.php
-  A possible workaround/bugfix is here:  
-  https://github.com/EuropeanSpallationSource/motor/commit/ff5349c6cfd83ac81260343b0bcb490293ac17e9
-  A better solution would be to introduce the SDBD field, see below.
-  
-True deadband handling, SDBD
-  "real" stepper motors can only be positioned at a whole step.
-  Many MCU support "microstepping", or support brushless motors.
-  The step size is no longer this important, as the motor can be positioned at
-  "any position". The MCU uses enginering units to communicate with the IOC.
-  All details about the motor are hidden using enginering units.
-  On top of that, they take the feedback of an external encoder,
-  and close the position loop inside the controller.
-  Visible to the outside world is a "deadband". As long as the motor stays
-  inside the tolarance band, it is treated as "in position".
-
-  Does it make sense to change the current calculation of positions,
-  and the determination whether to move or not?
-
-if (fabs(delta(newPOS - oldPOS)) < SDBD)
-     do nothing but signal dmov=0 ; dmov=1 trnasition
-  else if URIP && fabs(delta) < RRES
-     do nothing but sigble dmov=0 ; dmov=1 trnasition
-  else if UEIP && fabs(delta) < ERES
-     do nothing but sigble dmov=0 ; dmov=1 trnasition
-  else if fabs(delta) < MRES
-     do nothing but sigble dmov=0 ; dmov=1 trnasition
-  else
-    do_the_motion()
-  
 Synchronization at startup.
   When the record is started, the TCP/IP connection may not be established,
   making the RRBV field to jump to 0 and back to the real position later.

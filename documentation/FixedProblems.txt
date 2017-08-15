@@ -64,3 +64,50 @@ NTM not working as documented - Servo motor stopped at overshoot
   Remove the NTM/NTMF fields.
   If needed new code can be added later.
   
+Minimal movements, deadband, MRES, ERES, RRES
+
+  The current record was based on a stepper motor,
+  and all postions are rounded to a "step".
+
+  When the VAL field was updated, the position was converted
+  into steps, counted as an integer "npos = NINT(newpos)".
+  When the new position is very close to the actual position,
+  and they are at the "same step" (in other words: too_small is true),
+  the motor doesn't have to move at all.
+  In fact, it can't move, and the record sets "dmov" to true directly.
+  This may save some time, especially when the "auto-power-on" feature
+  is used, and we need to wait for the amplifier to be turned on.
+
+  Similar things should happen when an external encoder is used:
+  The can be skipped if the new "encoder tick position" is the same
+  as the old "encoder position".
+  This is, however, not always working as expected:
+  http://www.aps.anl.gov/epics/tech-talk/2015/msg01485.php
+  As a solution the SDBD field was added, see below.
+  
+True deadband handling, SDBD
+  "real" stepper motors can only be positioned at a whole step.
+  Many MCU support "microstepping", or support brushless motors.
+  There are many MCU that manage a motor in a closed-loop, when an encoder
+  is used. The closed loop is sometimes called a servo motor.
+  Here the step size is no longer important, as the motor can be positioned at
+  "any position". The MCU uses enginering units to communicate with the IOC.
+  All details about the motor are hidden using enginering units.
+  As said before, they take the feedback of an external encoder,
+  and close the position loop inside the controller.
+  Visible to the outside world is a "deadband". As long as the motor stays
+  inside the tolarance band, it is treated as "in position".
+
+  Therefore the SDBD field has been add, to change
+  the determination whether to move or not?
+
+  /* At initialization */
+  if (SDBD ==0)
+    SDBD = MRES
+
+  /* Do we need to move ? */
+  if (fabs(delta(newPOS - oldPOS)) < SDBD)
+    do nothing but signal dmov=0 ; dmov=1 trnasition
+  else
+     do_the_motion()
+  
