@@ -13,6 +13,8 @@ extern "C" {
     struct {
       double position;           /**< Commanded motor position */
       double encoderPosition;    /**< Actual encoder position */
+      double motorHighLimitRO;   /**< read only high limit from controller. Valid if mflg & MF_HIGH_LIMIT_RO */
+      double motorLowLimitRO;    /**< read only low limit from controller. Valid if mflg & MF_LOW_LIMIT_RO */
     } readBack;
     struct {
       double val;               /* last .VAL */

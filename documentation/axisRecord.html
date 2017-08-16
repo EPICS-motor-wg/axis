@@ -796,8 +796,11 @@
 
 <p>The motor flags as received from the hardware. The MFLG bits are defined as follows:</p>
 
-<pre><code>        Bit 0: MF_HOME_ON_LS: Homing on LS towards LS allowed (e.g. HOMF when HLS)
-        Bit 1: MF_STOP_PROB:  Stop the axis when RA_PROBLEM is set</code></pre>
+<pre><code>        Bit 0: MF_HOME_ON_LS:      Homing on LS towards LS allowed (e.g. HOMF when HLS)
+        Bit 1: MF_STOP_PROB:       Stop the axis when RA_PROBLEM is set
+        Bit 2: MF_SHOW_NOT_HOMED:  Show not homed in the msg str
+        Bit 3: MF_HIGH_LIMIT_RO:   Controller has a valid &quot;read only high soft limit&quot;
+        Bit 4: MF_LOW_LIMIT_RO:    Controller has a valid &quot;read only low soft limit&quot;</code></pre>
 
 
 

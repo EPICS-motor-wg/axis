@@ -205,6 +205,10 @@ typedef union
 /* Flag bits */
 #define MF_HOME_ON_LS      (1)
 #define MF_STOP_PROB       (1<<1)
+/*#define MF_SHOW_NOT_HOMED       (1<<2) not use in record */
+#define MF_HIGH_LIMIT_RO   (1<<3)
+#define MF_LOW_LIMIT_RO    (1<<4)
+
 
 /* device support entry table */
 struct motor_dset

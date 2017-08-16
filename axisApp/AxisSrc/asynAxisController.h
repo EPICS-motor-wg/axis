@@ -67,11 +67,17 @@
 #define motorFlagsHomeOnLsString        "MOTOR_FLAGSS_HOME_ON_LS"
 #define motorFlagsStopOnProblemString   "MOTOR_FLAGS_STOP_ON_PROBLEM"
 #define motorFlagsShowNotHomedString    "MOTOR_FLAGS_SHOW_NOT_HOMED"
+#define motorFlagsHighLimitROString     "MOTOR_FLAGS_HIGH_LIMIT_RO"
+#define motorFlagsLowLimitROString      "MOTOR_FLAGS_LOW_LIMIT_RO"
 
 /* These are per-axis parameters for passing additional motor record information to the driver */
 #define motorRecResolutionString        "MOTOR_REC_RESOLUTION"
 #define motorRecDirectionString         "MOTOR_REC_DIRECTION"
 #define motorRecOffsetString            "MOTOR_REC_OFFSET"
+
+  /* Parameters from the controller to the driver and record */
+#define motorHighLimitROString          "MOTOR_HIGH_LIMIT_RO"
+#define motorLowLimitROString           "MOTOR_LOW_LIMIT_RO"
 
 /* These are the per-controller parameters for profile moves (coordinated motion) */
 #define profileNumAxesString            "PROFILE_NUM_AXES"
@@ -131,6 +137,8 @@ typedef struct MotorStatus {
   double velocity;           /**< Actual velocity */
   epicsUInt32 status;        /**< Word containing status bits (motion done, limits, etc.) */
   epicsUInt32 flags;         /**< Word containing flag bits  */
+  double motorHighLimitRO;   /**< Read only high soft limit from controller. Valid if flags & MF_HIGH_LIMIT_RO */
+  double motorLowLimitRO;    /**< Read only low soft limit from controller. Valid if flags & MF_LOW_LIMIT_RO  */
 } MotorStatus;
 
 enum ProfileTimeMode{
@@ -287,15 +295,26 @@ class epicsShareClass asynAxisController : public asynPortDriver {
   int motorStatusLowLimit_;
   int motorStatusHomed_;
 
+  /*
+   * Flags from driver/controller to the record
+   * Don't change the order here, Add new values at the end
+   * Keep in sync with axis.h: #define MF_HOME
+   * Don't forget to update asynAxisAxis::setIntegerParam()
+   */
   int motorFlagsHomeOnLs_;
   int motorFlagsStopOnProblem_;
   int motorFlagsShowNotHomed_;
+  int motorFlagsHighLimitRO_;
+  int motorFlagsLowLimitRO_;
 
   // These are per-axis parameters for passing additional motor record information to the driver
   int motorRecResolution_;
   int motorRecDirection_;
   int motorRecOffset_;
 
+  // Parameters from the controller to the driver and record
+  int motorHighLimitRO_;
+  int motorLowLimitRO_;
   // These are the per-controller parameters for profile moves
   int profileNumAxes_;
   int profileNumPoints_;

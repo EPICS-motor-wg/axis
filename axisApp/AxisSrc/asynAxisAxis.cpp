@@ -258,7 +258,7 @@ asynStatus asynAxisAxis::setIntegerParam(int function, int value)
       statusChanged_ = 1;
     }
   } else  if (function >= pC_->motorFlagsHomeOnLs_ && 
-              function <= pC_->motorFlagsShowNotHomed_) {
+              function <= pC_->motorFlagsLowLimitRO_) {
     flags = status_.flags;
     mask = 1 << (function - pC_->motorFlagsHomeOnLs_);
     if (value) flags |= mask;
@@ -293,7 +293,17 @@ asynStatus asynAxisAxis::setDoubleParam(int function, double value)
         statusChanged_ = 1;
         status_.encoderPosition = value;
     }
-  }  
+  } else if (function == pC_->motorHighLimitRO_) {
+    if (value != status_.motorHighLimitRO) {
+      statusChanged_ = 1;
+      status_.motorHighLimitRO = value;
+    }
+  } else if (function == pC_->motorLowLimitRO_) {
+    if (value != status_.motorLowLimitRO) {
+      statusChanged_ = 1;
+      status_.motorLowLimitRO = value;
+    }
+  }
   // Call the base class method
   return pC_->setDoubleParam(axisNo_, function, value);
 }   

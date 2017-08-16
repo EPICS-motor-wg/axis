@@ -458,6 +458,8 @@ CALLBACK_VALUE update_values(struct axisRecord * pmr)
 
         pmr->priv->readBack.position = pPvt->status.position;
         pmr->priv->readBack.encoderPosition = pPvt->status.encoderPosition;
+        pmr->priv->readBack.motorHighLimitRO = pPvt->status.motorHighLimitRO;
+        pmr->priv->readBack.motorLowLimitRO = pPvt->status.motorLowLimitRO;
         rawvalue = (epicsInt32)floor(pPvt->status.position + 0.5);
         if (pmr->rmp != rawvalue)
         {

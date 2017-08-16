@@ -1001,8 +1001,12 @@ The record is put into MAJOR STATE alarm if either SLIP_STALL or PROBLEM bits ar
 
 The motor flags as received from the hardware.  The MFLG bits are defined as follows:
 
-        Bit 0: MF_HOME_ON_LS: Homing on LS towards LS allowed (e.g. HOMF when HLS)
-        Bit 1: MF_STOP_PROB:  Stop the axis when RA_PROBLEM is set
+        Bit 0: MF_HOME_ON_LS:      Homing on LS towards LS allowed (e.g. HOMF when HLS)
+        Bit 1: MF_STOP_PROB:       Stop the axis when RA_PROBLEM is set
+        Bit 2: MF_SHOW_NOT_HOMED:  Show not homed in the msg str
+        Bit 3: MF_HIGH_LIMIT_RO:   Controller has a valid "read only high soft limit"
+        Bit 4: MF_LOW_LIMIT_RO:    Controller has a valid "read only low soft limit"
+
 
 =cut
 
