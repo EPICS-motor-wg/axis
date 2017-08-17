@@ -476,8 +476,11 @@ CALLBACK_VALUE update_values(struct axisRecord * pmr)
 
         /* Don't post MSTA changes here; motor record's process() function does efficent MSTA posting. */
         pmr->msta = pPvt->status.status;
-        pmr->mflg = pPvt->status.flags;
-
+        if (pmr->mflg != pPvt->status.flags)
+        {
+            pmr->mflg = pPvt->status.flags;
+            db_post_events(pmr, &pmr->mflg, DBE_VAL_LOG);
+        }
         rawvalue = (epicsInt32)floor(pPvt->status.velocity);
         if (pmr->rvel != rawvalue)
         {
