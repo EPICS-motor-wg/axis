@@ -1060,7 +1060,7 @@ static void doBackLash(axisRecord *pmr)
 }
 
 /*****************************************************************************/
-static void doHome(axisRecord *pmr)
+static void doHomeSetcdir(axisRecord *pmr)
 {
     struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
     double vbase = pmr->vbas / fabs(pmr->mres);
@@ -1136,11 +1136,8 @@ static long postProcess(axisRecord * pmr)
             MARK(M_DMOV);
             pmr->rcnt = 0;
             MARK(M_RCNT);
-            doHome(pmr);
+            doHomeSetcdir(pmr);
             pmr->pp = TRUE;
-            pmr->cdir = (pmr->mip & MIP_HOMF) ? 1 : 0;
-            if (pmr->mres < 0.0)
-                pmr->cdir = !pmr->cdir;
         }
         else
         {
@@ -2370,14 +2367,11 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
                     pmr->eres = pmr->mres;
                     MARK(M_ERES);
                 }
-                doHome(pmr);
+                doHomeSetcdir(pmr);
                 pmr->dmov = FALSE;
                 MARK(M_DMOV);
                 pmr->rcnt = 0;
                 MARK(M_RCNT);
-                pmr->cdir = (pmr->mip & MIP_HOMF) ? 1 : 0;
-                if (pmr->mres < 0.0)
-                    pmr->cdir = !pmr->cdir;
             }
             return(OK);
         }
