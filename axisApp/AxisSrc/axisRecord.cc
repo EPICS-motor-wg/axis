@@ -383,6 +383,7 @@ typedef union
         unsigned int M_JOGR     :1;
         unsigned int M_HOMF     :1;
         unsigned int M_HOMR     :1;
+        unsigned int M_CDIR     :1;
     } Bits;
 } nmap_field;
 
@@ -838,7 +839,35 @@ LOGIC:
     
     
 ******************************************************************************/
+/*
+ * Set cdir dependent on the commanded move in "raw direction"
+ * directionRaw > 0  is positive
+ * directionRaw <= 0 is negative
+ */
+static void setCDIRfromRawMove(axisRecord *pmr, int directionRaw)
+{
+    int cdirRaw = directionRaw > 0 ? 1 : 0; /* only 1 or 0 */
+    if (pmr->cdir != cdirRaw)
+    {
+        MARK_AUX(M_CDIR);
+        pmr->cdir = cdirRaw;
+    }
+}
+/*****************************************************************************
 
+******************************************************************************/
+/*
+ * Set cdir dependent on the commanded move in "dial direction"
+ * directionDial > 0  is positive
+ * directionDial <= 0 is negative
+ */
+static void setCDIRfromDialMove(axisRecord *pmr, int directionDial)
+{
+    int cdirRaw = directionDial > 0 ? 1 : 0;
+    if (pmr->mres < 0.0)       /* mres < 0 means invert direction dial <-> raw */
+        cdirRaw = !cdirRaw; /* If needed, 1 -> 0; 0 -> 1 */
+    setCDIRfromRawMove(pmr, cdirRaw);
+}
 /*****************************************************************************
   Calls to device support
   Wrappers that call device support.
@@ -948,6 +977,7 @@ static void devSupJogRaw(axisRecord *pmr, double jogv, double vbase, double jacc
     WRITE_MSG(SET_ACCEL, &jacc);
     WRITE_MSG(JOG, &jogv);
     SEND_MSG();
+    setCDIRfromRawMove(pmr, jogv > 0);
 }
 /* No WRITE_MSG(JOG, ); after this point */
 #define JOG #ErrorJOG
@@ -995,7 +1025,7 @@ static void doMoveRelDial(axisRecord *pmr, double vel, double vbase,
      Position needs the sign of mres */
     double amres = fabs(pmr->mres);
     devSupMoveRelRaw(pmr, vel/amres, vbase/amres, accEGU/amres, relpos/pmr->mres);
-    pmr->cdir = relpos < 0.0 ? 0 : 1;
+    setCDIRfromDialMove(pmr, relpos < 0.0 ? 0 : 1);
 }
 /*****************************************************************************/
 
@@ -1007,7 +1037,7 @@ static void doMoveAbsDial(axisRecord *pmr, double vel, double vbase,
     double amres = fabs(pmr->mres);
     double diff = position - pmr->drbv;
     devSupMoveAbsRaw(pmr, vel/amres, vbase/amres, accEGU/amres, position/pmr->mres);
-    pmr->cdir = diff < 0.0 ? 0 : 1;
+    setCDIRfromDialMove(pmr, diff < 0.0 ? 0 : 1);
 }
 
 static void doMoveDialPosition(axisRecord *pmr, double vel, double vbase,
@@ -1710,7 +1740,6 @@ static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
             doMoveAbsDial(pmr, pmr->velo, vbase, acc, bpos);
         pmr->pp = TRUE;              /* do backlash from posprocess(). */
     }
-    pmr->cdir = (pmr->dval - pmr->drbv) < 0.0 ? 0 : 1;
 }
 
 /*************************************************************************/
@@ -2410,18 +2439,10 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
                 pmr->dmov = FALSE;
                 MARK(M_DMOV);
                 pmr->pp = TRUE;
-                if (pmr->jogf)
-                    pmr->cdir = 1;
-                else
+                if (pmr->jogr)
                 {
-                    pmr->cdir = 0;
                     jogv = -jogv;
                 }
-
-                if (pmr->mres < 0.0)
-                    pmr->cdir = !pmr->cdir;
-                if (dir == -1)
-                    pmr->cdir = !pmr->cdir;
                 devSupJogRaw(pmr, jogv, vbase, jacc);
   
             }
@@ -3642,6 +3663,8 @@ static void monitor(axisRecord * pmr)
         db_post_events(pmr, &pmr->homf, local_mask);
     if ((local_mask = monitor_mask | (MARKED_AUX(M_HOMR) ? DBE_VAL_LOG : 0)))
         db_post_events(pmr, &pmr->homr, local_mask);
+    if ((local_mask = monitor_mask | (MARKED_AUX(M_CDIR) ? DBE_VAL_LOG : 0)))
+        db_post_events(pmr, &pmr->cdir, local_mask);
 
     UNMARK_ALL;
 }
