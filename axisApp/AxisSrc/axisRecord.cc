@@ -3957,6 +3957,16 @@ static void set_dial_highlimit(axisRecord *pmr)
     } else {
         command = SET_HIGH_LIMIT;
     }
+    if (pmr->mflg & MF_HIGH_LIMIT_RO)
+    {
+        double maxValue = pmr->priv->readBack.motorHighLimitRO;
+        fprintf(stdout,
+                "%s:%d %s pmr->dhlm=%g maxValue=%g\n",
+                __FILE__, __LINE__, pmr->name,
+                pmr->dhlm, maxValue);
+        fflush(stdout);
+        if (pmr->dhlm > maxValue) pmr->dhlm = maxValue;
+    }
     devSupUpdateLimitFromDial(pmr, command, pmr->dhlm);
     if (dir_positive)
     {
@@ -4007,6 +4017,16 @@ static void set_dial_lowlimit(axisRecord *pmr)
         command = SET_HIGH_LIMIT;
     } else {
         command = SET_LOW_LIMIT;
+    }
+    if (pmr->mflg & MF_LOW_LIMIT_RO)
+    {
+        double minValue = pmr->priv->readBack.motorLowLimitRO;
+        fprintf(stdout,
+                "%s:%d %s pmr->dllm=%g minValue=%g\n",
+                __FILE__, __LINE__, pmr->name,
+                pmr->dllm, minValue);
+        fflush(stdout);
+        if (pmr->dllm < minValue) pmr->dllm = minValue;
     }
     devSupUpdateLimitFromDial(pmr, command, pmr->dllm);
 
