@@ -3976,27 +3976,15 @@ static void set_dial_highlimit(axisRecord *pmr)
 static void set_user_highlimit(axisRecord *pmr)
 {
     double offset = pmr->off;
-    int dir_positive = (pmr->dir == motorDIR_Pos);
-    /* Which controller limit we set depends not only on dir, but
-       also on the sign of MRES */
-    /* Direction +ve AND +ve MRES OR
-       Direction -ve AND -ve MRES */
-    motor_cmnd command = (dir_positive ^ (pmr->mres < 0)) ?
-                         SET_HIGH_LIMIT : SET_LOW_LIMIT;
-
-    if (dir_positive)
+    if (pmr->dir == motorDIR_Pos)
     {
         pmr->dhlm = pmr->hlm - offset;
-        devSupUpdateLimitFromDial(pmr, command, pmr->dhlm);
-        pmr->hlm = pmr->dhlm + offset;
-        MARK(M_DHLM);
+        set_dial_highlimit(pmr);
     }
     else
     {
         pmr->dllm = -(pmr->hlm) + offset;
-        devSupUpdateLimitFromDial(pmr, command, pmr->dllm);
-        pmr->hlm = -(pmr->dllm) + offset;
-        MARK(M_DLLM);
+        set_dial_lowlimit(pmr);
     }
     MARK(M_HLM);
 }
@@ -4038,26 +4026,15 @@ static void set_dial_lowlimit(axisRecord *pmr)
 static void set_user_lowlimit(axisRecord *pmr)
 {
     double offset = pmr->off;
-    /* Which controller limit we set depends not only on dir, but
-       also on the sign of MRES */
-    /* Direction +ve AND +ve MRES OR
-       Direction -ve AND -ve MRES */
-    int dir_positive = (pmr->dir == motorDIR_Pos);
-    motor_cmnd command = (dir_positive ^ (pmr->mres < 0)) ?
-      SET_LOW_LIMIT : SET_HIGH_LIMIT ;
-    if (dir_positive)
+    if (pmr->dir == motorDIR_Pos)
     {
         pmr->dllm = pmr->llm - offset;
-        devSupUpdateLimitFromDial(pmr, command, pmr->dllm );
-        pmr->llm = pmr->dllm + offset;
-        MARK(M_DLLM);
+        set_dial_lowlimit(pmr);
     }
     else
     {
         pmr->dhlm = -(pmr->llm) + offset;
-        devSupUpdateLimitFromDial(pmr, command, pmr->dhlm);
-        pmr->llm = -(pmr->dhlm) + offset;
-        MARK(M_DHLM);
+        set_dial_highlimit(pmr);
     }
     MARK(M_LLM);
 }
