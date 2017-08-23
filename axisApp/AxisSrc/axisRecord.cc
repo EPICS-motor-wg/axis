@@ -237,6 +237,8 @@ static void load_pos(axisRecord *);
 static void check_speed_and_resolution(axisRecord *);
 static void set_dial_highlimit(axisRecord *);
 static void set_dial_lowlimit(axisRecord *);
+static void set_user_highlimit(axisRecord *);
+static void set_user_lowlimit(axisRecord *);
 static void set_userlimits(axisRecord *);
 static void range_check(axisRecord *, double *, double, double);
 static void clear_buttons(axisRecord *);
@@ -2585,7 +2587,7 @@ static long special(DBADDR *paddr, int after)
     int dir = dir_positive ? 1 : -1;
     bool changed = false;
     int fieldIndex = dbGetFieldIndex(paddr);
-    double offset, tmp_limit, fabs_urev;
+    double fabs_urev;
     RTN_STATUS rtnval;
     motor_cmnd command;
     double temp_dbl;
@@ -2792,102 +2794,12 @@ static long special(DBADDR *paddr, int after)
 
         /* new user high limit */
     case axisRecordHLM:
-        offset = pmr->off;
-        if (dir_positive)
-        {
-            tmp_limit = pmr->hlm - offset;
-            MARK(M_DHLM);
-        }
-        else
-        {
-            tmp_limit = -(pmr->hlm) + offset;
-            MARK(M_DLLM);
-        }
-
-        /* Which controller limit we set depends not only on dir, but
-           also on the sign of MRES */
-        /* Direction +ve AND +ve MRES OR
-           Direction -ve AND -ve MRES */
-        if (dir_positive ^ (pmr->mres < 0))
-        {
-            command = SET_HIGH_LIMIT;
-        }
-        else
-        /* Direction -ve AND +ve MRES OR
-           Direction +ve AND -ve MRES */
-        {
-            command = SET_LOW_LIMIT;
-        }
-
-        rtnval = devSupUpdateLimitFromDial(pmr, command, tmp_limit);
-        if (rtnval != OK)
-        {
-            /* If an error occured, build_trans() has reset
-             * dial high or low limit to controller's value. */
-
-            if (dir_positive)
-                pmr->hlm = pmr->dhlm + offset;
-            else
-                pmr->hlm = -(pmr->dllm) + offset;
-        }
-        else
-        {
-            if (dir_positive)
-                pmr->dhlm = tmp_limit;
-            else
-                pmr->dllm = tmp_limit;
-        }
-        MARK(M_HLM);
+        set_user_highlimit(pmr);
         break;
 
         /* new user low limit */
     case axisRecordLLM:
-        offset = pmr->off;
-        if (dir_positive)
-        {
-            tmp_limit = pmr->llm - offset;
-            MARK(M_DLLM);
-        }
-        else
-        {
-            tmp_limit = -(pmr->llm) + offset;
-            MARK(M_DHLM);
-        }
-
-        /* Which controller limit we set depends not only on dir, but
-           also on the sign of MRES */
-        /* Direction +ve AND +ve MRES OR
-           Direction -ve AND -ve MRES */
-        if (dir_positive ^ (pmr->mres < 0))
-        {
-            command = SET_LOW_LIMIT;
-        }
-        else
-        /* Direction -ve AND +ve MRES OR
-           Direction +ve AND -ve MRES */
-        {
-            command = SET_HIGH_LIMIT;
-        }
-
-        rtnval = devSupUpdateLimitFromDial(pmr, command, tmp_limit);
-        if (rtnval != OK)
-        {
-            /* If an error occured, build_trans() has reset
-             * dial high or low limit to controller's value. */
-
-            if (dir_positive)
-                pmr->llm = pmr->dllm + offset;
-            else
-                pmr->llm = -(pmr->dhlm) + offset;
-        }
-        else
-        {
-            if (dir_positive)
-                pmr->dllm = tmp_limit;
-            else
-                pmr->dhlm = tmp_limit;
-        }
-        MARK(M_LLM);
+        set_user_lowlimit(pmr);
         break;
 
         /* new dial high limit */
@@ -4059,6 +3971,64 @@ static void set_dial_highlimit(axisRecord *pmr)
     MARK(M_DHLM);
 }
 
+
+
+static void set_user_highlimit(axisRecord *pmr)
+{
+    double offset = pmr->off;
+    double tmp_limit;
+    int dir_positive = (pmr->dir == motorDIR_Pos);
+    motor_cmnd command;
+    RTN_STATUS rtnval;
+
+    if (dir_positive)
+    {
+        tmp_limit = pmr->hlm - offset;
+        MARK(M_DHLM);
+    }
+    else
+    {
+        tmp_limit = -(pmr->hlm) + offset;
+        MARK(M_DLLM);
+    }
+
+    /* Which controller limit we set depends not only on dir, but
+       also on the sign of MRES */
+    /* Direction +ve AND +ve MRES OR
+       Direction -ve AND -ve MRES */
+    if (dir_positive ^ (pmr->mres < 0))
+    {
+        command = SET_HIGH_LIMIT;
+    }
+    else
+    /* Direction -ve AND +ve MRES OR
+       Direction +ve AND -ve MRES */
+    {
+        command = SET_LOW_LIMIT;
+    }
+
+    rtnval = devSupUpdateLimitFromDial(pmr, command, tmp_limit);
+    if (rtnval != OK)
+    {
+        /* If an error occured, build_trans() has reset
+         * dial high or low limit to controller's value. */
+
+        if (dir_positive)
+            pmr->hlm = pmr->dhlm + offset;
+        else
+            pmr->hlm = -(pmr->dllm) + offset;
+    }
+    else
+    {
+        if (dir_positive)
+            pmr->dhlm = tmp_limit;
+        else
+            pmr->dllm = tmp_limit;
+    }
+    MARK(M_HLM);
+}
+
+
 /*
 FUNCTION... void set_dial_lowlimit(axisRecord *)
 USAGE... Set dial-coordinate low limit.
@@ -4092,6 +4062,61 @@ static void set_dial_lowlimit(axisRecord *pmr)
     MARK(M_DLLM);
 }
 
+static void set_user_lowlimit(axisRecord *pmr)
+{
+    double offset = pmr->off;
+    double tmp_limit;
+    int dir_positive = (pmr->dir == motorDIR_Pos);
+    motor_cmnd command;
+    RTN_STATUS rtnval;
+
+    offset = pmr->off;
+    if (dir_positive)
+    {
+        tmp_limit = pmr->llm - offset;
+        MARK(M_DLLM);
+    }
+    else
+    {
+        tmp_limit = -(pmr->llm) + offset;
+        MARK(M_DHLM);
+    }
+
+    /* Which controller limit we set depends not only on dir, but
+       also on the sign of MRES */
+    /* Direction +ve AND +ve MRES OR
+       Direction -ve AND -ve MRES */
+    if (dir_positive ^ (pmr->mres < 0))
+    {
+        command = SET_LOW_LIMIT;
+    }
+    else
+    /* Direction -ve AND +ve MRES OR
+       Direction +ve AND -ve MRES */
+    {
+        command = SET_HIGH_LIMIT;
+    }
+
+    rtnval = devSupUpdateLimitFromDial(pmr, command, tmp_limit);
+    if (rtnval != OK)
+    {
+        /* If an error occured, build_trans() has reset
+         * dial high or low limit to controller's value. */
+
+        if (dir_positive)
+            pmr->llm = pmr->dllm + offset;
+        else
+            pmr->llm = -(pmr->dhlm) + offset;
+    }
+    else
+    {
+        if (dir_positive)
+            pmr->dllm = tmp_limit;
+        else
+            pmr->dhlm = tmp_limit;
+    }
+    MARK(M_LLM);
+}
 /*
 FUNCTION... void set_userlimits(axisRecord *)
 USAGE... Translate dial-coordinate limits to user-coordinate limits.
