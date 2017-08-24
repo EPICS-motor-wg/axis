@@ -173,7 +173,7 @@ static long init( int after )
     return 0;
 }
 
-static void init_controller(struct axisRecord *pmr, asynUser *pasynUser )
+static void init_controller_load_pos_if_needed(struct axisRecord *pmr, asynUser *pasynUser )
 {
     /* This routine is copied out of the old motordevCom and initialises the controller
        based on the record values. I think most of it should be transferred to init_record
@@ -181,14 +181,9 @@ static void init_controller(struct axisRecord *pmr, asynUser *pasynUser )
     motorAsynPvt *pPvt = (motorAsynPvt *)pmr->dpvt;
     double position = pPvt->status.position;
     double rdbd = (fabs(pmr->rdbd) < fabs(pmr->mres) ? fabs(pmr->mres) : fabs(pmr->rdbd) );
-    double encRatio[2] = {pmr->mres, pmr->eres};
     int use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
 
-    /*Before setting position, set the correct encoder ratio.*/
-    start_trans(pmr);
-    build_trans(SET_ENC_RATIO, encRatio, pmr);
-    end_trans(pmr);
-
+    /* the encoder ratio has been set in config_controller() */
     if ((use_rel != 0) ||
         ((fabs(pmr->dval) > rdbd) && (pmr->mres != 0) && (fabs(position * pmr->mres) < rdbd))
        )
@@ -203,7 +198,7 @@ static void init_controller(struct axisRecord *pmr, asynUser *pasynUser )
         end_trans(pmr);
 
         asynPrint(pasynUser, ASYN_TRACE_FLOW,
-                  "devMotorAsyn::init_controller, %s set position to %f\n",
+                  "devMotorAsyn::init_controller_load_pos_if_needed, %s set position to %f\n",
                   pmr->name, setPos );
 
         if ( initEvent )
@@ -215,7 +210,7 @@ static void init_controller(struct axisRecord *pmr, asynUser *pasynUser )
     }
     else
         asynPrint(pasynUser, ASYN_TRACE_FLOW,
-                  "devMotorAsyn::init_controller, %s setting of position not required, position=%f, mres=%f, dval=%f, rdbd=%f",
+                  "devMotorAsyn::init_controller_load_pos_if_needed, %s setting of position not required, position=%f, mres=%f, dval=%f, rdbd=%f",
                   pmr->name, position, pmr->mres, pmr->dval, rdbd );
 
 }
@@ -425,7 +420,7 @@ static long init_record(struct axisRecord * pmr )
      * the initial setting of position. Otherwise we won't be able to decide
      * whether or not to write new position values to the controller.
      */
-    init_controller(pmr, pasynUser);
+    init_controller_load_pos_if_needed(pmr, pasynUser);
     /* Do not need to manually retrieve the new status values, as if they are
      * set, a callback will be generated
      */
