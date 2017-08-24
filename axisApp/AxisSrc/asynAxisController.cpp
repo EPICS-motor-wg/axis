@@ -518,10 +518,7 @@ asynStatus asynAxisController::readGenericPointer(asynUser *pasynUser, void *poi
   axis = pAxis->axisNo_;
  
   getAddress(pasynUser, &axis);
-  getIntegerParam(axis, motorStatus_, (int *)&pStatus->status);
-  getDoubleParam(axis, motorPosition_, &pStatus->position);
-  getDoubleParam(axis, motorEncoderPosition_, &pStatus->encoderPosition);
-  getDoubleParam(axis, motorVelocity_, &pStatus->velocity);
+  memcpy(pStatus, &pAxis->status_, sizeof(*pStatus));
   asynPrint(pasynUser, ASYN_TRACE_FLOW,
     "%s:%s: MotorStatus = status%d, position=%f, encoder position=%f, velocity=%f\n", 
     driverName, functionName, pStatus->status, pStatus->position, pStatus->encoderPosition, pStatus->velocity);
