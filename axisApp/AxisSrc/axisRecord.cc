@@ -575,6 +575,13 @@ static void callbackFunc(struct callback *pcb)
 }
 
 
+static bool softLimitsDefined(axisRecord *pmr)
+{
+   if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
+       return FALSE;
+   else
+     return TRUE;
+}
 /******************************************************************************
         enforceMinRetryDeadband()
 
@@ -748,6 +755,14 @@ static long init_record(dbCommon* arg, int pass)
         MARK(M_RVAL);
     }
 
+    if (!softLimitsDefined(pmr) &&
+        (pmr->mflg & MF_HIGH_LIMIT_RO) &&
+        (pmr->mflg & MF_LOW_LIMIT_RO))
+    {
+      /* The record has no soft limits, but the controller has  */
+      pmr->dhlm = pmr->priv->readBack.motorHighLimitRO;
+      pmr->dllm = pmr->priv->readBack.motorLowLimitRO;
+    }
     /* Reset limits in case database values are invalid. */
     set_dial_highlimit(pmr);
     set_dial_lowlimit(pmr);
@@ -764,9 +779,8 @@ static long init_record(dbCommon* arg, int pass)
     pmr->priv->last.rval = pmr->rval;
     pmr->lvio = 0;              /* init limit-violation field */
 
-    if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
-        ;
-    else if ((pmr->drbv > pmr->dhlm + pmr->sdbd) || (pmr->drbv < pmr->dllm - pmr->sdbd))
+    if (softLimitsDefined(pmr) &&
+        ((pmr->drbv > pmr->dhlm + pmr->sdbd) || (pmr->drbv < pmr->dllm - pmr->sdbd)))
     {
         pmr->lvio = 1;
         MARK(M_LVIO);
@@ -1599,7 +1613,7 @@ static long process(dbCommon *arg)
 enter_do_work:
 
     /* check for soft-limit violation */
-    if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
+    if (!softLimitsDefined(pmr))
         pmr->lvio = false;
     else
     {
@@ -1899,7 +1913,7 @@ static RTN_STATUS doDVALchangedOrNOTdoneMoving(axisRecord *pmr)
             preferred_dir = false;
     }
     /* Check for soft-travel limit violation */
-    if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
+    if (!softLimitsDefined(pmr))
         pmr->lvio = false;
     /* LVIO = TRUE, AND, Move request towards valid travel limit range. */
     else if (((pmr->dval > pmr->dhlm) && (pmr->dval < pmr->priv->last.dval)) ||
@@ -2414,10 +2428,9 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
             (pmr->mip & MIP_JOG_REQ))
         {
             /* check for limit violation */
-            if ((pmr->dhlm == pmr->dllm) && (pmr->dllm == 0.0))
-                ;
-            else if ((pmr->jogf && (pmr->val > pmr->hlm - pmr->jvel)) ||
-                     (pmr->jogr && (pmr->val < pmr->llm + pmr->jvel)))
+            if (softLimitsDefined(pmr) &&
+                (pmr->jogf && (pmr->val > pmr->hlm - pmr->jvel)) ||
+                (pmr->jogr && (pmr->val < pmr->llm + pmr->jvel)))
             {
                 pmr->lvio = 1;
                 MARK(M_LVIO);
