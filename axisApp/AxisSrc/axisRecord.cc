@@ -779,8 +779,9 @@ static long init_record(dbCommon* arg, int pass)
     pmr->priv->last.rval = pmr->rval;
     pmr->lvio = 0;              /* init limit-violation field */
 
-    if (softLimitsDefined(pmr) &&
-        ((pmr->drbv > pmr->dhlm + pmr->sdbd) || (pmr->drbv < pmr->dllm - pmr->sdbd)))
+    if (!softLimitsDefined(pmr))
+        ;
+    else if ((pmr->drbv > pmr->dhlm + pmr->sdbd) || (pmr->drbv < pmr->dllm - pmr->sdbd))
     {
         pmr->lvio = 1;
         MARK(M_LVIO);
@@ -2428,9 +2429,10 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
             (pmr->mip & MIP_JOG_REQ))
         {
             /* check for limit violation */
-            if (softLimitsDefined(pmr) &&
-                (pmr->jogf && (pmr->val > pmr->hlm - pmr->jvel)) ||
-                (pmr->jogr && (pmr->val < pmr->llm + pmr->jvel)))
+            if (!softLimitsDefined(pmr))
+                ;
+            else if ((pmr->jogf && (pmr->val > pmr->hlm - pmr->jvel)) ||
+                     (pmr->jogr && (pmr->val < pmr->llm + pmr->jvel)))
             {
                 pmr->lvio = 1;
                 MARK(M_LVIO);
