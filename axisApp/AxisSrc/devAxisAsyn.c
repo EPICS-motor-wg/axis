@@ -230,6 +230,39 @@ static long findDrvInfo(axisRecord *pmotor, asynUser *pasynUser, char *drvInfoSt
     return(0);
 }
 
+static void init_controller_update_soft_limits(struct axisRecord *pmr)
+{
+    motorAsynPvt *pPvt = (motorAsynPvt *)pmr->dpvt;
+    int dialHighLimtEn = (pPvt->status.flags & MF_RAW_HIGH_LIMIT_RO) ? 1 : 0;
+    int dialLowLimtEn  = (pPvt->status.flags & MF_RAW_LOW_LIMIT_RO) ? 1 :0;
+    memset(&pmr->priv->softLimitRO, 0, sizeof(pmr->priv->softLimitRO));
+    if (dialHighLimtEn)
+    {
+        double dialHighLimitRO;
+        dialHighLimitRO = pPvt->status.MotorConfigRO.motorHighLimitRaw * pmr->mres;
+        if (pmr->mres < 0) {
+            pmr->priv->softLimitRO.motorDialLowLimitRO = dialHighLimitRO;
+            pmr->priv->softLimitRO.motorDialLowLimitEN = 1;
+        } else {
+            pmr->priv->softLimitRO.motorDialHighLimitRO = dialHighLimitRO;
+            pmr->priv->softLimitRO.motorDialHighLimitEN = 1;
+        }
+    }
+    if (dialLowLimtEn)
+    {
+        double dialLowLimitRO;
+        dialLowLimitRO = pPvt->status.MotorConfigRO.motorLowLimitRaw * pmr->mres;
+        if (pmr->mres < 0) {
+            pmr->priv->softLimitRO.motorDialHighLimitRO = dialLowLimitRO;
+            pmr->priv->softLimitRO.motorDialHighLimitEN = 1;
+        } else {
+            pmr->priv->softLimitRO.motorDialLowLimitRO = dialLowLimitRO;
+            pmr->priv->softLimitRO.motorDialLowLimitEN = 1;
+        }
+    }
+}
+
+
 static asynStatus config_controller(struct axisRecord *pmr, motorAsynPvt *pPvt)
 {
     asynUser *pasynUser;
@@ -421,6 +454,9 @@ static long init_record(struct axisRecord * pmr )
      * whether or not to write new position values to the controller.
      */
     init_controller_load_pos_if_needed(pmr, pasynUser);
+
+    init_controller_update_soft_limits(pmr);
+
     /* Do not need to manually retrieve the new status values, as if they are
      * set, a callback will be generated
      */
@@ -453,8 +489,6 @@ CALLBACK_VALUE update_values(struct axisRecord * pmr)
 
         pmr->priv->readBack.position = pPvt->status.position;
         pmr->priv->readBack.encoderPosition = pPvt->status.encoderPosition;
-        pmr->priv->readBack.motorHighLimitRO = pPvt->status.motorHighLimitRO;
-        pmr->priv->readBack.motorLowLimitRO = pPvt->status.motorLowLimitRO;
         rawvalue = (epicsInt32)floor(pPvt->status.position + 0.5);
         if (pmr->rmp != rawvalue)
         {
@@ -473,6 +507,7 @@ CALLBACK_VALUE update_values(struct axisRecord * pmr)
         pmr->msta = pPvt->status.status;
         if (pmr->mflg != pPvt->status.flags)
         {
+          init_controller_update_soft_limits(pmr);
             pmr->mflg = pPvt->status.flags;
             db_post_events(pmr, &pmr->mflg, DBE_VAL_LOG);
         }

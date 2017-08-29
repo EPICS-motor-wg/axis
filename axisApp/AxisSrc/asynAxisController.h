@@ -130,6 +130,12 @@
 #define STATUS_BIT_LOW_LIMIT       (1<<13)
 #define STATUS_BIT_HOMED           (1<<14)
 
+
+typedef struct MotorConfigRO {
+  double motorHighLimitRaw;   /**< Read only high soft limit from controller */
+  double motorLowLimitRaw;    /**< Read only low soft limit from controller */
+} MotorConfigRO;
+
 /** The structure that is passed back to devMotorAsyn when the status changes. */
 typedef struct MotorStatus {
   double position;           /**< Commanded motor position */
@@ -137,8 +143,7 @@ typedef struct MotorStatus {
   double velocity;           /**< Actual velocity */
   epicsUInt32 status;        /**< Word containing status bits (motion done, limits, etc.) */
   epicsUInt32 flags;         /**< Word containing flag bits  */
-  double motorHighLimitRO;   /**< Read only high soft limit from controller. Valid if flags & MF_HIGH_LIMIT_RO */
-  double motorLowLimitRO;    /**< Read only low soft limit from controller. Valid if flags & MF_LOW_LIMIT_RO  */
+  struct MotorConfigRO MotorConfigRO;
 } MotorStatus;
 
 enum ProfileTimeMode{
