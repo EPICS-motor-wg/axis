@@ -1,3 +1,33 @@
+MRES for modern controllers
+  Many modern controllers have MRES configured in the MCU, and use
+  engineering units to talk to the IOC.
+  The record did still count in "motor Steps", which means that each time
+  a move() is done, the value is processed twice:
+  steps = newPOS[EGU] / MRES in record.
+  newPOS[EGU] = steps * MRES in the driver.
+  When the positin is read back in the poller, the revers applies:
+  MCU --- newRBV[EGU] ----> driver
+  newRBV[steps] = newRBV[EGU] / MRES in driver
+  RBV[EGU] =  newRBV[steps] * MRES in record.
+
+  Some applications set MRES to a very small value, like 1 um.
+  The driver is configured to do a conversion when talking to
+  the MCU.
+  Other drivers forward MRES to the driver, and do inversion in the driver,
+  as described above.
+
+  The old code did not allow MRES to be set to 1.0, since that was assumed
+  to be the minimal movement.
+  (And the minimal change in the readback)
+  Today, we may have a situation like this:
+  - The controller uses mm and floating point when talking to the IOC
+  - The record is configured to use mm (EGU = "mm")
+  - MRES is set to 1.0
+  - The new field SDBD must to set to the minimal movement (SDBD).
+    This may be the step size for a real stepper motor (or more than 1 step)
+    Or the deadband for a servo motor.
+  See the SDBD section below
+
 The DLY-STOP problem
   When the motor is stopped, while in the DLY phase, the record may hang,
   when the readback position doesn't change and the record is not processed.
@@ -26,10 +56,9 @@ Motor done, when hitting a limit switch.
   setIntegerParam(pC_->motorFlagsHomeOnLs_, 1);
   
 Homing when sitting on a limit switch.
-  Today:
-  When the high limit switch is hit, writing 1 to HOMF does nothing.
+  Yesterday:
+  When the high limit switch was hit, writing 1 to HOMF did nothing.
   Espcecially recGblFwdLink(pmr) is not called.
-  This is a bug in MR, which needs to be fixed.
 
   Some controllers will do the correct homing, even if a on a limit
   switch, and HOMF and HOMR have the same effect.
@@ -45,16 +74,15 @@ Encoder readback was crippled to 32 bit.
 
 Motor stops while jogging.
   When the motor stops because of e.g. an internal soft limit,
-  the state machine was confused: commit 81bbe334
+  the state machine was confused: fixed in commit 81bbe334
   "Record recognizes motor stop while jogging"
   
 asyn-based simulator, automated test cases
   Partly fixed:
   There is a simulator for the Ethercat based controllers.
   We can run against the simulator or real hardware.
-  More test cases needed.
 
-NTM not working as documented - Servo motor stopped at overshoot
+NTM was not working as documented - Servo motor stopped at overshoot
   The documentation of the NTM said:
   "If NTM is "YES", the motor is immediately stopped and given a motion
   command to the new position".
@@ -110,4 +138,41 @@ True deadband handling, SDBD
     do nothing but signal dmov=0 ; dmov=1 trnasition
   else
      do_the_motion()
+
+NTM, NTMF and overshoot
+  The documentation about NTM sayd
+  "how the record processes a new target position while the motor is in motion"
+  The implementation did not distinguish between
+  a new value for the VAL field and an overshoot of a servo motor
+  (or a mis-configured motor which moves into the wrong direction)
+  Both fields are removed.
+  Need to be re-implemented if needed.
+
+FRAC
+  Used for devices like inchworms, piezo motors.
+  My problem was that the usage of FRAC field does not allow
+  any refactoring.
+  Knowing that
+  a) Modern piezo controllers do the closed loop locally (and don't need)
+  b) The FRAC field is better handled in the driver (and not the record)
+      it makes sense to remove it from the code, but keep it in the record.
+  The FRAC field is still there, but does not do anything
+  If really needed, the functionality can be re-added again later.
   
+Refuse "wrong" soft limits.
+  The model 1 driver could refuse to set soft limits which conflict to the
+  ones in the controller (read only softlimits:
+      rtnval = devSupUpdateLimitFromDial(pmr, command, tmp_limit);
+      if (rtnval != OK)
+      {
+          /* If an error occured, build_trans() has reset
+           * dial high or low limit to controller's value. */
+  This did not work for asyn based controllers
+  Logic was added (and tested) to use this with a model 3 driver.
+  The driver needs to set 4 parameters:
+
+  setDoubleParam(pC_->motorHighLimitRO_, fValue);
+  setIntegerParam(pC_->motorFlagsHighLimitRO_, 1);
+  setDoubleParam(pC_->motorLowLimitRO_, fValue);
+  setIntegerParam(pC_->motorFlagsLowLimitRO_, 1);
+

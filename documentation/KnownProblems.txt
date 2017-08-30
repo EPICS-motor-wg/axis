@@ -1,27 +1,5 @@
 Definition:
   MCU Motrion Control Unit
-  
-
-MRES for modern controllers
-  Many modern controllers have MRES configured in the MCU, and use
-  engineering units to talk to the IOC.
-  The record still counts in "motor Steps", which means that each time
-  a move() is done, the value is processed twice:
-  steps = newPOS[EGU] / MRES in record.
-  newPOS[EGU] = steps * MRES in the driver.
-  When the positin is read back in the poller, the revers applies:
-  MCU --- newRBV[EGU] ----> driver
-  newRBV[steps] = newRBV[EGU] / MRES in driver
-  RBV[EGU] =  newRBV[steps] * MRES in record.
-  
-  
-  Some applications set MRES to a very small value, like 1 um.
-  The driver is configured to do a conversion when talking to
-  the MCU.
-  Other drivers forward MRES to the driver, and do inversion in the driver,
-  as described above.
-
-  The whole re-calculation with floating points doesn't feel ideal.
 
 Synchronization at startup.
   When the record is started, the TCP/IP connection may not be established,
@@ -52,35 +30,5 @@ Values read out from the MCU and put into the record.
   "modern controllers" are typically configured with an engineering tool.
   It would be nice to read out the seetings from the controller and put
   them into the record.
-  This is already possible with a model 3 driver, but I haven't done that yet.
-
-Refuse "wrong" soft limits.
-  The model 1 driver can refuse to set soft limits which conflict to the ones
-  in the controller:
-      rtnval = devSupUpdateLimitFromDial(pmr, command, tmp_limit);
-      if (rtnval != OK)
-      {
-          /* If an error occured, build_trans() has reset
-           * dial high or low limit to controller's value. */
-  This does not work for asyn based controllers
-  (We need to wait for the callback, and handle the response code)
-
-
-NTM, NTMF and overshoot
-  The documentation about NTM says
-  "how the record processes a new target position while the motor is in motion"
-  The current implementation does not distinguish between
-  a new value for the VAL field and an overshoot of a servo motor
-  (or a mis-configured motor which moves into the wrong direction)
-  Possible solution:
-
-FRAC
-  Used for devices like inchworms, piezo motors.
-  My problem is that the usage of FRAC field does not allow
-  any refactoring.
-  Knowing that
-  a) Modern piezo controllers do the closed loop locally (and don't need)
-  b) The FRAC field is better handled in the driver (and not the record)
-      it makes sense to remove it from the code, but keep it in the record.
-  If really needed, the functionality can be re-added again later.
-  
+  This is currently done with the soft limits in the EthercatMC,
+  more to come.
