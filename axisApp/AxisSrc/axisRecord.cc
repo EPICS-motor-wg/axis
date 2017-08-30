@@ -990,15 +990,19 @@ static void devSupMoveRelRaw(axisRecord *pmr, double vel, double vbase,
 #define MOVE_REL #ErrorMOVE_REL
 
 /*****************************************************************************/
-static void devSupJogRaw(axisRecord *pmr, double jogv, double vbase, double jacc)
+static void devSupJogDial(axisRecord *pmr, double jogv, double jacc)
 {
     struct motor_dset *pdset = (struct motor_dset *) (pmr->dset);
+    double jogvRaw = jogv / pmr->mres;
+    double jaccRaw = jacc / fabs(pmr->mres);
+    double vbaseRaw = pmr->vbas / fabs(pmr->mres);
+
     INIT_MSG();
-    WRITE_MSG(SET_VEL_BASE, &vbase);
-    WRITE_MSG(SET_ACCEL, &jacc);
-    WRITE_MSG(JOG, &jogv);
+    WRITE_MSG(SET_VEL_BASE, &vbaseRaw);
+    WRITE_MSG(SET_ACCEL, &jaccRaw);
+    WRITE_MSG(JOG, &jogvRaw);
     SEND_MSG();
-    setCDIRfromRawMove(pmr, jogv > 0);
+    setCDIRfromRawMove(pmr, jogvRaw > 0);
 }
 /* No WRITE_MSG(JOG, ); after this point */
 #define JOG #ErrorJOG
@@ -2453,10 +2457,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
             }
             else
             {
-                double jogv = (pmr->jvel * dir) / pmr->mres;
-                double jacc = pmr->jar / fabs(pmr->mres);
-                double vbase = pmr->vbas / fabs(pmr->mres);
-
+                double jogv = pmr->jvel * dir;
                 pmr->dmov = FALSE;
                 MARK(M_DMOV);
                 pmr->pp = TRUE;
@@ -2464,8 +2465,7 @@ static RTN_STATUS do_work(axisRecord * pmr, CALLBACK_VALUE proc_ind)
                 {
                     jogv = -jogv;
                 }
-                devSupJogRaw(pmr, jogv, vbase, jacc);
-  
+                devSupJogDial(pmr, jogv, pmr->jar);
             }
             return(OK);
         }
