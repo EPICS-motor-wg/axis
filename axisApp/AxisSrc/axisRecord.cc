@@ -440,6 +440,14 @@ calls.
 /* To end a transaction and send accumulated commands to the motor... */
 #define SEND_MSG()                              (*pdset->end_trans)(pmr)
 
+
+/* How to move, either use VELO/ACCL or BVEL/BACC */
+enum moveMode{
+  moveModePosition,
+  moveModeBacklash
+};
+
+
 /******************************************************************************
  * Debug MIP and MIP changes
  * Not yet used (needs better printing)
@@ -1042,39 +1050,31 @@ static void devSupSetEncRatio(axisRecord *pmr, double ep_mp[2])
     SEND_MSG();
 }
 
-/*****************************************************************************/
-static void doMoveRelDial(axisRecord *pmr, double vel, double vbase,
-                          double accEGU, double relpos)
-{
-    /* Velocity and Accelerations are always > 0, use fabs(mres).
-     Position needs the sign of mres */
-    double amres = fabs(pmr->mres);
-    devSupMoveRelRaw(pmr, vel/amres, vbase/amres, accEGU/amres, relpos/pmr->mres);
-    setCDIRfromDialMove(pmr, relpos < 0.0 ? 0 : 1);
-}
-/*****************************************************************************/
-
-static void doMoveAbsDial(axisRecord *pmr, double vel, double vbase,
-                          double accEGU, double position)
-{
-    /* Velocity and Accelerations are always > 0, use fabs(mres).
-       Position needs the sign of mres */
-    double amres = fabs(pmr->mres);
-    double diff = position - pmr->drbv;
-    devSupMoveAbsRaw(pmr, vel/amres, vbase/amres, accEGU/amres, position/pmr->mres);
-    setCDIRfromDialMove(pmr, diff < 0.0 ? 0 : 1);
-}
-
-static void doMoveDialPosition(axisRecord *pmr, double vel, double vbase,
-                               double accEGU, double position)
+static void doMoveDialPosition(axisRecord *pmr, enum moveMode moveMode,
+                               double position)
 {
     /* Use if encoder or ReadbackLink is in use. */
     bool use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
     double diff = position - pmr->drbv;
+    double amres = fabs(pmr->mres);
+    double vbase = pmr->vbas;
+    double vel, accEGU;
+
+    switch (moveMode) {
+    case moveModePosition:
+      vel = pmr->velo; accEGU = (vel - vbase) / pmr->accl;
+      break;
+    case moveModeBacklash:
+      vel = pmr->bvel; accEGU = (vel - vbase) / pmr->bacc;
+      break;
+    default:
+      vel = accEGU = 0.0;
+    }
     if (use_rel)
-        doMoveRelDial(pmr, vel, vbase, accEGU, diff);
+        devSupMoveRelRaw(pmr, vel/amres, vbase/amres, accEGU/amres, diff/pmr->mres);
     else
-        doMoveAbsDial(pmr, vel, vbase, accEGU, position);
+        devSupMoveAbsRaw(pmr, vel/amres, vbase/amres, accEGU/amres, position/pmr->mres);
+    setCDIRfromDialMove(pmr, diff < 0.0 ? 0 : 1);
 }
 
 /*****************************************************************************
@@ -1088,26 +1088,20 @@ static void doBackLash(axisRecord *pmr)
     
     if (pmr->mip & MIP_JOG_STOP)
     {
-        double acc = (pmr->velo - pmr->vbas) / pmr->accl;
-        doMoveDialPosition(pmr, pmr->velo, pmr->vbas, acc,
-                           pmr->dval - pmr->bdst);
+        doMoveDialPosition(pmr, moveModePosition, pmr->dval - pmr->bdst);
         pmr->mip = MIP_JOG_BL1;
     }
     else if(pmr->mip & MIP_MOVE)
     {
         /* First part of move done. Do backlash correction. */
-        double bacc = (pmr->bvel - pmr->vbas) / pmr->bacc;
-        doMoveDialPosition(pmr, pmr->bvel, pmr->vbas, bacc,
-                           pmr->dval);
+        doMoveDialPosition(pmr, moveModeBacklash, pmr->dval);
         pmr->rval = NINT(pmr->dval);
         pmr->mip = MIP_MOVE_BL;
     }
     else if (pmr->mip & MIP_JOG_BL1)
     {
         /* First part of jog done. Do backlash correction. */
-        double bacc = (pmr->bvel - pmr->vbas) / pmr->bacc;
-        doMoveDialPosition(pmr, pmr->bvel, pmr->vbas, bacc,
-                           pmr->dval);
+        doMoveDialPosition(pmr, moveModeBacklash, pmr->dval);
         pmr->rval = NINT(pmr->dval);
         pmr->mip = MIP_JOG_BL2;
     }
@@ -1706,9 +1700,6 @@ static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
                           double relpos, double relbpos, double rbvpos, double newpos)
 {
     double bpos = pmr->dval - pmr->bdst;
-    double vbase = pmr->vbas; /* base speed      */
-    double acc = (pmr->velo - vbase) / pmr->accl;     /* normal accel.   */
-    double bacc = (pmr->bvel - vbase) / pmr->bacc;   /* backlash accel. */
     double rbdst1 = fabs(pmr->bdst) + pmr->sdbd;
 
     if (fabs(relpos) < pmr->sdbd)
@@ -1740,10 +1731,7 @@ static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
         (preferred_dir == true && pmr->bvel == pmr->velo &&
          pmr->bacc == pmr->accl))
     {
-        if (use_rel == true)
-            doMoveRelDial(pmr, pmr->velo, vbase, acc, relpos);
-        else
-            doMoveAbsDial(pmr, pmr->velo, vbase, acc, newpos);
+        doMoveDialPosition(pmr, moveModePosition, newpos);
     }
     /* IF move is in preferred direction, AND, current position is within backlash range. */
     else if ((preferred_dir == true) &&
@@ -1752,17 +1740,11 @@ static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
              )
             )
     {
-        if (use_rel == true)
-            doMoveRelDial(pmr, pmr->bvel, vbase, bacc, relpos);
-        else
-            doMoveAbsDial(pmr, pmr->bvel, vbase, bacc, newpos);
+        doMoveDialPosition(pmr, moveModeBacklash, newpos);
     }
     else
     {
-        if (use_rel == true)
-            doMoveRelDial(pmr, pmr->velo, vbase, acc, relbpos);
-        else
-            doMoveAbsDial(pmr, pmr->velo, vbase, acc, bpos);
+        doMoveDialPosition(pmr, moveModePosition, bpos);
         pmr->pp = TRUE;              /* do backlash from posprocess(). */
     }
 }
