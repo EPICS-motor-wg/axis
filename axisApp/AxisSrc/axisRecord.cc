@@ -1696,11 +1696,18 @@ static int homing_wanted_and_allowed(axisRecord *pmr)
 
 
 /*************************************************************************/
-static void doRetryOrDone(axisRecord *pmr, bool use_rel, bool preferred_dir,
-                          double relpos, double relbpos, double rbvpos, double newpos)
+static void doRetryOrDone(axisRecord *pmr, bool preferred_dir,
+                          double relpos, double relbpos, double rbvpos)
 {
     double bpos = pmr->dval - pmr->bdst;
     double rbdst1 = fabs(pmr->bdst) + pmr->sdbd;
+    double newpos = pmr->dval;      /* where to go     */
+    bool use_rel;
+    /*** Use if encoder or ReadbackLink is in use. ***/
+    if (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip))
+        use_rel = true;
+    else
+        use_rel = false;
 
     if (fabs(relpos) < pmr->sdbd)
         relpos = (relpos > 0.0) ? pmr->sdbd : -pmr->sdbd;
@@ -1809,22 +1816,16 @@ static RTN_STATUS doDVALchangedOrNOTdoneMoving(axisRecord *pmr)
     int old_lvio = pmr->lvio;
     /** Calc new dial position, and do a (backlash-corrected?) move. **/
     double rbvpos = pmr->drbv;   /* where motor is  */
-    double newpos = pmr->dval;      /* where to go     */
     /*
      * 'bpos' is one backlash distance away from 'newpos'.
      */
-    bool use_rel, too_small;
+    bool too_small;
     bool preferred_dir = true;
     double diff = pmr->dval - pmr->drbv;
     double relpos = diff;
     double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv);
     double absdiff = fabs(diff);
 
-    /*** Use if encoder or ReadbackLink is in use. ***/
-    if (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip))
-        use_rel = true;
-    else
-        use_rel = false;
 
     /*
      * Post new values, recalc .val to reflect the change in .dval. (We
@@ -1945,7 +1946,7 @@ static RTN_STATUS doDVALchangedOrNOTdoneMoving(axisRecord *pmr)
     }
 
     if (pmr->mip == MIP_DONE || pmr->mip == MIP_RETRY)
-        doRetryOrDone(pmr, use_rel, preferred_dir, relpos, relbpos, rbvpos, newpos);
+        doRetryOrDone(pmr, preferred_dir, relpos, relbpos, rbvpos);
 
     return(OK);
 }
