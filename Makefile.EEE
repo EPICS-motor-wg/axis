@@ -42,6 +42,7 @@ SOURCES += axisApp/AxisSrc/paramLib.c
 SOURCES += axisExApp/WithAsyn/WithAsynMain.c
 SOURCES += axisApp/EthercatSrc/EthercatMCAxis.cpp
 SOURCES += axisApp/EthercatSrc/EthercatMCController.cpp
+SOURCES += axisApp/EthercatSrc/EthercatMCHelper.cpp
 SOURCES += axisApp/IcePAPsrc/IcePAPAxis.cpp
 SOURCES += axisApp/IcePAPsrc/IcePAPController.cpp
 
