@@ -303,6 +303,7 @@ static long init_record(struct axisRecord * pmr )
     asynStatus status;
     asynInterface *pasynInterface;
     motorAsynPvt *pPvt;
+    double amres = fabs(pmr->mres);
     /*    double resolution;*/
 
     /* Allocate motorAsynPvt private structure */
@@ -456,6 +457,11 @@ static long init_record(struct axisRecord * pmr )
     init_controller_load_pos_if_needed(pmr, pasynUser);
 
     init_controller_update_soft_limits(pmr);
+    pmr->priv->configRO.motorMaxVelocityDial = amres * pPvt->status.MotorConfigRO.motorMaxVelocityRaw;
+    pmr->priv->configRO.motorDefJogVeloDial = amres * pPvt->status.MotorConfigRO.motorDefJogVeloRaw;
+    pmr->priv->configRO.motorDefJogAccDial = amres * pPvt->status.MotorConfigRO.motorDefJogAccRaw;
+    pmr->priv->configRO.motorSDBDDial = amres * pPvt->status.MotorConfigRO.motorSDBDRaw;
+    pmr->priv->configRO.motorRDBDDial = amres * pPvt->status.MotorConfigRO.motorRDBDRaw;
 
     /* Do not need to manually retrieve the new status values, as if they are
      * set, a callback will be generated

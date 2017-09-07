@@ -104,6 +104,12 @@ asynAxisController::asynAxisController(const char *portName, int numAxes, int nu
   /* Parameters from the controller to the driver and record */
   createParam(motorHighLimitROString,            asynParamFloat64,    &motorHighLimitRO_);
   createParam(motorLowLimitROString,             asynParamFloat64,    &motorLowLimitRO_);
+  createParam(motorDefVelocityROString,          asynParamFloat64,    &motorDefVelocityRO_);
+  createParam(motorMaxVelocityROString,          asynParamFloat64,    &motorMaxVelocityRO_);
+  createParam(motorDefJogVeloROString,           asynParamFloat64,    &motorDefJogVeloRO_);
+  createParam(motorDefJogAccROString,            asynParamFloat64,    &motorDefJogAccRO_);
+  createParam(motorSDBDROString,                 asynParamFloat64,    &motorSDBDRO_);
+  createParam(motorRDBDROString,                 asynParamFloat64,    &motorRDBDRO_);
 
   // These are the per-controller parameters for profile moves
   createParam(profileNumAxesString,              asynParamInt32,      &profileNumAxes_);
@@ -520,8 +526,18 @@ asynStatus asynAxisController::readGenericPointer(asynUser *pasynUser, void *poi
   getAddress(pasynUser, &axis);
   memcpy(pStatus, &pAxis->status_, sizeof(*pStatus));
   asynPrint(pasynUser, ASYN_TRACE_FLOW,
-    "%s:%s: MotorStatus = status%d, position=%f, encoder position=%f, velocity=%f\n", 
-    driverName, functionName, pStatus->status, pStatus->position, pStatus->encoderPosition, pStatus->velocity);
+    "%s:%s: MotorStatus = status%d, position=%f, encoder position=%f, velocity=%f, "
+    "highLimit=%f lowLimit=%f defVelo=%f maxVelo=%f defJogVelo=%f defJogAcc=%f sdbd=%f rdbd=%f\n",
+            driverName, functionName,  pStatus->status, pStatus->position,
+            pStatus->encoderPosition, pStatus->velocity,
+            pStatus->MotorConfigRO.motorHighLimitRaw,
+            pStatus->MotorConfigRO.motorLowLimitRaw,
+            pStatus->MotorConfigRO.motorDefVelocityRaw,
+            pStatus->MotorConfigRO.motorMaxVelocityRaw,
+            pStatus->MotorConfigRO.motorDefJogVeloRaw,
+            pStatus->MotorConfigRO.motorDefJogAccRaw,
+            pStatus->MotorConfigRO.motorSDBDRaw,
+            pStatus->MotorConfigRO.motorRDBDRaw);
   return asynSuccess;
 }  
 

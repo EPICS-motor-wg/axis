@@ -21,6 +21,13 @@ extern "C" {
       int motorDialLowLimitEN;
     } softLimitRO;
     struct {
+      double motorMaxVelocityDial; /**< Maximum velocity */
+      double motorDefJogVeloDial;  /**< Default velocity (for jogging) */
+      double motorDefJogAccDial;   /**< Default accelation (steps/sec2 or motorUnits/sec2) */
+      double motorSDBDDial;        /**< Minimal movement */
+      double motorRDBDDial;        /**< "At target position" deadband */
+    } configRO;
+    struct {
       double val;               /* last .VAL */
       double dval;               /* last .DVAL */
       double rval;               /* last .RVAL */

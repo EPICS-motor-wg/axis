@@ -303,6 +303,36 @@ asynStatus asynAxisAxis::setDoubleParam(int function, double value)
       statusChanged_ = 1;
       status_.MotorConfigRO.motorLowLimitRaw = value;
     }
+  } else if (function == pC_->motorDefVelocityRO_) {
+    if (value != status_.MotorConfigRO.motorDefVelocityRaw) {
+      statusChanged_ = 1;
+      status_.MotorConfigRO.motorDefVelocityRaw = value;
+    }
+  } else if (function == pC_->motorMaxVelocityRO_) {
+    if (value != status_.MotorConfigRO.motorMaxVelocityRaw) {
+      statusChanged_ = 1;
+      status_.MotorConfigRO.motorMaxVelocityRaw = value;
+    }
+  } else if (function == pC_->motorDefJogVeloRO_) {
+    if (value != status_.MotorConfigRO.motorDefJogVeloRaw) {
+      statusChanged_ = 1;
+      status_.MotorConfigRO.motorDefJogVeloRaw = value;
+    }
+  } else if (function == pC_->motorDefJogAccRO_) {
+    if (value != status_.MotorConfigRO.motorDefJogAccRaw) {
+      statusChanged_ = 1;
+      status_.MotorConfigRO.motorDefJogAccRaw = value;
+    }
+  } else if (function == pC_->motorSDBDRO_) {
+    if (value != status_.MotorConfigRO.motorSDBDRaw) {
+      statusChanged_ = 1;
+      status_.MotorConfigRO.motorSDBDRaw = value;
+    }
+  } else if (function == pC_->motorRDBDRO_) {
+    if (value != status_.MotorConfigRO.motorRDBDRaw) {
+      statusChanged_ = 1;
+      status_.MotorConfigRO.motorRDBDRaw = value;
+    }
   }
   // Call the base class method
   return pC_->setDoubleParam(axisNo_, function, value);
