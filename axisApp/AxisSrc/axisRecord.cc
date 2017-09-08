@@ -234,7 +234,8 @@ static void alarm_sub(axisRecord *);
 static void monitor(axisRecord *);
 static void process_motor_info(axisRecord *, bool);
 static void load_pos(axisRecord *);
-static void check_speed_and_resolution(axisRecord *);
+static void check_resolution(axisRecord *);
+static void check_speed(axisRecord *);
 static void set_dial_highlimit(axisRecord *);
 static void set_dial_lowlimit(axisRecord *);
 static void set_user_highlimit(axisRecord *);
@@ -694,7 +695,7 @@ static long init_record(dbCommon* arg, int pass)
      * Reconcile two different ways of specifying speed and resolution; make
      * sure things are sane.
      */
-    check_speed_and_resolution(pmr);
+    check_resolution(pmr);
     enforceMinRetryDeadband(pmr);
 
     /* Call device support to initialize itself and the driver */
@@ -778,6 +779,9 @@ static long init_record(dbCommon* arg, int pass)
     /* Reset limits in case database values are invalid. */
     set_dial_highlimit(pmr);
     set_dial_lowlimit(pmr);
+
+    check_speed(pmr);
+    enforceMinRetryDeadband(pmr);
 
     /* Initialize miscellaneous control fields. */
     pmr->dmov = TRUE;
@@ -3766,7 +3770,7 @@ static void load_pos(axisRecord * pmr)
 }
 
 /*
- * FUNCTION... static void check_speed_and_resolution(axisRecord *)
+ * FUNCTION... static void check_resolution(axisRecord *)
  *
  * INPUT ARGUMENTS...
  *      1 - motor record pointer
@@ -3788,46 +3792,10 @@ static void load_pos(axisRecord * pmr)
  *      Set UREV <- MRES * SREV.
  *  ENDIF
  *
- *  IF SMAX > 0.
- *      Set VMAX <- SMAX * |UREV|.
- *  ELSE IF VMAX > 0.
- *      Set SMAX <- VMAX / |UREV|.
- *  ELSE
- *      Set both SMAX and VMAX to zero.
- *  ENDIF
- *
- *  IF SBAS is nonzero.
- *      Range check; 0 < SBAS < SMAX.
- *      Set VBAS <- SBAS * |UREV|.
- *  ELSE
- *      Range check; 0 < VBAS < VMAX.
- *      Set SBAS <- VBAS / |UREV|.
- *  ENDIF
- *
- *  IF S is nonzero.
- *      Range check; SBAS < S < SMAX.
- *      VELO <- S * |UREV|.
- *  ELSE
- *      Range check; VBAS < VELO < VMAX.
- *      S < - VELO / |UREV|.
- *  ENDIF
- *
- *  IF SBAK is nonzero.
- *      Range check; SBAS < SBAK < SMAX.
- *      BVEL <- SBAK * |UREV|.
- *  ELSE
- *      Range check; VBAS < BVEL < VMAX.
- *      SBAK <- BVEL / |UREV|.
- *  ENDIF
- *
- *  IF ACCL or BACC is zero.
- *      Set ACCL/BACC to 0.1
- *  ENDIF
- *
  *  NORMAL RETURN.
  */
 
-static void check_speed_and_resolution(axisRecord * pmr)
+static void check_resolution(axisRecord * pmr)
 {
     double fabs_urev = fabs(pmr->urev);
 
@@ -3860,6 +3828,20 @@ static void check_speed_and_resolution(axisRecord * pmr)
         fabs_urev = fabs(pmr->urev);    /* Update local |UREV|. */
         MARK_AUX(M_UREV);
     }
+}
+
+/*
+ * FUNCTION... static void check_resolution(axisRecord *)
+ *
+ * INPUT ARGUMENTS...
+ *      1 - motor record pointer
+ *
+ *  NORMAL RETURN.
+ */
+
+static void check_speed(axisRecord * pmr)
+{
+    double fabs_urev = fabs(pmr->urev);
 
     /* SMAX (revolutions/sec) <--> VMAX (EGU/sec) */
     if (pmr->smax > 0.0)
