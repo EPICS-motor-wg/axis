@@ -22,6 +22,7 @@ extern "C" {
     } softLimitRO;
     struct {
       double motorMaxVelocityDial; /**< Maximum velocity */
+      double motorDefVelocityDial; /**< Default velocity (moveAbs, moveRel) */
       double motorDefJogVeloDial;  /**< Default velocity (for jogging) */
       double motorDefJogAccDial;   /**< Default accelation (steps/sec2 or motorUnits/sec2) */
       double motorSDBDDial;        /**< Minimal movement */

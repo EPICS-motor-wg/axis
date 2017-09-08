@@ -3850,6 +3850,15 @@ static void check_speed(axisRecord * pmr)
         pmr->smax = pmr->vmax / fabs_urev;
     else
         pmr->smax = pmr->vmax = 0.0;
+
+    if (pmr->priv->configRO.motorMaxVelocityDial > 0.0)
+    {
+        if (pmr->vmax == 0.0)
+            pmr->vmax = pmr->priv->configRO.motorMaxVelocityDial;
+        else
+            range_check(pmr, &pmr->vmax, 0.0, pmr->priv->configRO.motorMaxVelocityDial);
+        pmr->smax = pmr->vmax / fabs_urev;
+    }
     db_post_events(pmr, &pmr->vmax, DBE_VAL_LOG);
     db_post_events(pmr, &pmr->smax, DBE_VAL_LOG);
 
@@ -3867,7 +3876,9 @@ static void check_speed(axisRecord * pmr)
     db_post_events(pmr, &pmr->vbas, DBE_VAL_LOG);
     db_post_events(pmr, &pmr->sbas, DBE_VAL_LOG);
 
-    
+    if (pmr->priv->configRO.motorDefVelocityDial > 0.0)
+        pmr->velo = pmr->priv->configRO.motorDefVelocityDial;
+
     /* S (revolutions/sec) <--> VELO (EGU/sec) */
     if (pmr->s != 0.0)
     {
@@ -3899,7 +3910,10 @@ static void check_speed(axisRecord * pmr)
     /* Sanity check on acceleration time. */
     if (pmr->accl == 0.0)
     {
-        pmr->accl = 0.1;
+        if (pmr->priv->configRO.motorDefJogAccDial > 0.0 && pmr->velo > 0.0)
+            pmr->accl = pmr->velo / pmr->priv->configRO.motorDefJogAccDial;
+        else
+            pmr->accl = 0.1;
         db_post_events(pmr, &pmr->accl, DBE_VAL_LOG);
     }
     if (pmr->bacc == 0.0)
@@ -3909,12 +3923,22 @@ static void check_speed(axisRecord * pmr)
     }
     /* Sanity check on jog velocity and acceleration rate. */
     if (pmr->jvel == 0.0)
-        pmr->jvel = pmr->velo;
+    {
+        if (pmr->priv->configRO.motorDefJogVeloDial > 0.0)
+            pmr->jvel = pmr->priv->configRO.motorDefJogVeloDial;
+        else
+            pmr->jvel = pmr->velo;
+    }
     else
         range_check(pmr, &pmr->jvel, pmr->vbas, pmr->vmax);
 
     if (pmr->jar == 0.0)
-        pmr->jar = pmr->velo / pmr->accl;
+    {
+        if (pmr->priv->configRO.motorDefJogAccDial > 0.0)
+            pmr->jar = pmr->priv->configRO.motorDefJogAccDial;
+        else
+            pmr->jar = pmr->velo / pmr->accl;
+    }
 
     /* Sanity check on home velocity. */
     if (pmr->hvel == 0.0)

@@ -458,6 +458,7 @@ static long init_record(struct axisRecord * pmr )
 
     init_controller_update_soft_limits(pmr);
     pmr->priv->configRO.motorMaxVelocityDial = amres * pPvt->status.MotorConfigRO.motorMaxVelocityRaw;
+    pmr->priv->configRO.motorDefVelocityDial = amres * pPvt->status.MotorConfigRO.motorDefVelocityRaw;
     pmr->priv->configRO.motorDefJogVeloDial = amres * pPvt->status.MotorConfigRO.motorDefJogVeloRaw;
     pmr->priv->configRO.motorDefJogAccDial = amres * pPvt->status.MotorConfigRO.motorDefJogAccRaw;
     pmr->priv->configRO.motorSDBDDial = amres * pPvt->status.MotorConfigRO.motorSDBDRaw;
