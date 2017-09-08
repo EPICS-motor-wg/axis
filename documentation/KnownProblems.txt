@@ -25,10 +25,3 @@ Not yet started, but seams ready.
   The EthercatMC driver uses a waitNumPollsBeforeReady:
   When the motion is comanded, we wait n polls before calling
   setIntegerParam(pC_->motorStatusDone_, 0);
-
-Values read out from the MCU and put into the record.
-  "modern controllers" are typically configured with an engineering tool.
-  It would be nice to read out the seetings from the controller and put
-  them into the record.
-  This is currently done with the soft limits in the EthercatMC,
-  more to come.

@@ -176,3 +176,17 @@ Refuse "wrong" soft limits.
   setDoubleParam(pC_->motorLowLimitRO_, fValue);
   setIntegerParam(pC_->motorFlagsLowLimitRO_, 1);
 
+
+Values read out from the MCU and put into the record.
+  "modern controllers" are typically configured with an engineering tool.
+  It is nice to read out the seetings from the controller and put
+  them into the record (*).
+  This is currently done in the EthercatMC:
+    - softlimits (DHLM, DLLM)
+    - velocity (used for absolute or relative moves) (VELO)
+    - maximum velocity (VMAX)
+    - velocity for "jogging" using JOGF JOGR
+    - Acceleration in EGU/sec2 (JAR, ACCL)
+    - Setpoint deadband (SDBD)
+    - Retry deadbanc (RDBD)
+  (*) Unless the database sets values != 0.0 in the record.
