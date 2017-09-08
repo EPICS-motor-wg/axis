@@ -600,19 +600,21 @@ Make RDBD >= MRES.
 ******************************************************************************/
 static void enforceMinRetryDeadband(axisRecord * pmr)
 {
-    double min_rdbd;
+    double old_rdbd = pmr->rdbd;
     if (!pmr->sdbd)
-    { /* SDBD is 0, set it to MRES */
-        pmr->sdbd = fabs(pmr->mres);
+    {
+        if (pmr->priv->configRO.motorSDBDDial > 0.0)
+            pmr->sdbd = pmr->priv->configRO.motorSDBDDial;
+        else /* SDBD is 0, set it to MRES */
+            pmr->sdbd = fabs(pmr->mres);
         db_post_events(pmr, &pmr->sdbd, DBE_VAL_LOG);
     }
-    min_rdbd = pmr->sdbd;
+    if (!pmr->rdbd && pmr->priv->configRO.motorRDBDDial > 0.0)
+            pmr->rdbd = pmr->priv->configRO.motorRDBDDial;
 
-    if (pmr->rdbd < min_rdbd)
-    {
-        pmr->rdbd = min_rdbd;
+    range_check(pmr, &pmr->rdbd, pmr->sdbd, 0.0);
+    if (pmr->rdbd != old_rdbd)
         db_post_events(pmr, &pmr->rdbd, DBE_VAL_LOG);
-    }
 }
 
 
@@ -696,7 +698,6 @@ static long init_record(dbCommon* arg, int pass)
      * sure things are sane.
      */
     check_resolution(pmr);
-    enforceMinRetryDeadband(pmr);
 
     /* Call device support to initialize itself and the driver */
     if (pdset->base.init_record)
