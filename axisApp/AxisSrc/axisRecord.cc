@@ -600,19 +600,22 @@ Make RDBD >= MRES.
 ******************************************************************************/
 static void enforceMinRetryDeadband(axisRecord * pmr)
 {
+    double old_sdbd = pmr->sdbd;
     double old_rdbd = pmr->rdbd;
+    if (!pmr->rdbd && pmr->priv->configRO.motorRDBDDial > 0.0)
+        pmr->rdbd = pmr->priv->configRO.motorRDBDDial;
+
     if (!pmr->sdbd)
     {
         if (pmr->priv->configRO.motorSDBDDial > 0.0)
             pmr->sdbd = pmr->priv->configRO.motorSDBDDial;
         else /* SDBD is 0, set it to MRES */
             pmr->sdbd = fabs(pmr->mres);
-        db_post_events(pmr, &pmr->sdbd, DBE_VAL_LOG);
+        /* if SDBD was 0.0, it must be less than RDBD */
+        range_check(pmr, &pmr->sdbd, 0.0, pmr->rdbd);
     }
-    if (!pmr->rdbd && pmr->priv->configRO.motorRDBDDial > 0.0)
-            pmr->rdbd = pmr->priv->configRO.motorRDBDDial;
-
-    range_check(pmr, &pmr->rdbd, pmr->sdbd, 0.0);
+    if (pmr->sdbd != old_sdbd)
+        db_post_events(pmr, &pmr->sdbd, DBE_VAL_LOG);
     if (pmr->rdbd != old_rdbd)
         db_post_events(pmr, &pmr->rdbd, DBE_VAL_LOG);
 }
@@ -768,12 +771,12 @@ static long init_record(dbCommon* arg, int pass)
     if (!softLimitsDefined(pmr))
     {
         /* The record has no soft limits, but the controller may have */
-        if (pmr->priv->softLimitRO.motorDialHighLimitEN)
+        if (pmr->priv->softLimitRO.motorDialHighLimitEN &&
+            pmr->priv->softLimitRO.motorDialLowLimitEN &&
+            (pmr->priv->softLimitRO.motorDialHighLimitRO >
+             pmr->priv->softLimitRO.motorDialLowLimitRO))
         {
             pmr->dhlm = pmr->priv->softLimitRO.motorDialHighLimitRO;
-        }
-        if (pmr->priv->softLimitRO.motorDialLowLimitEN)
-        {
             pmr->dllm = pmr->priv->softLimitRO.motorDialLowLimitRO;
         }
     }
@@ -2674,13 +2677,15 @@ static long special(DBADDR *paddr, int after)
         }
         break;
 
-        /* new vmax: make smax agree */
+        /* new vmax: check against controller value and make smax agree */
     case axisRecordVMAX:
         if (pmr->vmax < 0.0)
         {
-            pmr->vmax = 0.0;
+            pmr->vmax = pmr->priv->configRO.motorMaxVelocityDial;
             db_post_events(pmr, &pmr->vmax, DBE_VAL_LOG);
         }
+
+        range_check(pmr, &pmr->vmax, 0.0, pmr->priv->configRO.motorMaxVelocityDial);
 
         if ((pmr->urev != 0.0) && (pmr->smax != (temp_dbl = pmr->vmax / fabs_urev)))
         {
@@ -3798,8 +3803,6 @@ static void load_pos(axisRecord * pmr)
 
 static void check_resolution(axisRecord * pmr)
 {
-    double fabs_urev = fabs(pmr->urev);
-
     /*
      * Reconcile two different ways of specifying speed, resolution, and make
      * sure things are sane.
@@ -3826,7 +3829,6 @@ static void check_resolution(axisRecord * pmr)
     if (pmr->urev != pmr->mres * pmr->srev)
     {
         pmr->urev = pmr->mres * pmr->srev;
-        fabs_urev = fabs(pmr->urev);    /* Update local |UREV|. */
         MARK_AUX(M_UREV);
     }
 }

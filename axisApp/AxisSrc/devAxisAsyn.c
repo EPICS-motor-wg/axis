@@ -304,7 +304,7 @@ static long init_record(struct axisRecord * pmr )
     asynInterface *pasynInterface;
     motorAsynPvt *pPvt;
     double amres = fabs(pmr->mres);
-    /*    double resolution;*/
+    double tmp;
 
     /* Allocate motorAsynPvt private structure */
     pPvt = callocMustSucceed(1, sizeof(motorAsynPvt), "devMotorAsyn init_record()");
@@ -457,12 +457,22 @@ static long init_record(struct axisRecord * pmr )
     init_controller_load_pos_if_needed(pmr, pasynUser);
 
     init_controller_update_soft_limits(pmr);
-    pmr->priv->configRO.motorMaxVelocityDial = amres * pPvt->status.MotorConfigRO.motorMaxVelocityRaw;
-    pmr->priv->configRO.motorDefVelocityDial = amres * pPvt->status.MotorConfigRO.motorDefVelocityRaw;
-    pmr->priv->configRO.motorDefJogVeloDial = amres * pPvt->status.MotorConfigRO.motorDefJogVeloRaw;
-    pmr->priv->configRO.motorDefJogAccDial = amres * pPvt->status.MotorConfigRO.motorDefJogAccRaw;
-    pmr->priv->configRO.motorSDBDDial = amres * pPvt->status.MotorConfigRO.motorSDBDRaw;
-    pmr->priv->configRO.motorRDBDDial = amres * pPvt->status.MotorConfigRO.motorRDBDRaw;
+    tmp = pPvt->status.MotorConfigRO.motorMaxVelocityRaw;
+    if (tmp > 0.0) pmr->priv->configRO.motorMaxVelocityDial = amres * tmp;
+    tmp = pPvt->status.MotorConfigRO.motorDefVelocityRaw;
+    if (tmp > 0.0) pmr->priv->configRO.motorDefVelocityDial = amres * tmp;
+
+    tmp = pPvt->status.MotorConfigRO.motorDefJogVeloRaw;
+    if (tmp > 0.0) pmr->priv->configRO.motorDefJogVeloDial = amres * tmp;
+
+    tmp = pPvt->status.MotorConfigRO.motorDefJogAccRaw;
+    if (tmp > 0.0) pmr->priv->configRO.motorDefJogAccDial = amres * tmp;
+
+    tmp = pPvt->status.MotorConfigRO.motorSDBDRaw;
+    if (tmp > 0.0) pmr->priv->configRO.motorSDBDDial = amres * tmp;
+
+    tmp = pPvt->status.MotorConfigRO.motorRDBDRaw;
+    if (tmp > 0.0) pmr->priv->configRO.motorRDBDDial = amres * tmp;
 
     /* Do not need to manually retrieve the new status values, as if they are
      * set, a callback will be generated
