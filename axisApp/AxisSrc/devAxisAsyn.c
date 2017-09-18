@@ -236,28 +236,22 @@ static void init_controller_update_soft_limits(struct axisRecord *pmr)
     int dialHighLimtEn = (pPvt->status.flags & MF_RAW_HIGH_LIMIT_RO) ? 1 : 0;
     int dialLowLimtEn  = (pPvt->status.flags & MF_RAW_LOW_LIMIT_RO) ? 1 :0;
     memset(&pmr->priv->softLimitRO, 0, sizeof(pmr->priv->softLimitRO));
-    if (dialHighLimtEn)
+    if (dialHighLimtEn && dialLowLimtEn)
     {
         double dialHighLimitRO;
-        dialHighLimitRO = pPvt->status.MotorConfigRO.motorHighLimitRaw * pmr->mres;
-        if (pmr->mres < 0) {
-            pmr->priv->softLimitRO.motorDialLowLimitRO = dialHighLimitRO;
-            pmr->priv->softLimitRO.motorDialLowLimitEN = 1;
-        } else {
-            pmr->priv->softLimitRO.motorDialHighLimitRO = dialHighLimitRO;
-            pmr->priv->softLimitRO.motorDialHighLimitEN = 1;
-        }
-    }
-    if (dialLowLimtEn)
-    {
         double dialLowLimitRO;
+        dialHighLimitRO = pPvt->status.MotorConfigRO.motorHighLimitRaw * pmr->mres;
         dialLowLimitRO = pPvt->status.MotorConfigRO.motorLowLimitRaw * pmr->mres;
-        if (pmr->mres < 0) {
-            pmr->priv->softLimitRO.motorDialHighLimitRO = dialLowLimitRO;
-            pmr->priv->softLimitRO.motorDialHighLimitEN = 1;
-        } else {
-            pmr->priv->softLimitRO.motorDialLowLimitRO = dialLowLimitRO;
-            pmr->priv->softLimitRO.motorDialLowLimitEN = 1;
+        if (dialHighLimitRO > dialLowLimitRO)
+        {
+            if (pmr->mres < 0) {
+                pmr->priv->softLimitRO.motorDialLowLimitRO = dialHighLimitRO;
+                pmr->priv->softLimitRO.motorDialHighLimitRO = dialLowLimitRO;
+            } else {
+                pmr->priv->softLimitRO.motorDialHighLimitRO = dialHighLimitRO;
+                pmr->priv->softLimitRO.motorDialLowLimitRO = dialLowLimitRO;
+            }
+            pmr->priv->softLimitRO.motorDialLimitsValid = 1;
         }
     }
 }

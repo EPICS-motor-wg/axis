@@ -17,8 +17,7 @@ extern "C" {
     struct {
       double motorDialHighLimitRO;   /**< read only high limit from controller. */
       double motorDialLowLimitRO;    /**< read only low limit from controller. */
-      int motorDialHighLimitEN;
-      int motorDialLowLimitEN;
+      int motorDialLimitsValid;
     } softLimitRO;
     struct {
       double motorMaxVelocityDial; /**< Maximum velocity */

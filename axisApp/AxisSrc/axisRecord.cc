@@ -771,10 +771,7 @@ static long init_record(dbCommon* arg, int pass)
     if (!softLimitsDefined(pmr))
     {
         /* The record has no soft limits, but the controller may have */
-        if (pmr->priv->softLimitRO.motorDialHighLimitEN &&
-            pmr->priv->softLimitRO.motorDialLowLimitEN &&
-            (pmr->priv->softLimitRO.motorDialHighLimitRO >
-             pmr->priv->softLimitRO.motorDialLowLimitRO))
+        if (pmr->priv->softLimitRO.motorDialLimitsValid)
         {
             pmr->dhlm = pmr->priv->softLimitRO.motorDialHighLimitRO;
             pmr->dllm = pmr->priv->softLimitRO.motorDialLowLimitRO;
@@ -3968,7 +3965,7 @@ static void set_dial_highlimit(axisRecord *pmr)
     } else {
         command = SET_HIGH_LIMIT;
     }
-    if (pmr->priv->softLimitRO.motorDialHighLimitEN)
+    if (pmr->priv->softLimitRO.motorDialLimitsValid)
     {
         double maxValue = pmr->priv->softLimitRO.motorDialHighLimitRO;
         fprintf(stdout,
@@ -4029,7 +4026,7 @@ static void set_dial_lowlimit(axisRecord *pmr)
     } else {
         command = SET_LOW_LIMIT;
     }
-    if (pmr->priv->softLimitRO.motorDialLowLimitEN)
+    if (pmr->priv->softLimitRO.motorDialLimitsValid)
     {
         double minValue = pmr->priv->softLimitRO.motorDialLowLimitRO;
         fprintf(stdout,
