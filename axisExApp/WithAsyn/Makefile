@@ -11,7 +11,7 @@ PROD_IOC_DEFAULT = WithAsyn
 PROD_IOC_vxWorks = WithAsynVx
 
 COMMONDBDS  = base.dbd
-COMMONDBDS += motorSupport.dbd
+COMMONDBDS += axisSupport.dbd
 COMMONDBDS += devAcsMotor.dbd
 COMMONDBDS += devImsMotor.dbd
 COMMONDBDS += devMclennanMotor.dbd
