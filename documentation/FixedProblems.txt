@@ -169,12 +169,10 @@ Refuse "wrong" soft limits.
            * dial high or low limit to controller's value. */
   This did not work for asyn based controllers
   Logic was added (and tested) to use this with a model 3 driver.
-  The driver needs to set 4 parameters:
+  The driver needs to set 2 parameters, and fValueHigh must be greater than fValueLow
 
-  setDoubleParam(pC_->motorHighLimitRO_, fValue);
-  setIntegerParam(pC_->motorFlagsHighLimitRO_, 1);
-  setDoubleParam(pC_->motorLowLimitRO_, fValue);
-  setIntegerParam(pC_->motorFlagsLowLimitRO_, 1);
+  setDoubleParam(pC_->motorHighLimitRO_, fValueHigh);
+  setDoubleParam(pC_->motorLowLimitRO_, fValueLow);
 
 
 Values read out from the MCU and put into the record.

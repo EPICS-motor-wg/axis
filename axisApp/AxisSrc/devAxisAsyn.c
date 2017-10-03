@@ -233,27 +233,35 @@ static long findDrvInfo(axisRecord *pmotor, asynUser *pasynUser, char *drvInfoSt
 static void init_controller_update_soft_limits(struct axisRecord *pmr)
 {
     motorAsynPvt *pPvt = (motorAsynPvt *)pmr->dpvt;
-    int dialHighLimtEn = (pPvt->status.flags & MF_RAW_HIGH_LIMIT_RO) ? 1 : 0;
-    int dialLowLimtEn  = (pPvt->status.flags & MF_RAW_LOW_LIMIT_RO) ? 1 :0;
+    asynUser *pasynUser = pPvt->pasynUser;
+    double rawHighLimitRO = pPvt->status.MotorConfigRO.motorHighLimitRaw;
+    double rawLowLimitRO  = pPvt->status.MotorConfigRO.motorLowLimitRaw;
     memset(&pmr->priv->softLimitRO, 0, sizeof(pmr->priv->softLimitRO));
-    if (dialHighLimtEn && dialLowLimtEn)
+    /*  Raw high limit must be higher than raw low limit */
+    if (rawHighLimitRO > rawLowLimitRO)
     {
-        double dialHighLimitRO;
-        double dialLowLimitRO;
-        dialHighLimitRO = pPvt->status.MotorConfigRO.motorHighLimitRaw * pmr->mres;
-        dialLowLimitRO = pPvt->status.MotorConfigRO.motorLowLimitRaw * pmr->mres;
-        if (dialHighLimitRO > dialLowLimitRO)
-        {
-            if (pmr->mres < 0) {
-                pmr->priv->softLimitRO.motorDialLowLimitRO = dialHighLimitRO;
-                pmr->priv->softLimitRO.motorDialHighLimitRO = dialLowLimitRO;
-            } else {
-                pmr->priv->softLimitRO.motorDialHighLimitRO = dialHighLimitRO;
-                pmr->priv->softLimitRO.motorDialLowLimitRO = dialLowLimitRO;
-            }
-            pmr->priv->softLimitRO.motorDialLimitsValid = 1;
+        double dialHighLimitRO = rawHighLimitRO * pmr->mres;
+        double dialLowLimitRO  = rawLowLimitRO * pmr->mres;
+        if (pmr->mres < 0) {
+            pmr->priv->softLimitRO.motorDialLowLimitRO = dialHighLimitRO;
+            pmr->priv->softLimitRO.motorDialHighLimitRO = dialLowLimitRO;
+        } else {
+            pmr->priv->softLimitRO.motorDialHighLimitRO = dialHighLimitRO;
+            pmr->priv->softLimitRO.motorDialLowLimitRO = dialLowLimitRO;
         }
+        pmr->priv->softLimitRO.motorDialLimitsValid = 1;
     }
+    asynPrint(pasynUser, ASYN_TRACE_ERROR,
+              "devMotorAsyn::update_soft_limits %s RawHLM_RO=%f RawLLM_RO=%f valid=%d "
+              "DHLM_RO=%f DLLM_RO=%f\n",
+              pmr->name,
+              pPvt->status.MotorConfigRO.motorHighLimitRaw,
+              pPvt->status.MotorConfigRO.motorLowLimitRaw,
+              pmr->priv->softLimitRO.motorDialLimitsValid,
+              pmr->priv->softLimitRO.motorDialHighLimitRO,
+              pmr->priv->softLimitRO.motorDialLowLimitRO);
+    pmr->priv->last.motorHighLimitRaw = rawHighLimitRO;
+    pmr->priv->last.motorLowLimitRaw = rawLowLimitRO;
 }
 
 
@@ -494,6 +502,7 @@ CALLBACK_VALUE update_values(struct axisRecord * pmr)
     asynPrint(pPvt->pasynUser, ASYN_TRACEIO_DEVICE,
         "%s devMotorAsyn::update_values, needUpdate=%d\n",
         pmr->name, pPvt->needUpdate);
+
     if ( pPvt->needUpdate )
     {
         epicsInt32 rawvalue;
@@ -518,7 +527,6 @@ CALLBACK_VALUE update_values(struct axisRecord * pmr)
         pmr->msta = pPvt->status.status;
         if (pmr->mflg != pPvt->status.flags)
         {
-          init_controller_update_soft_limits(pmr);
             pmr->mflg = pPvt->status.flags;
             db_post_events(pmr, &pmr->mflg, DBE_VAL_LOG);
         }
@@ -530,6 +538,14 @@ CALLBACK_VALUE update_values(struct axisRecord * pmr)
         }
 
         rc = CALLBACK_DATA;
+        if ((pPvt->status.MotorConfigRO.motorHighLimitRaw !=
+             pmr->priv->last.motorHighLimitRaw) ||
+            (pPvt->status.MotorConfigRO.motorLowLimitRaw !=
+             pmr->priv->last.motorLowLimitRaw))
+         {
+              init_controller_update_soft_limits(pmr);
+              rc = CALLBACK_NEWLIMITS;
+        }
         pPvt->needUpdate = 0;
     }
     return (rc);

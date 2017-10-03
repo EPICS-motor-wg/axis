@@ -28,6 +28,8 @@ extern "C" {
       double motorRDBDDial;        /**< "At target position" deadband */
     } configRO;
     struct {
+      double motorHighLimitRaw;  /* last from dev support in status */
+      double motorLowLimitRaw;   /* last from dev support in status */
       double val;               /* last .VAL */
       double dval;               /* last .DVAL */
       double rval;               /* last .RVAL */

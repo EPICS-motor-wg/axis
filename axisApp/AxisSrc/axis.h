@@ -79,7 +79,7 @@ message size for each device. */
 
 typedef enum RTN_VALUES {OK = 0, ERROR = 1} RTN_STATUS;
 
-typedef enum CALLBACK_VALUES {NOTHING_DONE = 0, CALLBACK_DATA = 1} CALLBACK_VALUE;
+typedef enum CALLBACK_VALUES {NOTHING_DONE = 0, CALLBACK_DATA = 1, CALLBACK_NEWLIMITS} CALLBACK_VALUE;
 
 #define NINT(f) (long)((f)>0 ? (f)+0.5 : (f)-0.5)       /* Nearest integer. */
 
@@ -206,8 +206,6 @@ typedef union
 #define MF_HOME_ON_LS      (1)
 #define MF_STOP_PROB       (1<<1)
 /*#define MF_SHOW_NOT_HOMED       (1<<2) not use in record */
-#define MF_RAW_HIGH_LIMIT_RO   (1<<3)
-#define MF_RAW_LOW_LIMIT_RO    (1<<4)
 
 
 /* device support entry table */

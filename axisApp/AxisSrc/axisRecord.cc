@@ -1477,6 +1477,24 @@ static long process(dbCommon *arg)
     if (pmr->msta != old_msta)
         MARK(M_MSTA);
 
+    if (process_reason == CALLBACK_NEWLIMITS)
+    {
+        if (pmr->priv->softLimitRO.motorDialLimitsValid)
+        {
+            double maxValue = pmr->priv->softLimitRO.motorDialHighLimitRO;
+            double minValue = pmr->priv->softLimitRO.motorDialLowLimitRO;
+            fprintf(stdout,
+                    "%s:%d %s pmr->dhlm=%g maxValue=%g pmr->dllm=%g minValue=%g\n",
+                    __FILE__, __LINE__, pmr->name,
+                    pmr->dhlm, maxValue,
+                    pmr->dllm, minValue);
+            fflush(stdout);
+            if (pmr->dllm < minValue) pmr->dllm = minValue;
+            if (pmr->dhlm > maxValue) pmr->dhlm = maxValue;
+        }
+        process_reason = CALLBACK_DATA;
+    }
+
     if ((process_reason == CALLBACK_DATA) || (pmr->mip & MIP_DELAY_ACK))
     {
         /*

@@ -258,7 +258,7 @@ asynStatus asynAxisAxis::setIntegerParam(int function, int value)
       statusChanged_ = 1;
     }
   } else  if (function >= pC_->motorFlagsHomeOnLs_ && 
-              function <= pC_->motorFlagsLowLimitRO_) {
+              function <= pC_->motorFlagsShowNotHomed_) {
     flags = status_.flags;
     mask = 1 << (function - pC_->motorFlagsHomeOnLs_);
     if (value) flags |= mask;
