@@ -21,9 +21,10 @@ PODREMOVEPL=$EPICS_BASE/bin/$EPICS_HOST_ARCH/podRemove.pl
 
 export AXISPWD AXISDBD AXISRECORDHTML AXISPERL DBDTOHTMLPL PODREMOVEPL
 
+
 if test -x "$DBDTOHTMLPL"; then
 (
-  rm -f $AXISPWD/documentation/$AXISRECORDHTML &&
+  rm -f $AXISPWD/axisApp/documentation/$AXISRECORDHTML &&
   if test -e "$AXISDBD"; then
     chmod u+w $AXISDBD
   fi &&
@@ -33,12 +34,12 @@ if test -x "$DBDTOHTMLPL"; then
   cmd=$(echo $AXISPERL $DBDTOHTMLPL -I $EPICS_BASE/dbd/ $AXISDBD.pod)
   echo $cmd &&
   eval $cmd &&
-  mv $AXISRECORDHTML $AXISPWD/documentation/$AXISRECORDHTML
+  mv $AXISRECORDHTML $AXISPWD/axisApp/documentation/$AXISRECORDHTML
 )
 else
   echo "Info: dbdToHtml.pl is only available in EPICS base since 15.4" &&
   echo "Info: You can ignore this message, if you didn't change $AXISDBD.pod" &&
   touch $AXISDBD &&
-  touch $AXISPWD/documentation/$AXISRECORDHTML
+  touch $AXISPWD/axisApp/documentation/$AXISRECORDHTML
 fi &&
 chmod -v ugo-w $AXISDBD
