@@ -87,7 +87,7 @@ class epicsShareClass asynAxisAxis {
 };
 
 #define asynMotorController asynAxisController 
-#define asynMotorAxis asynAxis
+#define asynMotorAxis asynAxisAxis
 
 #endif /* _cplusplus */
 #endif /* asynAxisAxis_H */
