@@ -4,26 +4,19 @@ set -e -x
 SUPPORT=$HOME/.cache/support
 
 install -d $SUPPORT
-
-# Conditionally build IPAC
-if [ -n "$IPAC" ]; then
-    IPAC_PATH=$SUPPORT/ipac
-else
-    IPAC_PATH=
-fi
+install -d $TRAVIS_BUILD_DIR/configure
 
 RELEASE_PATH=$TRAVIS_BUILD_DIR/configure/RELEASE
 EPICS_BASE=$SUPPORT/epics-base
 
 cat << EOF > $RELEASE_PATH
-IPAC=$IPAC_PATH
 SNCSEQ=$SUPPORT/seq
 ASYN=$SUPPORT/asyn
 EPICS_BASE=$SUPPORT/epics-base
 EOF
 
 # use default selection for MSI
-sed -i -e '/MSI/d' configure/CONFIG_SITE
+#sed -i -e '/MSI/d' configure/CONFIG_SITE
 
 if [ ! -e "$EPICS_BASE/built" ] 
 then
@@ -117,24 +110,6 @@ EOF
     touch $EPICS_BASE/built
 else
     echo "Using cached epics-base!"
-fi
-
-# IPAC
-if [ -n "$IPAC" ]; then
-    if [ ! -e "$SUPPORT/ipac/built" ]; then
-        echo "Build ipac"
-        install -d $SUPPORT/ipac
-        git clone --depth 10 --branch $IPAC https://github.com/epics-modules/ipac.git $SUPPORT/ipac
-        cat << EOF > $SUPPORT/ipac/configure/RELEASE
-EPICS_BASE=$SUPPORT/epics-base
-EOF
-        make -C $SUPPORT/ipac
-        touch $SUPPORT/ipac/built
-    else
-        echo "Using cached ipac"
-    fi
-else
-    echo "Skipping ipac"
 fi
 
 
