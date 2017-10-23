@@ -1,0 +1,3 @@
+[submodule "axisCore"]
+	path = axisCore
+	url = https://github.com/EPICS-motor-wg/axisCore.git
