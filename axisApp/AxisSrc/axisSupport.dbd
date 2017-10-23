@@ -1,8 +1,0 @@
-include axisRecord.dbd
-registrar(axisUtilRegister)
-#variable(axisRecordDebug)
-#variable(motordrvComdebug)
-#variable(motorUtil_debug)
-registrar(asynAxisControllerRegister)
-device(axis,INST_IO,devMotorAsyn,"asynAxis")
-

@@ -1,4 +1,0 @@
-# FILE... axis_settings.req
-
-file basic_axis_settings.req P=$(P),M=$(M)
-$(P)$(M)_able.VAL

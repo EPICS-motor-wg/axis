@@ -4,7 +4,7 @@
 TOP = .
 include $(TOP)/configure/CONFIG
 
-DIRS += configure axisApp
+DIRS += configure axisCore
 axisApp_DEPEND_DIRS   = configure
 
 # To build axis examples;

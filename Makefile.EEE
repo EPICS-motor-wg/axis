@@ -5,38 +5,37 @@ PROJECT=axis
 
 USR_DEPENDENCIES = asyn,4.31.0
 
-TEMPLATES += axisApp/Db/asyn_auto_power.db
-TEMPLATES += axisApp/Db/asyn_axis.db
-TEMPLATES += axisApp/Db/basic_asyn_axis.db
-TEMPLATES += axisApp/Db/basic_axis.db
-TEMPLATES += axisApp/Db/coordTrans2D.db
-TEMPLATES += axisApp/Db/axis.db
-TEMPLATES += axisApp/Db/axisUtil.db
-TEMPLATES += axisApp/Db/pseudoAxis.db
-TEMPLATES += axisApp/Db/softAxisTest.db
-TEMPLATES += axisApp/Db/EthercatMC.template
-TEMPLATES += axisApp/Db/EthercatMCdebug.template
-TEMPLATES += axisApp/Db/EthercatMChome.template
-TEMPLATES += axisApp/Db/IcePAP.template
+TEMPLATES += axisCore/Db/asyn_auto_power.db
+TEMPLATES += axisCore/Db/asyn_axis.db
+TEMPLATES += axisCore/Db/basic_asyn_axis.db
+TEMPLATES += axisCore/Db/basic_axis.db
+TEMPLATES += axisCore/Db/coordTrans2D.db
+TEMPLATES += axisCore/Db/axis.db
+TEMPLATES += axisCore/Db/axisUtil.db
+TEMPLATES += axisCore/Db/pseudoAxis.db
+TEMPLATES += axisCore/Db/softAxisTest.db
 
 
-DBDS += axisApp/AxisSrc/axisSupport.dbd
-DBDS += axisApp/AxisSrc/axisRecord.dbd
-#DBDS += axisApp/EthercatSrc/devEthercatMC.dbd
-#DBDS += axisApp/IcePAPsrc/IcePAPController.dbd
+DBDS += axisCore/AxisSrc/axisSupport.dbd
+DBDS += axisCore/AxisSrc/axisRecord.dbd
 
 SUBSTITUTIONS=-none-
 
 # What we need at ESS
-OPIS += axisApp/op/opi/
+OPIS += axisCore/op/opi/
 
 
 # What we need at ESS
-SOURCES += axisApp/AxisSrc/asynAxisAxis.cpp
-SOURCES += axisApp/AxisSrc/asynAxisController.cpp
-SOURCES += axisApp/AxisSrc/axisRecord.cc
-SOURCES += axisApp/AxisSrc/axisUtil.cc
-SOURCES += axisApp/AxisSrc/axisUtilAux.cc
-SOURCES += axisApp/AxisSrc/devAxisAsyn.c
-SOURCES += axisApp/AxisSrc/paramLib.c
+SOURCES += axisCore/AxisSrc/asynAxisAxis.cpp
+SOURCES += axisCore/AxisSrc/asynAxisController.cpp
+SOURCES += axisCore/AxisSrc/axisRecord.cc
+SOURCES += axisCore/AxisSrc/axisUtil.cc
+SOURCES += axisCore/AxisSrc/axisUtilAux.cc
+SOURCES += axisCore/AxisSrc/devAxisAsyn.c
+SOURCES += axisCore/AxisSrc/paramLib.c
 SOURCES += axisExApp/WithAsyn/WithAsynMain.c
+
+HEADERS = \
+  axisCore/AxisSrc/axis.h \
+  axisCore/AxisSrc/asynAxisAxis.h \
+  axisCore/AxisSrc/asynAxisController.h
