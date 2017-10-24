@@ -1,3 +1,6 @@
 [submodule "axisCore"]
 	path = axisCore
 	url = https://github.com/EPICS-motor-wg/axisCore.git
+[submodule "drivers/EthercatMC"]
+	path = drivers/EthercatMC
+	url = https://bitbucket.org/europeanspallationsource/m-epics-EthercatMC.git
