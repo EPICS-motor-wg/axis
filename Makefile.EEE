@@ -5,16 +5,12 @@ PROJECT=axis
 
 USR_DEPENDENCIES = asyn,4.31.0
 
-TEMPLATES += axisCore/Db/asyn_auto_power.db
-TEMPLATES += axisCore/Db/asyn_axis.db
-TEMPLATES += axisCore/Db/basic_asyn_axis.db
-TEMPLATES += axisCore/Db/basic_axis.db
-TEMPLATES += axisCore/Db/coordTrans2D.db
 TEMPLATES += axisCore/Db/axis.db
 TEMPLATES += axisCore/Db/axisUtil.db
+TEMPLATES += axisCore/Db/basic_asyn_axis.db
+TEMPLATES += axisCore/Db/basic_axis.db
 TEMPLATES += axisCore/Db/pseudoAxis.db
-TEMPLATES += axisCore/Db/softAxisTest.db
-
+TEMPLATES += axisCore/Db/trajectoryScan.db
 
 DBDS += axisCore/AxisSrc/axisSupport.dbd
 DBDS += axisCore/AxisSrc/axisRecord.dbd
@@ -33,7 +29,6 @@ SOURCES += axisCore/AxisSrc/axisUtil.cc
 SOURCES += axisCore/AxisSrc/axisUtilAux.cc
 SOURCES += axisCore/AxisSrc/devAxisAsyn.c
 SOURCES += axisCore/AxisSrc/paramLib.c
-SOURCES += axisExApp/WithAsyn/WithAsynMain.c
 
 HEADERS = \
   axisCore/AxisSrc/axis.h \
