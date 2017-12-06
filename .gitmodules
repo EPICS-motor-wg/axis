@@ -4,3 +4,6 @@
 [submodule "drivers/EthercatMC"]
 	path = drivers/EthercatMC
 	url = https://bitbucket.org/europeanspallationsource/m-epics-EthercatMC.git
+[submodule "axisTest"]
+	path = axisTest
+	url = https://github.com/EPICS-motor-wg/axisTest.git
