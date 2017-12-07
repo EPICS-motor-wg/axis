@@ -7,3 +7,6 @@
 [submodule "axisTest"]
 	path = axisTest
 	url = https://github.com/EPICS-motor-wg/axisTest.git
+[submodule "drivers/IcePAP"]
+	path = drivers/IcePAP
+	url = https://github.com/EuropeanSpallationSource/m-epics-IcePAP.git
