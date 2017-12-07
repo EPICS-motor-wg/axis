@@ -1,19 +1,64 @@
 #!/bin/sh
 set -e -x
 
-SUPPORT=$HOME/.cache/support
 
+###########################################
+
+SUPPORT=$HOME/.cache/support
+if test -z "$TRAVIS_BUILD_DIR"; then
+  TRAVIS_BUILD_DIR=$HOME/.cache/travis_build_dir
+  export TRAVIS_BUILD_DIR
+fi
+export SUPPORT
 install -d $SUPPORT
 install -d $TRAVIS_BUILD_DIR/configure
 
 RELEASE_PATH=$TRAVIS_BUILD_DIR/configure/RELEASE
 EPICS_BASE=$SUPPORT/epics-base
+export RELEASE_PATH EPICS_BASE
+
+
+# Helper functions
+create_AXIS_RELEASE_PATH_local()
+{
+  file=$1 &&
+  echo PWD=$PWD file=$file &&
+  cat >$file <<EOF
+EPICS_BASE  = $EPICS_BASE
+SUPPORT     = $SUPPORT
+EOF
+}
+  
+create_AXIS_RELEASE_LIBS_local()
+{
+  file=$1 &&
+  echo PWD=$PWD file=$file &&
+  cat >$file <<EOF
+ASYN        = $SUPPORT/asyn
+EOF
+}
+  
+create_DRIVERS_RELEASE_LIBS_local()
+{
+  file=$1 &&
+  echo PWD=$PWD file=$file &&
+  cat >$file <<EOF
+ASYN        = $SUPPORT/asyn
+AXIS        = $SUPPORT/axis
+EOF
+}
+
 
 cat << EOF > $RELEASE_PATH
-SNCSEQ=$SUPPORT/seq
 ASYN=$SUPPORT/asyn
 EPICS_BASE=$SUPPORT/epics-base
 EOF
+
+if [ -n "$SEQ" ]; then
+	  echo SNCSEQ=$SUPPORT/seq >> $RELEASE_PATH
+fi
+
+
 
 # use default selection for MSI
 #sed -i -e '/MSI/d' configure/CONFIG_SITE
@@ -21,7 +66,10 @@ EOF
 if [ ! -e "$EPICS_BASE/built" ] 
 then
 
-    git clone --depth 10 --branch $BASE https://github.com/epics-base/epics-base.git $EPICS_BASE
+    git clone --recursive https://github.com/epics-base/epics-base.git $EPICS_BASE &&
+    (
+        cd $EPICS_BASE && git checkout $BASE 
+    )
 
     EPICS_HOST_ARCH=`sh $EPICS_BASE/startup/EpicsHostArch`
 
@@ -114,7 +162,9 @@ fi
 
 
 # sequencer
-if [ ! -e "$SUPPORT/seq/built" ]; then
+if [ -z "$SEQ" ]; then
+ :
+elif [ ! -e "$SUPPORT/seq/built" ]; then
     echo "Build sequencer"
     install -d $SUPPORT/seq
     curl -L "http://www-csr.bessy.de/control/SoftDist/sequencer/releases/seq-${SEQ}.tar.gz" | tar -C $SUPPORT/seq -xvz --strip-components=1
@@ -128,12 +178,49 @@ fi
 
 # asyn
 if [ ! -e "$SUPPORT/asyn/built" ]; then
-    echo "Build asyn"
-    install -d $SUPPORT/asyn
-    curl -L "https://www.aps.anl.gov/epics/download/modules/asyn${ASYN}.tar.gz" | tar -C $SUPPORT/asyn -xvz --strip-components=1
+     echo "Build asyn"
+     git clone --recursive https://github.com/epics-modules/asyn.git $SUPPORT/asyn &&
+    (
+        cd $SUPPORT/asyn && git checkout $ASYN
+    )
     cp $RELEASE_PATH $SUPPORT/asyn/configure/RELEASE
     make -C "$SUPPORT/asyn" -j2
     touch $SUPPORT/asyn/built
 else
     echo "Using cached asyn"
+fi
+
+# axis with submdules
+if [ ! -e "$SUPPORT/axis/built" ]; then
+    echo "Build axis"
+    git clone . $SUPPORT/axis
+    (
+        cd $SUPPORT/axis
+        git submodule init
+        git submodule update
+        (
+          cd configure && 
+          create_AXIS_RELEASE_PATH_local RELEASE_PATHS.local &&
+          create_AXIS_RELEASE_LIBS_local RELEASE_LIBS.local
+        )
+        (
+          cd axisCore &&
+					make install	
+        )
+       for d in drivers/*; do
+       (
+          cd "$d" &&
+          (
+            echo SUB PWD=$PWD &&
+            cd configure &&
+            create_AXIS_RELEASE_PATH_local RELEASE_PATHS.local &&
+            create_DRIVERS_RELEASE_LIBS_local RELEASE_LIBS.local
+          ) &&
+        make 
+       )
+       done
+    ) 
+    touch $SUPPORT/axis/built
+else
+    echo "Using cached axis"
 fi
