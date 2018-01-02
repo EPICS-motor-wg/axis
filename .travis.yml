@@ -18,7 +18,7 @@ addons:
 env:
 # - BASE=R3.14.12.6 STATIC=shared                     SEQ=2.2.4 ASYN=R4-31
   - BASE=R3.15.5    STATIC=share                      SEQ=      ASYN=R4-31
-# - BASE=R3.15.5    STATIC=static                     SEQ=      ASYN=R4-31
+  - BASE=R3.15.5    STATIC=static                     SEQ=      ASYN=R4-31
 #   - BASE=R3.15.5  STATIC=shared RTEMS=4.10          SEQ=2.2.4 ASYN=R4-31
   - BASE=R3.16.1    STATIC=shared                     SEQ=      ASYN=R4-31
 #  - BASE=R3.16.1    STATIC=shared CMPLR=clang WINE=32 SEQ=      ASYN=R4-31
