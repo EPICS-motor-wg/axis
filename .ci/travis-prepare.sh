@@ -1,19 +1,11 @@
 #!/bin/sh
 set -e -x
 
-
-###########################################
-
 SUPPORT=$HOME/.cache/support
-if test -z "$TRAVIS_BUILD_DIR"; then
-  TRAVIS_BUILD_DIR=$HOME/.cache/travis_build_dir
-  export TRAVIS_BUILD_DIR
-fi
-export SUPPORT
-install -d $SUPPORT
-install -d $TRAVIS_BUILD_DIR/configure
 
-RELEASE_PATH=$TRAVIS_BUILD_DIR/configure/RELEASE
+install -d $SUPPORT
+
+RELEASE_PATH=$TRAVIS_BUILD_DIR/configure/RELEASE_XXX.local
 EPICS_BASE=$SUPPORT/epics-base
 export RELEASE_PATH EPICS_BASE
 
@@ -44,7 +36,7 @@ create_DRIVERS_RELEASE_LIBS_local()
   echo PWD=$PWD file=$file &&
   cat >$file <<EOF
 ASYN        = $SUPPORT/asyn
-AXIS        = $SUPPORT/axis
+AXIS        = $TRAVIS_BUILD_DIR
 EOF
 }
 
@@ -55,7 +47,7 @@ EPICS_BASE=$SUPPORT/epics-base
 EOF
 
 if [ -n "$SEQ" ]; then
-	  echo SNCSEQ=$SUPPORT/seq >> $RELEASE_PATH
+    echo SNCSEQ=$SUPPORT/seq >> $RELEASE_PATH
 fi
 
 
@@ -65,12 +57,20 @@ fi
 
 if [ ! -e "$EPICS_BASE/built" ] 
 then
-
-    git clone --recursive https://github.com/epics-base/epics-base.git $EPICS_BASE &&
-    (
-        cd $EPICS_BASE && git checkout $BASE 
-    )
-
+    case "$BASE" in
+    R3*)
+      git clone --depth 10 --branch $BASE https://github.com/epics-base/epics-base.git $EPICS_BASE
+      ;;
+    R7*)
+      git clone --recursive https://github.com/epics-base/epics-base.git $EPICS_BASE &&
+        (
+          cd $EPICS_BASE && git checkout $BASE 
+        )
+      ;;
+    *)
+      echo >&2 "Neither base 3.x nor base 7.x"
+      exit 1
+    esac
     EPICS_HOST_ARCH=`sh $EPICS_BASE/startup/EpicsHostArch`
 
     case "$STATIC" in
@@ -191,36 +191,29 @@ else
 fi
 
 # axis with submdules
-if [ ! -e "$SUPPORT/axis/built" ]; then
-    echo "Build axis"
-    git clone . $SUPPORT/axis
+echo "Build axis"
+(
+    git submodule init
+    git submodule update
     (
-        cd $SUPPORT/axis
-        git submodule init
-        git submodule update
-        (
-          cd configure && 
-          create_AXIS_RELEASE_PATH_local RELEASE_PATHS.local &&
-          create_AXIS_RELEASE_LIBS_local RELEASE_LIBS.local
-        )
-        (
-          cd axisCore &&
-					make install	
-        )
-       for d in drivers/*; do
-       (
-          cd "$d" &&
-          (
-            echo SUB PWD=$PWD &&
-            cd configure &&
-            create_AXIS_RELEASE_PATH_local RELEASE_PATHS.local &&
-            create_DRIVERS_RELEASE_LIBS_local RELEASE_LIBS.local
-          ) &&
-        make 
-       )
-       done
-    ) 
-    touch $SUPPORT/axis/built
-else
-    echo "Using cached axis"
-fi
+      cd configure && 
+      create_AXIS_RELEASE_PATH_local RELEASE_PATHS.local &&
+      create_AXIS_RELEASE_LIBS_local RELEASE_LIBS.local
+    )
+    (
+      cd axisCore &&
+      make install  
+    )
+   for d in drivers/*; do
+   (
+      cd "$d" &&
+      (
+        echo SUB PWD=$PWD &&
+        cd configure &&
+        create_AXIS_RELEASE_PATH_local RELEASE_PATHS.local &&
+        create_DRIVERS_RELEASE_LIBS_local RELEASE_LIBS.local
+      ) &&
+    make 
+   )
+   done
+) 
